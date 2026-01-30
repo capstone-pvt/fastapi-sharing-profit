@@ -26,6 +26,12 @@ class Settings:
     )
     upload_root = os.getenv("UPLOAD_ROOT", "uploads")
     model_root = os.getenv("MODEL_ROOT", "models")
+    classifier_model_path = os.getenv("CLASSIFIER_MODEL_PATH", "")
+    weight_model_path = os.getenv("WEIGHT_MODEL_PATH", "")
+    price_model_path = os.getenv("PRICE_MODEL_PATH", "")
+    detector_model_path = os.getenv("DETECTOR_MODEL_PATH", "")
+    detector_confidence = float(os.getenv("DETECTOR_CONFIDENCE", "0.25"))
+    detector_iou = float(os.getenv("DETECTOR_IOU", "0.45"))
 
 
 @lru_cache()
