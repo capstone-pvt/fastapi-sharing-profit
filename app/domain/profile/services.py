@@ -7,14 +7,30 @@ from typing import Any
 def validate_profile_update(payload: dict[str, Any]) -> None:
     if not payload:
         raise ValueError("No profile fields provided")
-    allowed = {"firstName", "lastName", "email", "companyName"}
+    allowed = {
+        "firstName",
+        "lastName",
+        "email",
+        "companyName",
+        "companyAddress",
+        "companyPhone",
+        "companyTaxId",
+    }
     if not any(field in payload for field in allowed):
         raise ValueError("No updatable fields provided")
 
 
 def build_profile_update_payload(payload: dict[str, Any]) -> dict[str, Any]:
     update_payload = {}
-    for field in ("firstName", "lastName", "email", "companyName"):
+    for field in (
+        "firstName",
+        "lastName",
+        "email",
+        "companyName",
+        "companyAddress",
+        "companyPhone",
+        "companyTaxId",
+    ):
         if field in payload:
             update_payload[field] = payload.get(field)
     update_payload["updatedAt"] = datetime.utcnow()

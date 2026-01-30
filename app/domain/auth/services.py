@@ -15,6 +15,9 @@ def validate_register_payload(payload: dict[str, Any]) -> dict[str, str | None]:
     last_name = payload.get("lastName")
     role_id = payload.get("roleId")
     company_name = payload.get("companyName")
+    company_address = payload.get("companyAddress")
+    company_phone = payload.get("companyPhone")
+    company_tax_id = payload.get("companyTaxId")
     if not email or not password or not first_name or not last_name:
         raise ValueError("Missing required fields")
     return {
@@ -24,6 +27,9 @@ def validate_register_payload(payload: dict[str, Any]) -> dict[str, str | None]:
         "lastName": last_name,
         "roleId": role_id,
         "companyName": company_name,
+        "companyAddress": company_address,
+        "companyPhone": company_phone,
+        "companyTaxId": company_tax_id,
     }
 
 
@@ -50,6 +56,9 @@ def build_user_doc(
     role_id: str,
     session_id: str | None = None,
     company_name: str | None = None,
+    company_address: str | None = None,
+    company_phone: str | None = None,
+    company_tax_id: str | None = None,
 ) -> dict[str, Any]:
     now = datetime.utcnow()
     user_doc = {
@@ -65,6 +74,12 @@ def build_user_doc(
         user_doc["sessionId"] = session_id
     if company_name:
         user_doc["companyName"] = company_name
+    if company_address:
+        user_doc["companyAddress"] = company_address
+    if company_phone:
+        user_doc["companyPhone"] = company_phone
+    if company_tax_id:
+        user_doc["companyTaxId"] = company_tax_id
     return user_doc
 
 
@@ -77,6 +92,9 @@ def build_auth_response(
     role_id: str,
     role_name: str | None,
     company_name: str | None,
+    company_address: str | None,
+    company_phone: str | None,
+    company_tax_id: str | None,
     permissions: list[str] | None,
     access_token: str,
     refresh_token: str,
@@ -91,6 +109,9 @@ def build_auth_response(
             "lastName": last_name,
             "role": {"id": role_id, "name": role_name},
             "companyName": company_name,
+            "companyAddress": company_address,
+            "companyPhone": company_phone,
+            "companyTaxId": company_tax_id,
             "permissions": permissions or [],
         },
     }
