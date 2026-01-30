@@ -23,10 +23,13 @@ async def get_current_user(request: Request) -> dict[str, Any]:
     user_id = payload.get("sub")
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    session_id = payload.get("sid")
 
     db = get_db()
     user = await db["users"].find_one({"_id": to_object_id(user_id)})
     if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    if not session_id or user.get("sessionId") != session_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     user_data = serialize_doc(user)

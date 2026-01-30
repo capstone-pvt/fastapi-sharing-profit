@@ -28,6 +28,43 @@ Optional:
 uvicorn app.main:app --reload --port 5000
 ```
 
+## Seed Broker Role/Permissions
+
+The API auto-seeds the Broker/Financer role and its default permissions on startup.
+You can also run the seeder manually:
+
+```
+python -m app.seeders.run_broker
+```
+
+## Seed Boat Owner Role/Permissions
+
+The API auto-seeds the Boat Owner role and its default permissions on startup.
+You can also run the seeder manually:
+
+```
+python -m app.seeders.run_boat_owner
+```
+
+## Seed All Roles/Permissions
+
+To seed Broker/Financer, Boat Owner, and Fisherman in one go:
+
+```
+python -m app.seeders.run_all
+```
+
+Or run the project root seeder:
+
+```
+python seed.py
+```
+
+## Backfill Default User Role
+
+The combined seeders will also assign the default `User` role to any existing
+users without a role.
+
 ## Notes
 
 - Collections use the same names as the NestJS implementation.

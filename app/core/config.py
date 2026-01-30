@@ -32,6 +32,8 @@ class Settings:
     detector_model_path = os.getenv("DETECTOR_MODEL_PATH", "")
     detector_confidence = float(os.getenv("DETECTOR_CONFIDENCE", "0.25"))
     detector_iou = float(os.getenv("DETECTOR_IOU", "0.45"))
+    size_small_max_kg = float(os.getenv("SIZE_SMALL_MAX_KG", "0.5"))
+    size_medium_max_kg = float(os.getenv("SIZE_MEDIUM_MAX_KG", "1.5"))
 
 
 @lru_cache()

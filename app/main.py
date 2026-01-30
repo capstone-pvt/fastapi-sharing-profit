@@ -3,7 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 
 from app.db import connect_db, disconnect_db
-from app.api.v1.api import api_router
+from app.api.v1 import api_router
+from app.seeders.roles_permissions import (
+    seed_admin_role_with_all_permissions,
+    seed_boat_owner_role_with_permissions,
+    seed_broker_role_with_permissions,
+    seed_fisherman_role_with_permissions,
+)
+from app.seeders.users import backfill_default_user_role
 
 
 load_dotenv()
@@ -14,6 +21,11 @@ app = FastAPI(title="Profit Sharing API (FastAPI)")
 @app.on_event("startup")
 async def startup_event() -> None:
     await connect_db()
+    await seed_broker_role_with_permissions()
+    await seed_boat_owner_role_with_permissions()
+    await seed_fisherman_role_with_permissions()
+    await seed_admin_role_with_all_permissions()
+    await backfill_default_user_role()
 
 
 @app.on_event("shutdown")
