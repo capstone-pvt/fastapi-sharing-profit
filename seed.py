@@ -7,7 +7,7 @@ from app.seeders.roles_permissions import (
     seed_broker_role_with_permissions,
     seed_fisherman_role_with_permissions,
 )
-from app.seeders.users import backfill_default_user_role
+from app.seeders.users import backfill_default_user_role, seed_default_role_users
 
 
 async def main() -> None:
@@ -18,6 +18,7 @@ async def main() -> None:
         await seed_fisherman_role_with_permissions()
         await seed_admin_role_with_all_permissions()
         await backfill_default_user_role()
+        await seed_default_role_users()
         print(
             "Broker, Boat Owner, Fisherman, and Admin roles/permissions seeded."
         )

@@ -17,6 +17,8 @@ from app.infrastructure.users.repository import (
     list_users as repo_list_users,
     update_user as repo_update_user,
 )
+from app.infrastructure.roles.repository import get_role
+from app.db import get_db
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -54,6 +56,47 @@ async def create_user(
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     if not payload.get("companyName") and user.get("companyName"):
         payload["companyName"] = user["companyName"]
+    if payload.get("email") and payload["email"].strip().lower() == user.get("email", "").lower():
+        raise HTTPException(status_code=400, detail="Cannot create your own account")
+    role_id = payload.get("roleId")
+    if role_id:
+        role = await get_role(role_id)
+        role_name = role.get("name") if role else None
+        if role_name and role_name.lower() in {
+            "admin",
+            "system admin",
+            "superadmin",
+            "super admin",
+            "super-admin",
+        }:
+            raise HTTPException(status_code=403, detail="Cannot assign admin roles")
+    if role_id:
+        role = await get_role(role_id)
+        role_name = role.get("name") if role else None
+        if role_name and role_name.lower() in {
+            "admin",
+            "system admin",
+            "superadmin",
+            "super admin",
+            "super-admin",
+        }:
+            raise HTTPException(status_code=403, detail="Cannot assign admin roles")
+    if role_id and payload.get("companyName"):
+        db = get_db()
+        name = payload.get("companyName", "").strip()
+        if name:
+            await db["companies"].update_one(
+                {"companyName": {"$regex": f"^{name}$", "$options": "i"}},
+                {
+                    "$setOnInsert": {
+                        "companyName": name,
+                        "companyAddress": payload.get("companyAddress"),
+                        "companyPhone": payload.get("companyPhone"),
+                        "companyTaxId": payload.get("companyTaxId"),
+                    }
+                },
+                upsert=True,
+            )
     user_payload = build_create_user_payload(payload, hash_password=hash_password)
     return await repo_create_user(user_payload)
 
@@ -64,7 +107,39 @@ async def update_user(
     payload: dict[str, Any] = Body(...),
     user: dict[str, Any] = Depends(get_current_user),
 ):
-    payload.pop("companyName", None)
+    role_id = user.get("roleId")
+    if not role_id and isinstance(user.get("role"), dict):
+        role_id = user.get("role", {}).get("id")
+    role = await get_role(role_id) if role_id else None
+    role_name = (role.get("name") if role else None) or ""
+    is_admin = role_name.lower() in {
+        "admin",
+        "system admin",
+        "superadmin",
+        "super admin",
+        "super-admin",
+    }
+    if not is_admin:
+        payload.pop("companyName", None)
+        payload.pop("companyAddress", None)
+        payload.pop("companyPhone", None)
+        payload.pop("companyTaxId", None)
+    if is_admin and payload.get("companyName"):
+        db = get_db()
+        name = payload.get("companyName", "").strip()
+        if name:
+            await db["companies"].update_one(
+                {"companyName": {"$regex": f"^{name}$", "$options": "i"}},
+                {
+                    "$setOnInsert": {
+                        "companyName": name,
+                        "companyAddress": payload.get("companyAddress"),
+                        "companyPhone": payload.get("companyPhone"),
+                        "companyTaxId": payload.get("companyTaxId"),
+                    }
+                },
+                upsert=True,
+            )
     update_payload = build_update_user_payload(payload, hash_password=hash_password)
     doc = await repo_update_user(user_id, update_payload)
     if not doc:

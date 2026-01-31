@@ -16,10 +16,22 @@ from app.infrastructure.profile.repository import (
     update_profile,
 )
 from app.infrastructure.roles.repository import get_role_permissions_names
+from app.infrastructure.auth.repository import get_role_by_id
 from app.infrastructure.profile.storage import save_profile_avatar
 
 
 router = APIRouter(prefix="/profile", tags=["profile"])
+
+def _get_role_id(profile: dict[str, Any]) -> str | None:
+    role_id = profile.get("roleId")
+    if role_id:
+        return role_id
+    role_value = profile.get("role")
+    if isinstance(role_value, dict):
+        return role_value.get("id")
+    if isinstance(role_value, str):
+        return role_value
+    return None
 
 
 @router.get("")
@@ -27,7 +39,10 @@ async def fetch_profile(user: dict[str, Any] = Depends(get_current_user)):
     profile = await get_profile(user["id"])
     if not profile:
         raise HTTPException(status_code=404, detail="User not found")
-    role_id = profile.get("roleId") or profile.get("role", {}).get("id")
+    role_id = _get_role_id(profile)
+    role = await get_role_by_id(role_id) if role_id else None
+    if role_id:
+        profile["role"] = {"id": role_id, "name": role.get("name") if role else None}
     profile["permissions"] = (
         await get_role_permissions_names(role_id) if role_id else []
     )
@@ -47,7 +62,10 @@ async def patch_profile(
     profile = await update_profile(user["id"], update_payload)
     if not profile:
         raise HTTPException(status_code=404, detail="User not found")
-    role_id = profile.get("roleId") or profile.get("role", {}).get("id")
+    role_id = _get_role_id(profile)
+    role = await get_role_by_id(role_id) if role_id else None
+    if role_id:
+        profile["role"] = {"id": role_id, "name": role.get("name") if role else None}
     profile["permissions"] = (
         await get_role_permissions_names(role_id) if role_id else []
     )
@@ -67,7 +85,10 @@ async def upload_avatar(
     profile = await update_avatar(user["id"], image_url)
     if not profile:
         raise HTTPException(status_code=404, detail="User not found")
-    role_id = profile.get("roleId") or profile.get("role", {}).get("id")
+    role_id = _get_role_id(profile)
+    role = await get_role_by_id(role_id) if role_id else None
+    if role_id:
+        profile["role"] = {"id": role_id, "name": role.get("name") if role else None}
     profile["permissions"] = (
         await get_role_permissions_names(role_id) if role_id else []
     )

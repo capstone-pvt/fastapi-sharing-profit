@@ -4,7 +4,7 @@ from typing import Any
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
 
 from app.core.config import get_settings
-from app.deps import get_current_user, require_roles
+from app.deps import get_current_user, require_permissions, require_roles
 from app.domain.fish_training_samples.services import (
     build_sample_doc,
     build_samples_query,
@@ -24,7 +24,7 @@ from app.infrastructure.fish_training_samples.storage import save_training_uploa
 router = APIRouter(prefix="/fish/training-samples", tags=["fish-training"])
 
 
-@router.post("")
+@router.post("", dependencies=[Depends(require_permissions("training-samples:create"))])
 async def create_sample(
     image: UploadFile = File(...),
     payload: dict[str, Any] = Body(...),
@@ -37,16 +37,21 @@ async def create_sample(
         image, Path(settings.upload_root) / "fish-training"
     )
     image_url = f"/uploads/fish-training/{image_path.name}"
+    full_name = " ".join(
+        part for part in [user.get("firstName"), user.get("lastName")] if part
+    ).strip()
+    trained_by = full_name if full_name else user.get("email")
     doc = build_sample_doc(
         payload=payload,
         user_id=user["id"],
         image_path=str(image_path),
         image_url=image_url,
+        trained_by=trained_by,
     )
     return await repo_create_sample(doc)
 
 
-@router.get("", dependencies=[Depends(require_roles("admin"))])
+@router.get("", dependencies=[Depends(require_permissions("training-samples:read"))])
 async def list_samples(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
@@ -57,7 +62,7 @@ async def list_samples(
     return {"results": results, "total": total, "limit": limit, "offset": offset}
 
 
-@router.get("/mine")
+@router.get("/mine", dependencies=[Depends(require_permissions("training-samples:read"))])
 async def list_my_samples(
     user: dict[str, Any] = Depends(get_current_user),
     limit: int = Query(50, ge=1, le=500),

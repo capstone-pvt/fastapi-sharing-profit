@@ -222,6 +222,30 @@ async def ensure_default_permissions() -> dict[str, str]:
             "description": "Delete users",
         },
         {
+            "name": "companies:read",
+            "resource": "companies",
+            "action": "read",
+            "description": "View companies",
+        },
+        {
+            "name": "companies:create",
+            "resource": "companies",
+            "action": "create",
+            "description": "Create companies",
+        },
+        {
+            "name": "companies:update",
+            "resource": "companies",
+            "action": "update",
+            "description": "Update companies",
+        },
+        {
+            "name": "companies:delete",
+            "resource": "companies",
+            "action": "delete",
+            "description": "Delete companies",
+        },
+        {
             "name": "forecasts:read",
             "resource": "forecasts",
             "action": "read",

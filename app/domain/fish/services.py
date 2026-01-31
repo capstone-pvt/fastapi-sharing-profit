@@ -47,11 +47,21 @@ async def apply_estimates_to_detections(
         bbox = detection.get("boundingBox") or {}
         bbox_width = float(bbox.get("width") or 0.0)
         bbox_height = float(bbox.get("height") or 0.0)
+        bbox_x = float(bbox.get("x") or 0.0)
+        bbox_y = float(bbox.get("y") or 0.0)
         species = detection.get("species")
         species_index = await get_species_index(species)
         length_cm, width_cm = estimate_cm_from_scale(
             int(bbox_width), int(bbox_height), scale_reference_cm
         )
+        if bbox_width >= bbox_height:
+            mouth = {"x": bbox_x, "y": bbox_y + (bbox_height / 2)}
+            tail = {"x": bbox_x + bbox_width, "y": bbox_y + (bbox_height / 2)}
+            pixel_length = bbox_width
+        else:
+            mouth = {"x": bbox_x + (bbox_width / 2), "y": bbox_y}
+            tail = {"x": bbox_x + (bbox_width / 2), "y": bbox_y + bbox_height}
+            pixel_length = bbox_height
         estimated_weight = estimate_weight(
             species_index,
             bbox_width,
@@ -66,6 +76,13 @@ async def apply_estimates_to_detections(
                 **detection,
                 "estimatedWeight": estimated_weight,
                 "sizeCategory": size_category,
+                "lengthCm": length_cm,
+                "widthCm": width_cm,
+                "pixelLength": pixel_length,
+                "keypoints": {
+                    "mouth": mouth,
+                    "tail": tail,
+                },
             }
         )
     return enriched
@@ -78,6 +95,9 @@ async def build_analysis(
     image_url: str,
     scale_reference_cm: float | None,
     single_fish: bool | None,
+    image_width: int | None = None,
+    image_height: int | None = None,
+    scanned_by: str | None = None,
     get_species_index: Callable[[str | None], Awaitable[int]],
     estimate_price: Callable[[int, float], float],
 ) -> dict[str, Any]:
@@ -103,4 +123,7 @@ async def build_analysis(
         "analyzedAt": datetime.utcnow().isoformat(),
         "singleFish": single_fish,
         "scaleReferenceCm": scale_reference_cm,
+        "imageWidth": image_width,
+        "imageHeight": image_height,
+        "scannedBy": scanned_by,
     }

@@ -149,6 +149,46 @@ async def ensure_default_roles(
             "createdAt": now,
             "updatedAt": now,
         },
+        {
+            "name": "Admin",
+            "description": "Administrator role",
+            "permissions": [],
+            "isActive": True,
+            "createdAt": now,
+            "updatedAt": now,
+        },
+        {
+            "name": "System Admin",
+            "description": "System administrator role",
+            "permissions": [],
+            "isActive": True,
+            "createdAt": now,
+            "updatedAt": now,
+        },
+        {
+            "name": "Superadmin",
+            "description": "Super administrator role",
+            "permissions": [],
+            "isActive": True,
+            "createdAt": now,
+            "updatedAt": now,
+        },
+        {
+            "name": "Super Admin",
+            "description": "Super admin role",
+            "permissions": [],
+            "isActive": True,
+            "createdAt": now,
+            "updatedAt": now,
+        },
+        {
+            "name": "Super-Admin",
+            "description": "Super admin role",
+            "permissions": [],
+            "isActive": True,
+            "createdAt": now,
+            "updatedAt": now,
+        },
     ]
     for payload in defaults:
         name = payload["name"]

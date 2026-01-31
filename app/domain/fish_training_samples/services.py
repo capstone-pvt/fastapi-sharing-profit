@@ -10,6 +10,7 @@ def build_sample_doc(
     user_id: str,
     image_path: str,
     image_url: str,
+    trained_by: str | None = None,
 ) -> dict[str, Any]:
     now = datetime.utcnow()
     doc = {
@@ -27,6 +28,7 @@ def build_sample_doc(
         "capturedAt": payload.get("capturedAt"),
         "createdAt": now,
         "updatedAt": now,
+        "trainedBy": trained_by,
     }
     if all(
         key in payload

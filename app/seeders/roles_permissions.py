@@ -28,6 +28,7 @@ async def seed_broker_role_with_permissions() -> None:
         permission_ids.get("expenses:update"),
         permission_ids.get("expenses:delete"),
         permission_ids.get("cash-advances:read"),
+        permission_ids.get("cash-advances:update"),
         permission_ids.get("cash-advances:approve"),
         permission_ids.get("cash-advances:decline"),
         permission_ids.get("training-samples:create"),
@@ -64,10 +65,12 @@ async def seed_boat_owner_role_with_permissions() -> None:
         permission_ids.get("cash-advances:decline"),
         permission_ids.get("cash-advances:update"),
         permission_ids.get("forecasts:read"),
+        permission_ids.get("training-samples:read"),
     ]
     await ensure_default_roles(
         {
             "Boat Owner": [pid for pid in boat_owner_permissions if pid],
+            "Vessel Owner": [pid for pid in boat_owner_permissions if pid],
         }
     )
 
@@ -97,5 +100,6 @@ async def seed_admin_role_with_all_permissions() -> None:
             "Superadmin": all_permissions,
             "Super Admin": all_permissions,
             "Super-Admin": all_permissions,
+            "System Admin": all_permissions,
         }
     )

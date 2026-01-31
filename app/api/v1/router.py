@@ -8,6 +8,7 @@ from app.api.v1.fish_training_samples.routes import (
     router as fish_training_router,
 )
 from app.api.v1.profile.routes import router as profile_router
+from app.api.v1.companies.routes import router as companies_router
 from app.api.v1.permissions.routes import router as permissions_router
 from app.api.v1.roles.routes import router as roles_router
 from app.api.v1.shared.crud import build_crud_router
@@ -26,82 +27,135 @@ api_router.include_router(fish_models_router)
 api_router.include_router(fish_species_router)
 api_router.include_router(fish_training_router)
 api_router.include_router(profile_router)
+api_router.include_router(companies_router)
 
 api_router.include_router(
-    build_crud_router("vessels"),
+    build_crud_router(
+        "vessels",
+        permissions={
+            "create": "vessels:create",
+            "read": "vessels:read",
+            "update": "vessels:update",
+            "delete": "vessels:delete",
+        },
+    ),
     prefix="/vessels",
     tags=["vessels"],
-    dependencies=[
-        Depends(
-            require_roles("admin", "system admin", "broker", "financer")
-        )
-    ],
 )
 api_router.include_router(
-    build_crud_router("vessel_owners"),
+    build_crud_router(
+        "vessel_owners",
+        permissions={
+            "create": "vessel-owners:create",
+            "read": "vessel-owners:read",
+            "update": "vessel-owners:update",
+            "delete": "vessel-owners:delete",
+        },
+    ),
     prefix="/vessel-owners",
     tags=["vessel-owners"],
-    dependencies=[
-        Depends(
-            require_roles("admin", "system admin", "broker", "financer")
-        )
-    ],
 )
 api_router.include_router(
-    build_crud_router("trips"),
+    build_crud_router(
+        "trips",
+        permissions={
+            "create": "trips:create",
+            "read": "trips:read",
+            "update": "trips:update",
+            "delete": "trips:delete",
+        },
+    ),
     prefix="/trips",
     tags=["trips"],
-    dependencies=[
-        Depends(
-            require_roles("admin", "system admin", "broker", "financer", "boat owner")
-        )
-    ],
 )
 api_router.include_router(
-    build_crud_router("expenses"),
+    build_crud_router(
+        "expenses",
+        permissions={
+            "create": "expenses:create",
+            "read": "expenses:read",
+            "update": "expenses:update",
+            "delete": "expenses:delete",
+        },
+    ),
     prefix="/expenses",
     tags=["expenses"],
-    dependencies=[
-        Depends(
-            require_roles("admin", "system admin", "broker", "financer", "boat owner")
-        )
-    ],
 )
 api_router.include_router(
-    build_crud_router("fish_sales"),
+    build_crud_router(
+        "fish_sales",
+        permissions={
+            "create": "fish-sales:create",
+            "read": "fish-sales:read",
+            "update": "fish-sales:update",
+            "delete": "fish-sales:delete",
+        },
+    ),
     prefix="/fish-sales",
     tags=["fish-sales"],
-    dependencies=[
-        Depends(
-            require_roles("admin", "system admin", "broker", "financer", "boat owner")
-        )
-    ],
 )
 api_router.include_router(
-    build_crud_router("cash_advances"),
+    build_crud_router(
+        "cash_advances",
+        permissions={
+            "create": "cash-advances:create",
+            "read": "cash-advances:read",
+            "update": "cash-advances:update",
+            "delete": "cash-advances:update",
+        },
+    ),
     prefix="/cash-advances",
     tags=["cash-advances"],
-    dependencies=[
-        Depends(
-            require_roles(
-                "admin",
-                "system admin",
-                "broker",
-                "financer",
-                "boat owner",
-                "vessel owner",
-                "fisherman",
-            )
-        )
-    ],
 )
 api_router.include_router(
-    build_crud_router("forecasts"),
+    build_crud_router(
+        "forecasts",
+        permissions={
+            "read": "forecasts:read",
+        },
+        allowed_actions={"read"},
+    ),
     prefix="/forecasts",
     tags=["forecasts"],
-    dependencies=[
-        Depends(
-            require_roles("admin", "system admin", "broker", "financer")
-        )
-    ],
+)
+
+api_router.include_router(
+    build_crud_router(
+        "catches",
+        permissions={
+            "create": "catches:create",
+            "read": "catches:read",
+            "update": "catches:update",
+            "delete": "catches:delete",
+        },
+    ),
+    prefix="/catches",
+    tags=["catches"],
+)
+
+api_router.include_router(
+    build_crud_router(
+        "profit_shares",
+        permissions={
+            "create": "profit-shares:generate",
+            "read": "profit-shares:read",
+        },
+        allowed_actions={"create", "read"},
+    ),
+    prefix="/profit-shares",
+    tags=["profit-shares"],
+)
+
+api_router.include_router(
+    build_crud_router(
+        "profit_sharing_policies",
+        permissions={
+            "create": "profit-sharing-policies:create",
+            "read": "profit-sharing-policies:read",
+            "update": "profit-sharing-policies:update",
+            "delete": "profit-sharing-policies:delete",
+        },
+    ),
+    prefix="/profit-sharing-policies",
+    tags=["profit-sharing-policies"],
 )

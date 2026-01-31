@@ -99,12 +99,19 @@ async def analyze_fish(
     if singleFish and detections:
         detections = [detections[0]]
 
+    full_name = " ".join(
+        part for part in [user.get("firstName"), user.get("lastName")] if part
+    ).strip()
+    scanned_by = full_name if full_name else user.get("email")
     analysis = await build_analysis(
         detections,
         user_id=user["id"],
         image_url=image_url,
         scale_reference_cm=scaleReferenceCm,
         single_fish=singleFish,
+        image_width=width,
+        image_height=height,
+        scanned_by=scanned_by,
         get_species_index=get_species_index,
         estimate_price=estimate_price,
     )
