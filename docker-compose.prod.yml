@@ -1,0 +1,108 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: profit-sharing-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - profit-sharing-network
+    command: mongod --auth
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: profit-sharing-api:latest
+    container_name: profit-sharing-api
+    restart: always
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - DATABASE_NAME=${DATABASE_NAME:-profit_sharing_db}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-15m}
+      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION:-7d}
+      - JWT_REFRESH_EXPIRATION_DAYS=${JWT_REFRESH_EXPIRATION_DAYS:-7}
+      - UPLOAD_ROOT=${UPLOAD_ROOT:-uploads}
+      - MODEL_ROOT=${MODEL_ROOT:-models}
+      - CLASSIFIER_MODEL_PATH=${CLASSIFIER_MODEL_PATH:-models/classifier/best.pt}
+      - DETECTOR_MODEL_PATH=${DETECTOR_MODEL_PATH:-models/detector/best.pt}
+      - WEIGHT_MODEL_PATH=${WEIGHT_MODEL_PATH:-models/weight/weight_model.joblib}
+      - PRICE_MODEL_PATH=${PRICE_MODEL_PATH:-models/price/price_model.joblib}
+      - DETECTOR_CONFIDENCE=${DETECTOR_CONFIDENCE:-0.25}
+      - DETECTOR_IOU=${DETECTOR_IOU:-0.45}
+      - WORKERS=${WORKERS:-4}
+      - MAX_WORKERS=${MAX_WORKERS:-8}
+      - TIMEOUT=${TIMEOUT:-120}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./models:/app/models
+      - ./logs:/app/logs
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - profit-sharing-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 4G
+        reservations:
+          cpus: '1'
+          memory: 2G
+
+  nginx:
+    image: nginx:alpine
+    container_name: profit-sharing-nginx
+    restart: always
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - api
+    networks:
+      - profit-sharing-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  profit-sharing-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
