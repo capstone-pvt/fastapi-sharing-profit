@@ -1,4 +1,5 @@
-# Multi-stage build for production
+# Alternative Alpine-based Dockerfile (smaller but may have compatibility issues)
+# Use Dockerfile (Debian-based) for better compatibility with ML libraries
 
 # Stage 1: Builder stage
 FROM python:3.11-slim as builder
@@ -17,6 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     git \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements file
@@ -45,16 +47,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     MAX_WORKERS=8 \
     TIMEOUT=120
 
-# Install runtime dependencies only
+# Install runtime dependencies
+# This version is more minimal - only essential packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1 \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender1 \
-    libgomp1 \
-    libgcc-s1 \
-    libstdc++6 \
     curl \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*

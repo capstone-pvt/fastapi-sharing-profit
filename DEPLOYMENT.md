@@ -274,6 +274,37 @@ For multiple API instances:
 
 ## Troubleshooting
 
+### Docker Build Failures
+
+**Issue:** Package installation fails with exit code 100
+
+```bash
+# Error: apt-get install failed
+# Solution: The package names may be incorrect or unavailable
+```
+
+**Fix:**
+The updated Dockerfile uses compatible package names:
+- `libgl1` instead of `libgl1-mesa-glx`
+- `libxrender1` instead of `libxrender-dev`
+
+If build still fails, try the minimal version:
+```bash
+# Use Dockerfile.alpine (minimal dependencies)
+docker build -f Dockerfile.alpine -t profit-sharing-api:latest .
+```
+
+**Issue:** Build takes too long or runs out of memory
+
+**Solution:**
+```bash
+# Build with resource limits
+docker build --memory=4g --memory-swap=4g -t profit-sharing-api:latest .
+
+# Or use BuildKit for better caching
+DOCKER_BUILDKIT=1 docker build -t profit-sharing-api:latest .
+```
+
 ### API Not Starting
 
 ```bash
@@ -284,6 +315,18 @@ docker-compose -f docker-compose.prod.yml logs api
 # 1. MongoDB not ready - wait for health check
 # 2. Missing models - verify models/ directory
 # 3. Permission errors - check file ownership
+# 4. Package dependencies - check if all system packages installed
+```
+
+**Issue:** ImportError for OpenCV or ML libraries
+
+**Solution:**
+```bash
+# Verify packages are installed in container
+docker exec profit-sharing-api apt list --installed | grep -E "libgl|libglib|opencv"
+
+# Rebuild with full dependencies
+docker-compose -f docker-compose.prod.yml build --no-cache
 ```
 
 ### Database Connection Failed
