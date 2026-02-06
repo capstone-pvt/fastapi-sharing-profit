@@ -9,6 +9,7 @@ from app.api.v1.fish_training_samples.routes import (
 )
 from app.api.v1.profile.routes import router as profile_router
 from app.api.v1.companies.routes import router as companies_router
+from app.api.v1.cash_advances.routes import router as cash_advances_router
 from app.api.v1.permissions.routes import router as permissions_router
 from app.api.v1.roles.routes import router as roles_router
 from app.api.v1.shared.crud import build_crud_router
@@ -28,7 +29,21 @@ api_router.include_router(fish_species_router)
 api_router.include_router(fish_training_router)
 api_router.include_router(profile_router)
 api_router.include_router(companies_router)
+api_router.include_router(cash_advances_router)
 
+api_router.include_router(
+    build_crud_router(
+        "boats",
+        permissions={
+            "create": "boats:create",
+            "read": "boats:read",
+            "update": "boats:update",
+            "delete": "boats:delete",
+        },
+    ),
+    prefix="/boats",
+    tags=["boats"],
+)
 api_router.include_router(
     build_crud_router(
         "vessels",
@@ -112,8 +127,11 @@ api_router.include_router(
         "forecasts",
         permissions={
             "read": "forecasts:read",
+            "create": "forecasts:create",
+            "update": "forecasts:update",
+            "delete": "forecasts:delete",
         },
-        allowed_actions={"read"},
+        allowed_actions={"create", "read", "update", "delete"},
     ),
     prefix="/forecasts",
     tags=["forecasts"],

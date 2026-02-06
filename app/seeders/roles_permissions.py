@@ -7,6 +7,10 @@ from app.infrastructure.roles.repository import ensure_default_roles
 async def seed_broker_role_with_permissions() -> None:
     permission_ids = await ensure_default_permissions()
     broker_permissions = [
+        permission_ids.get("boats:create"),
+        permission_ids.get("boats:read"),
+        permission_ids.get("boats:update"),
+        permission_ids.get("boats:delete"),
         permission_ids.get("vessels:create"),
         permission_ids.get("vessels:read"),
         permission_ids.get("vessels:update"),
@@ -34,6 +38,9 @@ async def seed_broker_role_with_permissions() -> None:
         permission_ids.get("training-samples:create"),
         permission_ids.get("training-samples:read"),
         permission_ids.get("forecasts:read"),
+        permission_ids.get("forecasts:create"),
+        permission_ids.get("forecasts:update"),
+        permission_ids.get("forecasts:delete"),
     ]
     await ensure_default_roles(
         {
@@ -45,6 +52,10 @@ async def seed_broker_role_with_permissions() -> None:
 async def seed_boat_owner_role_with_permissions() -> None:
     permission_ids = await ensure_default_permissions()
     boat_owner_permissions = [
+        permission_ids.get("boats:create"),
+        permission_ids.get("boats:read"),
+        permission_ids.get("boats:update"),
+        permission_ids.get("boats:delete"),
         permission_ids.get("fishermen:create"),
         permission_ids.get("fishermen:read"),
         permission_ids.get("fishermen:update"),
