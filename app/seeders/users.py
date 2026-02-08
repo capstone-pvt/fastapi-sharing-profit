@@ -12,6 +12,7 @@ from app.infrastructure.auth.repository import (
     get_user_by_email,
 )
 from app.infrastructure.roles.repository import RoleNames
+from app.seeders.companies import DEFAULT_COMPANIES
 
 
 async def backfill_default_user_role() -> int:
@@ -35,24 +36,35 @@ DEFAULT_ROLE_USERS = [
         "email": "broker@example.com",
         "first_name": "Broker",
         "last_name": "User",
+        "company_key": "company_a",
     },
     {
         "role_names": [RoleNames.OWNER],
         "email": "owner@example.com",
         "first_name": "Vessel",
         "last_name": "Owner",
+        "company_key": "company_a",
     },
     {
         "role_names": [RoleNames.CREW],
         "email": "crew@example.com",
         "first_name": "Crew",
         "last_name": "Member",
+        "company_key": "company_a",
     },
     {
         "role_names": [RoleNames.ADMIN],
         "email": "admin@example.com",
         "first_name": "Admin",
         "last_name": "User",
+        "company_key": "company_a",
+    },
+    {
+        "role_names": [RoleNames.ADMIN],
+        "email": "admin2@example.com",
+        "first_name": "Admin",
+        "last_name": "Two",
+        "company_key": "company_b",
     },
     {
         "role_names": [RoleNames.SUPER],
@@ -69,6 +81,17 @@ async def seed_default_role_users(
     db = get_db()
     created = 0
     updated = 0
+    company_lookup: dict[str, dict] = {}
+    for company in DEFAULT_COMPANIES:
+        key = company.get("key")
+        code = (company.get("companyCode") or "").strip()
+        name = (company.get("companyName") or "").strip()
+        query = {"companyName": {"$regex": f"^{re.escape(name)}$", "$options": "i"}}
+        if code:
+            query = {"companyCode": {"$regex": f"^{re.escape(code)}$", "$options": "i"}}
+        company_doc = await db["companies"].find_one(query)
+        if key and company_doc:
+            company_lookup[key] = company_doc
     for user in DEFAULT_ROLE_USERS:
         role = None
         for role_name in user["role_names"]:
@@ -77,17 +100,36 @@ async def seed_default_role_users(
                 break
         if not role:
             continue
+        company_doc = None
+        company_key = user.get("company_key")
+        if company_key:
+            company_doc = company_lookup.get(company_key)
+        company_id = str(company_doc["_id"]) if company_doc else None
         hashed = hash_password(default_password)
         existing = await get_user_by_email(user["email"])
         if existing:
+            update_fields = {
+                "password": hashed,
+                "role": role["_id"],
+                "updatedAt": datetime.utcnow(),
+                "companyApproved": True,
+            }
+            unset_fields: dict[str, str] = {
+                "companyName": "",
+                "companyCode": "",
+                "companyAddress": "",
+                "companyPhone": "",
+                "companyTaxId": "",
+            }
+            if company_doc:
+                update_fields["companyId"] = company_doc["_id"]
+            else:
+                unset_fields["companyId"] = ""
             await db["users"].update_one(
                 {"_id": existing["_id"]},
                 {
-                    "$set": {
-                        "password": hashed,
-                        "role": role["_id"],
-                        "updatedAt": datetime.utcnow(),
-                    }
+                    "$set": update_fields,
+                    "$unset": unset_fields,
                 },
             )
             updated += 1
@@ -98,7 +140,9 @@ async def seed_default_role_users(
             first_name=user["first_name"],
             last_name=user["last_name"],
             role_id=str(role["_id"]),
+            company_id=company_id,
         )
+        user_doc["companyApproved"] = True
         await create_user(user_doc)
         created += 1
     return created + updated

@@ -153,6 +153,20 @@ api_router.include_router(
 
 api_router.include_router(
     build_crud_router(
+        "crew",
+        permissions={
+            "create": "fishermen:create",
+            "read": "fishermen:read",
+            "update": "fishermen:update",
+            "delete": "fishermen:delete",
+        },
+    ),
+    prefix="/crew",
+    tags=["crew"],
+)
+
+api_router.include_router(
+    build_crud_router(
         "profit_shares",
         permissions={
             "create": "profit-shares:generate",

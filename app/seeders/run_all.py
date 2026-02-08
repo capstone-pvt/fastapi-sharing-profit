@@ -8,7 +8,7 @@ from app.seeders.roles_permissions import (
     seed_fisherman_role_with_permissions,
 )
 from app.seeders.users import backfill_default_user_role, seed_default_role_users
-from app.seeders.companies import seed_default_company_and_assign_to_users
+from app.seeders.companies import seed_default_companies
 
 
 async def main() -> None:
@@ -19,15 +19,12 @@ async def main() -> None:
         await seed_fisherman_role_with_permissions()
         await seed_admin_role_with_all_permissions()
         await backfill_default_user_role()
+        created_count, _ = await seed_default_companies()
         await seed_default_role_users()
-        company_created, users_updated = await seed_default_company_and_assign_to_users()
         print(
             "Broker, Boat Owner, Fisherman, and Admin roles/permissions seeded."
         )
-        print(
-            f"Default company: {'created' if company_created else 'already exists'}; "
-            f"users assigned: {users_updated}."
-        )
+        print(f"Default companies created: {created_count}.")
     finally:
         await disconnect_db()
 

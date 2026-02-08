@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, Body, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
 
 from app.deps import require_roles
 from app.domain.fish_models.services import (
@@ -71,6 +71,19 @@ async def update_model(model_id: str, payload: dict[str, Any] = Body(...)):
 @router.patch("/{model_id}/activate", dependencies=[Depends(require_roles("admin"))])
 async def activate_model(model_id: str):
     doc = await repo_activate_model(model_id)
+    if not doc:
+        raise HTTPException(status_code=404, detail="Model not found")
+    return doc
+
+
+@router.delete("/{model_id}", dependencies=[Depends(require_roles("admin"))])
+async def delete_model(
+    model_id: str, status: str = Query("cancelled", regex="^(cancelled|rejected)$")
+):
+    model_payload = build_update_model_payload(
+        {"status": status, "isActive": False}
+    )
+    doc = await repo_update_model(model_id, model_payload)
     if not doc:
         raise HTTPException(status_code=404, detail="Model not found")
     return doc
