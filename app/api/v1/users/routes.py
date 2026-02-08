@@ -153,6 +153,12 @@ async def create_user(
                 },
                 upsert=True,
             )
+            # Get the company _id and set it in the payload
+            company = await db["companies"].find_one(
+                {"companyName": {"$regex": f"^{name}$", "$options": "i"}}
+            )
+            if company:
+                payload["companyId"] = company["_id"]
     user_payload = build_create_user_payload(payload, hash_password=hash_password)
     return await repo_create_user(user_payload)
 
@@ -196,7 +202,7 @@ async def update_user(
         db = get_db()
         name = payload.get("companyName", "").strip()
         if name:
-            await db["companies"].update_one(
+            result = await db["companies"].update_one(
                 {"companyName": {"$regex": f"^{name}$", "$options": "i"}},
                 {
                     "$setOnInsert": {
@@ -208,6 +214,12 @@ async def update_user(
                 },
                 upsert=True,
             )
+            # Get the company _id and set it in the payload
+            company = await db["companies"].find_one(
+                {"companyName": {"$regex": f"^{name}$", "$options": "i"}}
+            )
+            if company:
+                payload["companyId"] = company["_id"]
     update_payload = build_update_user_payload(payload, hash_password=hash_password)
     doc = await repo_update_user(user_id, update_payload)
     if not doc:

@@ -19,13 +19,21 @@ def _load_classifier():
         return _classifier_model
     settings = get_settings()
     if not settings.classifier_model_path:
+        print("WARNING: CLASSIFIER_MODEL_PATH not configured in environment")
         return None
     try:
         from ultralytics import YOLO
+        import os
+
+        if not os.path.exists(settings.classifier_model_path):
+            print(f"ERROR: Classifier model file not found at: {settings.classifier_model_path}")
+            return None
 
         _classifier_model = YOLO(settings.classifier_model_path)
+        print(f"SUCCESS: Classifier model loaded from {settings.classifier_model_path}")
         return _classifier_model
-    except Exception:
+    except Exception as e:
+        print(f"ERROR loading classifier model: {str(e)}")
         return None
 
 
@@ -35,11 +43,20 @@ def _load_weight_model():
         return _weight_model
     settings = get_settings()
     if not settings.weight_model_path:
+        print("WARNING: WEIGHT_MODEL_PATH not configured in environment")
         return None
     try:
+        import os
+
+        if not os.path.exists(settings.weight_model_path):
+            print(f"ERROR: Weight model file not found at: {settings.weight_model_path}")
+            return None
+
         _weight_model = joblib.load(settings.weight_model_path)
+        print(f"SUCCESS: Weight model loaded from {settings.weight_model_path}")
         return _weight_model
-    except Exception:
+    except Exception as e:
+        print(f"ERROR loading weight model: {str(e)}")
         return None
 
 
@@ -49,11 +66,20 @@ def _load_price_model():
         return _price_model
     settings = get_settings()
     if not settings.price_model_path:
+        print("WARNING: PRICE_MODEL_PATH not configured in environment")
         return None
     try:
+        import os
+
+        if not os.path.exists(settings.price_model_path):
+            print(f"ERROR: Price model file not found at: {settings.price_model_path}")
+            return None
+
         _price_model = joblib.load(settings.price_model_path)
+        print(f"SUCCESS: Price model loaded from {settings.price_model_path}")
         return _price_model
-    except Exception:
+    except Exception as e:
+        print(f"ERROR loading price model: {str(e)}")
         return None
 
 
@@ -63,13 +89,21 @@ def _load_detector():
         return _detector_model
     settings = get_settings()
     if not settings.detector_model_path:
+        print("WARNING: DETECTOR_MODEL_PATH not configured in environment")
         return None
     try:
         from ultralytics import YOLO
+        import os
+
+        if not os.path.exists(settings.detector_model_path):
+            print(f"ERROR: Detector model file not found at: {settings.detector_model_path}")
+            return None
 
         _detector_model = YOLO(settings.detector_model_path)
+        print(f"SUCCESS: Detector model loaded from {settings.detector_model_path}")
         return _detector_model
-    except Exception:
+    except Exception as e:
+        print(f"ERROR loading detector model: {str(e)}")
         return None
 
 
