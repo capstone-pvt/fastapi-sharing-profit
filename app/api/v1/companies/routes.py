@@ -50,6 +50,7 @@ async def create_company(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
             {
                 "$set": {
                     "companyName": name,
+                    "companyCode": payload.get("companyCode"),
                     "companyAddress": payload.get("companyAddress"),
                     "companyPhone": payload.get("companyPhone"),
                     "companyTaxId": payload.get("companyTaxId"),
@@ -62,6 +63,7 @@ async def create_company(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
 
     doc = {
         "companyName": name,
+        "companyCode": payload.get("companyCode"),
         "companyAddress": payload.get("companyAddress"),
         "companyPhone": payload.get("companyPhone"),
         "companyTaxId": payload.get("companyTaxId"),

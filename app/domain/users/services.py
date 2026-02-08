@@ -31,7 +31,9 @@ def build_update_user_payload(
     payload: dict[str, Any], *, hash_password: Callable[[str], str]
 ) -> dict[str, Any]:
     update_payload = dict(payload)
-    if "password" in update_payload:
-        update_payload["password"] = hash_password(update_payload["password"])
+    # Only update password when a non-empty new password is provided (never overwrite with empty)
+    raw_password = update_payload.pop("password", None)
+    if raw_password is not None and str(raw_password).strip():
+        update_payload["password"] = hash_password(raw_password)
     update_payload["updatedAt"] = datetime.utcnow()
     return update_payload

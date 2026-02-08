@@ -31,8 +31,8 @@ def build_profile_update_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "companyPhone",
         "companyTaxId",
     ):
-        if field in payload:
-            update_payload[field] = payload.get(field)
+        if field in payload and payload[field] is not None:
+            update_payload[field] = payload[field]
     update_payload["updatedAt"] = datetime.utcnow()
     return update_payload
 
