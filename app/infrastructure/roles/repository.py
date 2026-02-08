@@ -11,6 +11,16 @@ from app.db import get_db
 from app.utils import serialize_doc, to_object_id
 
 
+# Role name constants
+class RoleNames:
+    USER = "user"
+    BROKER = "broker"
+    OWNER = "owner"
+    CREW = "crew"
+    ADMIN = "admin"
+    SUPER = "super"
+
+
 async def list_roles() -> list[dict[str, Any]]:
     db = get_db()
     return [serialize_doc(doc) async for doc in db["roles"].find({})]
@@ -118,7 +128,7 @@ async def ensure_default_roles(
     now = datetime.utcnow()
     defaults = [
         {
-            "name": "User",
+            "name": RoleNames.USER,
             "description": "Default user role",
             "permissions": [],
             "isActive": True,
@@ -126,7 +136,7 @@ async def ensure_default_roles(
             "updatedAt": now,
         },
         {
-            "name": "Broker/Financer",
+            "name": RoleNames.BROKER,
             "description": "Broker or financer role",
             "permissions": [],
             "isActive": True,
@@ -134,56 +144,32 @@ async def ensure_default_roles(
             "updatedAt": now,
         },
         {
-            "name": "Boat Owner",
-            "description": "Boat owner role",
+            "name": RoleNames.OWNER,
+            "description": "Vessel owner role",
             "permissions": [],
             "isActive": True,
             "createdAt": now,
             "updatedAt": now,
         },
         {
-            "name": "Fisherman",
-            "description": "Fisherman role",
+            "name": RoleNames.CREW,
+            "description": "Crew member role",
             "permissions": [],
             "isActive": True,
             "createdAt": now,
             "updatedAt": now,
         },
         {
-            "name": "Admin",
-            "description": "Administrator role",
+            "name": RoleNames.ADMIN,
+            "description": "Administrator role with elevated permissions",
             "permissions": [],
             "isActive": True,
             "createdAt": now,
             "updatedAt": now,
         },
         {
-            "name": "System Admin",
-            "description": "System administrator role",
-            "permissions": [],
-            "isActive": True,
-            "createdAt": now,
-            "updatedAt": now,
-        },
-        {
-            "name": "Superadmin",
-            "description": "Super administrator role",
-            "permissions": [],
-            "isActive": True,
-            "createdAt": now,
-            "updatedAt": now,
-        },
-        {
-            "name": "Super Admin",
-            "description": "Super admin role",
-            "permissions": [],
-            "isActive": True,
-            "createdAt": now,
-            "updatedAt": now,
-        },
-        {
-            "name": "Super-Admin",
-            "description": "Super admin role",
+            "name": RoleNames.SUPER,
+            "description": "Super administrator role with all permissions",
             "permissions": [],
             "isActive": True,
             "createdAt": now,

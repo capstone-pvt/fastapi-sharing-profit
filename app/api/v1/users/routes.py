@@ -62,24 +62,7 @@ async def create_user(
     if role_id:
         role = await get_role(role_id)
         role_name = role.get("name") if role else None
-        if role_name and role_name.lower() in {
-            "admin",
-            "system admin",
-            "superadmin",
-            "super admin",
-            "super-admin",
-        }:
-            raise HTTPException(status_code=403, detail="Cannot assign admin roles")
-    if role_id:
-        role = await get_role(role_id)
-        role_name = role.get("name") if role else None
-        if role_name and role_name.lower() in {
-            "admin",
-            "system admin",
-            "superadmin",
-            "super admin",
-            "super-admin",
-        }:
+        if role_name and role_name.lower() in {"admin", "super"}:
             raise HTTPException(status_code=403, detail="Cannot assign admin roles")
     if role_id and payload.get("companyName"):
         db = get_db()

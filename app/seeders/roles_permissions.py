@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.infrastructure.permissions.repository import ensure_default_permissions
-from app.infrastructure.roles.repository import ensure_default_roles
+from app.infrastructure.roles.repository import ensure_default_roles, RoleNames
 
 
 async def seed_broker_role_with_permissions() -> None:
@@ -44,7 +44,7 @@ async def seed_broker_role_with_permissions() -> None:
     ]
     await ensure_default_roles(
         {
-            "Broker/Financer": [pid for pid in broker_permissions if pid],
+            RoleNames.BROKER: [pid for pid in broker_permissions if pid],
         }
     )
 
@@ -80,8 +80,7 @@ async def seed_boat_owner_role_with_permissions() -> None:
     ]
     await ensure_default_roles(
         {
-            "Boat Owner": [pid for pid in boat_owner_permissions if pid],
-            "Vessel Owner": [pid for pid in boat_owner_permissions if pid],
+            RoleNames.OWNER: [pid for pid in boat_owner_permissions if pid],
         }
     )
 
@@ -97,7 +96,7 @@ async def seed_fisherman_role_with_permissions() -> None:
     ]
     await ensure_default_roles(
         {
-            "Fisherman": [pid for pid in fisherman_permissions if pid],
+            RoleNames.CREW: [pid for pid in fisherman_permissions if pid],
         }
     )
 
@@ -107,10 +106,7 @@ async def seed_admin_role_with_all_permissions() -> None:
     all_permissions = [pid for pid in permission_ids.values() if pid]
     await ensure_default_roles(
         {
-            "Admin": all_permissions,
-            "Superadmin": all_permissions,
-            "Super Admin": all_permissions,
-            "Super-Admin": all_permissions,
-            "System Admin": all_permissions,
+            RoleNames.ADMIN: all_permissions,
+            RoleNames.SUPER: all_permissions,
         }
     )

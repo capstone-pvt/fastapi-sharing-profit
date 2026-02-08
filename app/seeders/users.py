@@ -11,12 +11,13 @@ from app.infrastructure.auth.repository import (
     get_role_by_name,
     get_user_by_email,
 )
+from app.infrastructure.roles.repository import RoleNames
 
 
 async def backfill_default_user_role() -> int:
     db = get_db()
     role = await db["roles"].find_one(
-        {"name": {"$regex": r"^User$", "$options": "i"}}
+        {"name": {"$regex": f"^{RoleNames.USER}$", "$options": "i"}}
     )
     if not role:
         return 0
@@ -30,33 +31,33 @@ async def backfill_default_user_role() -> int:
 
 DEFAULT_ROLE_USERS = [
     {
-        "role_names": ["Broker/Financer", "Broker/Financier", "Broker"],
+        "role_names": [RoleNames.BROKER],
         "email": "broker@example.com",
         "first_name": "Broker",
         "last_name": "User",
     },
     {
-        "role_names": ["Vessel Owner", "Boat Owner"],
-        "email": "vesselowner@example.com",
+        "role_names": [RoleNames.OWNER],
+        "email": "owner@example.com",
         "first_name": "Vessel",
         "last_name": "Owner",
     },
     {
-        "role_names": ["Fisherman"],
-        "email": "fisherman@example.com",
-        "first_name": "Fisherman",
-        "last_name": "User",
+        "role_names": [RoleNames.CREW],
+        "email": "crew@example.com",
+        "first_name": "Crew",
+        "last_name": "Member",
     },
     {
-        "role_names": ["Admin"],
+        "role_names": [RoleNames.ADMIN],
         "email": "admin@example.com",
         "first_name": "Admin",
         "last_name": "User",
     },
     {
-        "role_names": ["System Admin", "Superadmin", "Super Admin", "Super-Admin"],
-        "email": "systemadmin@example.com",
-        "first_name": "System",
+        "role_names": [RoleNames.SUPER],
+        "email": "super@example.com",
+        "first_name": "Super",
         "last_name": "Admin",
     },
 ]
