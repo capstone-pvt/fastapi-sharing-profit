@@ -76,7 +76,13 @@ async def list_companies(
 
 
 @router.post("", dependencies=[Depends(require_permissions("companies:create"))])
-async def create_company(payload: dict[str, Any] = Body(...)) -> dict[str, Any]:
+async def create_company(
+    payload: dict[str, Any] = Body(...),
+    user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    is_super, is_company_admin = await _get_role_flags(user)
+    if is_company_admin and not is_super:
+        raise HTTPException(status_code=403, detail="Forbidden")
     name = (payload.get("companyName") or "").strip()
     if not name:
         raise HTTPException(status_code=400, detail="companyName is required")
