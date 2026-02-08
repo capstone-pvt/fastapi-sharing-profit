@@ -18,6 +18,7 @@ from app.infrastructure.users.repository import (
     update_user as repo_update_user,
 )
 from app.infrastructure.roles.repository import get_role
+from app.infrastructure.auth.repository import get_role_by_name
 from app.db import get_db
 
 
@@ -31,7 +32,8 @@ async def list_users(
     offset: int = Query(0, ge=0),
 ):
     search = request.query_params.get("search")
-    query = build_user_query(search)
+    pending = request.query_params.get("pending", "").lower() in ("1", "true", "yes")
+    query = build_user_query(search=search, pending=pending)
     results, total = await repo_list_users(query, limit=limit, offset=offset)
     return {"results": results, "total": total, "limit": limit, "offset": offset}
 
@@ -107,6 +109,11 @@ async def update_user(
         payload.pop("companyAddress", None)
         payload.pop("companyPhone", None)
         payload.pop("companyTaxId", None)
+        payload.pop("companyApproved", None)  # Only admins can approve registration
+    if is_admin and payload.get("companyApproved") is True:
+        crew_role = await get_role_by_name("crew")
+        if crew_role:
+            payload["roleId"] = str(crew_role["_id"])
     if is_admin and payload.get("companyName"):
         db = get_db()
         name = payload.get("companyName", "").strip()

@@ -4,10 +4,15 @@ from datetime import datetime
 from typing import Any, Callable
 
 
-def build_user_query(search: str | None) -> dict[str, Any]:
+def build_user_query(
+    search: str | None = None,
+    pending: bool | None = None,
+) -> dict[str, Any]:
     query: dict[str, Any] = {}
     if search:
         query["email"] = {"$regex": search, "$options": "i"}
+    if pending is True:
+        query["companyApproved"] = False
     return query
 
 

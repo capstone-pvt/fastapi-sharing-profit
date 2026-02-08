@@ -34,8 +34,29 @@ async def create_user(user_doc: dict[str, Any]) -> str:
     role_id = user_doc.pop("roleId", None)
     if role_id:
         user_doc["role"] = to_object_id(role_id)
+    company_id = user_doc.pop("companyId", None)
+    if company_id:
+        user_doc["companyId"] = to_object_id(company_id)
     result = await db["users"].insert_one(user_doc)
     return str(result.inserted_id)
+
+
+async def get_company_by_id(company_id: str) -> dict[str, Any] | None:
+    db = get_db()
+    try:
+        return await db["companies"].find_one({"_id": to_object_id(company_id)})
+    except Exception:
+        return None
+
+
+async def get_company_by_code(company_code: str) -> dict[str, Any] | None:
+    if not (company_code or "").strip():
+        return None
+    db = get_db()
+    code = (company_code or "").strip()
+    return await db["companies"].find_one(
+        {"companyCode": {"$regex": f"^{code}$", "$options": "i"}}
+    )
 
 
 async def update_refresh_token(

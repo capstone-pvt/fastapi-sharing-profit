@@ -1,5 +1,7 @@
 from app.infrastructure.auth.repository import (
     create_user,
+    get_company_by_code,
+    get_company_by_id,
     get_role_by_id,
     get_role_by_name,
     get_user_by_email,
@@ -12,6 +14,8 @@ from app.infrastructure.auth.repository import (
 
 __all__ = [
     "create_user",
+    "get_company_by_code",
+    "get_company_by_id",
     "get_role_by_id",
     "get_role_by_name",
     "get_user_by_email",

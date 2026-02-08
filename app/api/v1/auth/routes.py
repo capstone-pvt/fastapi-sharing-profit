@@ -22,6 +22,8 @@ from app.domain.auth.services import (
 )
 from app.infrastructure.auth.repository import (
     create_user,
+    get_company_by_code,
+    get_company_by_id,
     get_role_by_id,
     get_role_by_name,
     get_user_by_email,
@@ -48,14 +50,20 @@ async def register(payload: dict[str, Any] = Body(...)):
     first_name = fields["firstName"]
     last_name = fields["lastName"]
     role_id = fields["roleId"]
-    company_name = fields.get("companyName")
-    company_address = fields.get("companyAddress")
-    company_phone = fields.get("companyPhone")
-    company_tax_id = fields.get("companyTaxId")
+    company_code = fields.get("companyCode")
 
     existing = await get_user_by_email(email)
     if existing:
         raise HTTPException(status_code=409, detail="Email already registered")
+
+    company_id: str | None = None
+    if company_code:
+        company = await get_company_by_code(company_code)
+        if not company:
+            raise HTTPException(
+                status_code=400, detail="Company code not found"
+            )
+        company_id = str(company["_id"])
 
     if not role_id:
         default_role = await get_role_by_name("user")
@@ -74,10 +82,7 @@ async def register(payload: dict[str, Any] = Body(...)):
         last_name=last_name,
         role_id=role_id,
         session_id=session_id,
-        company_name=company_name,
-        company_address=company_address,
-        company_phone=company_phone,
-        company_tax_id=company_tax_id,
+        company_id=company_id,
     )
     user_id = await create_user(user_doc)
 
@@ -97,6 +102,8 @@ async def register(payload: dict[str, Any] = Body(...)):
 
     role = await get_role_by_id(role_id)
     permissions = await get_role_permissions_names(role_id)
+    company = await get_company_by_id(company_id) if company_id else None
+    company_approved = False if company_id else True  # New sign-up with company = pending
     return build_auth_response(
         user_id=user_id,
         email=email,
@@ -104,10 +111,12 @@ async def register(payload: dict[str, Any] = Body(...)):
         last_name=last_name,
         role_id=role_id,
         role_name=role.get("name") if role else None,
-        company_name=company_name,
-        company_address=company_address,
-        company_phone=company_phone,
-        company_tax_id=company_tax_id,
+        company_id=company_id,
+        company_approved=company_approved,
+        company_name=company.get("companyName") if company else None,
+        company_address=company.get("companyAddress") if company else None,
+        company_phone=company.get("companyPhone") if company else None,
+        company_tax_id=company.get("companyTaxId") if company else None,
         permissions=permissions,
         access_token=access_token,
         refresh_token=refresh_token,
@@ -144,6 +153,11 @@ async def login(payload: dict[str, Any] = Body(...)):
 
     role = await get_role_by_id(role_id) if role_id else None
     permissions = await get_role_permissions_names(role_id) if role_id else []
+    company_id = str(user["companyId"]) if user.get("companyId") else None
+    company = (
+        await get_company_by_id(company_id) if company_id else None
+    )
+    company_approved = user.get("companyApproved", True)
     return build_auth_response(
         user_id=user_id,
         email=email,
@@ -151,10 +165,12 @@ async def login(payload: dict[str, Any] = Body(...)):
         last_name=user.get("lastName"),
         role_id=role_id,
         role_name=role.get("name") if role else None,
-        company_name=user.get("companyName"),
-        company_address=user.get("companyAddress"),
-        company_phone=user.get("companyPhone"),
-        company_tax_id=user.get("companyTaxId"),
+        company_id=company_id,
+        company_approved=company_approved,
+        company_name=company.get("companyName") if company else user.get("companyName"),
+        company_address=company.get("companyAddress") if company else user.get("companyAddress"),
+        company_phone=company.get("companyPhone") if company else user.get("companyPhone"),
+        company_tax_id=company.get("companyTaxId") if company else user.get("companyTaxId"),
         permissions=permissions,
         access_token=access_token,
         refresh_token=refresh_token,
@@ -208,6 +224,11 @@ async def refresh(payload: dict[str, Any] = Body(...)):
     role_id = str(user.get("role")) if user.get("role") else ""
     role = await get_role_by_id(role_id) if role_id else None
     permissions = await get_role_permissions_names(role_id) if role_id else []
+    company_id = str(user["companyId"]) if user.get("companyId") else None
+    company = (
+        await get_company_by_id(company_id) if company_id else None
+    )
+    company_approved = user.get("companyApproved", True)
     return build_auth_response(
         user_id=user_id,
         email=user.get("email"),
@@ -215,10 +236,12 @@ async def refresh(payload: dict[str, Any] = Body(...)):
         last_name=user.get("lastName"),
         role_id=role_id,
         role_name=role.get("name") if role else None,
-        company_name=user.get("companyName"),
-        company_address=user.get("companyAddress"),
-        company_phone=user.get("companyPhone"),
-        company_tax_id=user.get("companyTaxId"),
+        company_id=company_id,
+        company_approved=company_approved,
+        company_name=company.get("companyName") if company else user.get("companyName"),
+        company_address=company.get("companyAddress") if company else user.get("companyAddress"),
+        company_phone=company.get("companyPhone") if company else user.get("companyPhone"),
+        company_tax_id=company.get("companyTaxId") if company else user.get("companyTaxId"),
         permissions=permissions,
         access_token=access_token,
         refresh_token=new_refresh_token,
