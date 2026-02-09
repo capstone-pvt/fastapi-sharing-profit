@@ -12,8 +12,9 @@ from app.utils import serialize_doc, to_object_id
 
 router = APIRouter(prefix="/companies", tags=["companies"])
 
-SUPER_ROLE_NAMES = {"super", "superadmin", "super admin", "super-admin"}
-ADMIN_ROLE_NAMES = {"admin", "system admin"}
+# Canonical role names: super | admin | broker | owner | crew | user
+SUPER_ROLE_NAMES = {"super"}
+ADMIN_ROLE_NAMES = {"admin"}
 
 
 async def _get_role_name(user: dict[str, Any]) -> str:

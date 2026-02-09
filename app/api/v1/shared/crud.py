@@ -34,7 +34,13 @@ def build_crud_router(
                 if key in {"limit", "offset"}:
                     continue
                 query[key] = value
-            cursor = db[collection_name].find(query).skip(offset).limit(limit)
+            cursor = (
+                db[collection_name]
+                .find(query)
+                .sort("createdAt", -1)
+                .skip(offset)
+                .limit(limit)
+            )
             results = [serialize_doc(doc) async for doc in cursor]
             total = await db[collection_name].count_documents(query)
             return {

@@ -31,8 +31,9 @@ async def _get_role_name(user: dict[str, Any]) -> str:
 
 
 async def _get_role_flags(user: dict[str, Any]) -> tuple[str, bool, bool]:
-    SUPER_ROLE_NAMES = {"super", "superadmin", "super admin", "super-admin"}
-    ADMIN_ROLE_NAMES = {"admin", "system admin"}
+    # Canonical role names: super | admin | broker | owner | crew | user
+    SUPER_ROLE_NAMES = {"super"}
+    ADMIN_ROLE_NAMES = {"admin"}
     role_name = (await _get_role_name(user)).strip().lower()
     is_super = role_name in SUPER_ROLE_NAMES
     is_company_admin = role_name in ADMIN_ROLE_NAMES

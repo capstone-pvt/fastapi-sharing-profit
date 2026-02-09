@@ -159,8 +159,10 @@ async def _get_role_flags(user: dict[str, Any]) -> tuple[str, bool, bool]:
     return role_name, is_super, is_company_admin
 ```
 
-**Super Role Names:** `{"super", "superadmin", "super admin", "super-admin"}`
-**Admin Role Names:** `{"admin", "system admin"}`
+**Canonical Role Names:** `super | admin | broker | owner | crew | user`
+
+**Super Role Names:** `{"super"}`
+**Admin Role Names:** `{"admin"}`
 
 #### Company ID Extraction
 ```python

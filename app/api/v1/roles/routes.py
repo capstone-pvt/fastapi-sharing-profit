@@ -46,9 +46,10 @@ async def update_role(role_id: str, payload: dict[str, Any] = Body(...)):
     if not doc:
         raise HTTPException(status_code=404, detail="Role not found")
     role_name = (doc.get("name") or "").strip().lower()
-    protected = {"admin", "superadmin", "super admin", "super-admin"}
+    # Canonical protected roles
+    protected = {"admin", "super"}
     if role_name in protected:
-        raise HTTPException(status_code=403, detail="Cannot modify admin role")
+        raise HTTPException(status_code=403, detail="Cannot modify protected role")
     role_payload = build_update_role_payload(payload)
     doc = await repo_update_role(role_id, role_payload)
     if not doc:
@@ -62,9 +63,10 @@ async def add_permissions(role_id: str, payload: dict[str, Any] = Body(...)):
     if not doc:
         raise HTTPException(status_code=404, detail="Role not found")
     role_name = (doc.get("name") or "").strip().lower()
-    protected = {"admin", "superadmin", "super admin", "super-admin"}
+    # Canonical protected roles
+    protected = {"admin", "super"}
     if role_name in protected:
-        raise HTTPException(status_code=403, detail="Cannot modify admin role")
+        raise HTTPException(status_code=403, detail="Cannot modify protected role")
     permissions = payload.get("permissions", [])
     doc = await repo_add_permissions(role_id, permissions)
     if not doc:
@@ -78,9 +80,10 @@ async def remove_permissions(role_id: str, payload: dict[str, Any] = Body(...)):
     if not doc:
         raise HTTPException(status_code=404, detail="Role not found")
     role_name = (doc.get("name") or "").strip().lower()
-    protected = {"admin", "superadmin", "super admin", "super-admin"}
+    # Canonical protected roles
+    protected = {"admin", "super"}
     if role_name in protected:
-        raise HTTPException(status_code=403, detail="Cannot modify admin role")
+        raise HTTPException(status_code=403, detail="Cannot modify protected role")
     permissions = payload.get("permissions", [])
     doc = await repo_remove_permissions(role_id, permissions)
     if not doc:
@@ -94,9 +97,10 @@ async def delete_role(role_id: str):
     if not doc:
         raise HTTPException(status_code=404, detail="Role not found")
     role_name = (doc.get("name") or "").strip().lower()
-    protected = {"admin", "superadmin", "super admin", "super-admin"}
+    # Canonical protected roles
+    protected = {"admin", "super"}
     if role_name in protected:
-        raise HTTPException(status_code=403, detail="Cannot delete admin role")
+        raise HTTPException(status_code=403, detail="Cannot delete protected role")
     deleted = await repo_delete_role(role_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Role not found")
