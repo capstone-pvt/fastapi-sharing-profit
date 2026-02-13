@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
 
 from app.core.config import get_settings
 from app.deps import get_current_user, require_permissions, require_roles
@@ -9,7 +9,7 @@ from app.domain.fish_training_samples.services import (
     build_sample_doc,
     build_samples_query,
 )
-from app.infrastructure.fish_training_samples.exporter import export_dataset
+from app.infrastructure.fish_training_samples import exporter as training_exporter
 from app.infrastructure.fish_training_samples.repository import (
     create_sample as repo_create_sample,
     delete_sample as repo_delete_sample,
@@ -27,7 +27,18 @@ router = APIRouter(prefix="/fish/training-samples", tags=["fish-training"])
 @router.post("", dependencies=[Depends(require_permissions("training-samples:create"))])
 async def create_sample(
     image: UploadFile = File(...),
-    payload: dict[str, Any] = Body(...),
+    species: str | None = Form(None),
+    weightKg: float | None = Form(None),
+    pricePerKg: float | None = Form(None),
+    lengthCm: float | None = Form(None),
+    widthCm: float | None = Form(None),
+    scaleReferenceCm: float | None = Form(None),
+    bboxX: float | None = Form(None),
+    bboxY: float | None = Form(None),
+    bboxWidth: float | None = Form(None),
+    bboxHeight: float | None = Form(None),
+    notes: str | None = Form(None),
+    capturedAt: str | None = Form(None),
     user: dict[str, Any] = Depends(get_current_user),
 ):
     if not image:
@@ -41,6 +52,27 @@ async def create_sample(
         part for part in [user.get("firstName"), user.get("lastName")] if part
     ).strip()
     trained_by = full_name if full_name else user.get("email")
+    payload = {
+        "species": species,
+        "weightKg": weightKg,
+        "pricePerKg": pricePerKg,
+        "lengthCm": lengthCm,
+        "widthCm": widthCm,
+        "scaleReferenceCm": scaleReferenceCm,
+        "bboxX": bboxX,
+        "bboxY": bboxY,
+        "bboxWidth": bboxWidth,
+        "bboxHeight": bboxHeight,
+        "notes": notes,
+        "capturedAt": capturedAt,
+    }
+
+    if not species or weightKg is None:
+        raise HTTPException(
+            status_code=400,
+            detail="species and weightKg are required",
+        )
+
     doc = build_sample_doc(
         payload=payload,
         user_id=user["id"],
@@ -73,10 +105,10 @@ async def list_my_samples(
 
 
 @router.post("/export", dependencies=[Depends(require_roles("admin"))])
-async def export_dataset(includeImages: bool = Query(True)):
+async def export_training_samples(includeImages: bool = Query(True)):
     species_records = await repo_list_active_species()
     samples = await repo_list_all_samples()
-    return export_dataset(
+    return training_exporter.export_dataset(
         samples=samples,
         species_records=species_records,
         include_images=includeImages,

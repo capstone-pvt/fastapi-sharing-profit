@@ -57,20 +57,29 @@ def export_dataset(
             with Image.open(image_path) as img:
                 width, height = img.size
             if width and height:
-                x_center = (bbox["x"] + bbox["width"] / 2) / width
-                y_center = (bbox["y"] + bbox["height"] / 2) / height
-                width_norm = bbox["width"] / width
-                height_norm = bbox["height"] / height
-                label_line = (
-                    f"{class_index} {x_center:.6f} {y_center:.6f} "
-                    f"{width_norm:.6f} {height_norm:.6f}"
-                )
-                (labels_dir / f"{sample['_id']}.txt").write_text(label_line + "\n")
-                labels_count += 1
-                bbox_x = str(bbox["x"])
-                bbox_y = str(bbox["y"])
-                bbox_w = str(bbox["width"])
-                bbox_h = str(bbox["height"])
+                try:
+                    if all(
+                        bbox.get(key) is not None
+                        for key in ("x", "y", "width", "height")
+                    ):
+                        x_center = (bbox["x"] + bbox["width"] / 2) / width
+                        y_center = (bbox["y"] + bbox["height"] / 2) / height
+                        width_norm = bbox["width"] / width
+                        height_norm = bbox["height"] / height
+                        label_line = (
+                            f"{class_index} {x_center:.6f} {y_center:.6f} "
+                            f"{width_norm:.6f} {height_norm:.6f}"
+                        )
+                        (labels_dir / f"{sample['_id']}.txt").write_text(
+                            label_line + "\n"
+                        )
+                        labels_count += 1
+                        bbox_x = str(bbox["x"])
+                        bbox_y = str(bbox["y"])
+                        bbox_w = str(bbox["width"])
+                        bbox_h = str(bbox["height"])
+                except Exception:
+                    pass
 
         weight_rows.append(
             ",".join(

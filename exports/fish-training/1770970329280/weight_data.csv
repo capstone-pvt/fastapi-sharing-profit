@@ -1,0 +1,6 @@
+image,species,classIndex,weightKg,pricePerKg,lengthCm,widthCm,scaleReferenceCm,bboxX,bboxY,bboxWidth,bboxHeight
+698f22607d801db66abc6f2e.jpg,Tuna,0,150.0,350.0,,,,,,,
+698f22887d801db66abc6f30.jpg,Tuna,0,150.0,350.0,,,,,,,
+698f31522ec56ac69f9a9f4d.jpg,Tune,1,150.0,350.0,,,,,,,
+698f3a8b7b356f9f62c1e42d.jpg,Tuna,0,130.0,350.0,180.0,60.0,50.0,5.0,8.0,5.0,5.0
+698f3c9a7b356f9f62c1e42f.jpg,Tuna,0,130.0,150.0,160.0,40.0,40.0,50.0,50.0,30.0,62.0

@@ -16,7 +16,8 @@ from app.seeders.roles_permissions import (
 from app.seeders.users import backfill_default_user_role, seed_default_role_users
 
 
-load_dotenv()
+env_path = Path(__file__).resolve().parents[1] / ".env"
+load_dotenv(env_path)
 
 app = FastAPI(title="Profit Sharing API (FastAPI)")
 

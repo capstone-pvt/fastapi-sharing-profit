@@ -1,0 +1,12 @@
+{
+  "createdAt": "2026-02-13T14:44:16.203202",
+  "samples": 3,
+  "images": 3,
+  "labels": 0,
+  "priceSamples": 3,
+  "classes": [
+    "Tuna",
+    "Tune"
+  ],
+  "exportRoot": "exports\\fish-training\\1770965056166"
+}
