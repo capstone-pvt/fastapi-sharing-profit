@@ -1,7 +1,18 @@
 from pathlib import Path
+import os
+import subprocess
 from typing import Any
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile
+from fastapi import (
+    APIRouter,
+    BackgroundTasks,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+)
 
 from app.core.config import get_settings
 from app.deps import get_current_user, require_permissions, require_roles
@@ -22,6 +33,20 @@ from app.infrastructure.fish_training_samples.storage import save_training_uploa
 
 
 router = APIRouter(prefix="/fish/training-samples", tags=["fish-training"])
+
+
+def _auto_train_enabled() -> bool:
+    value = os.getenv("AUTO_TRAIN_ON_SAMPLE", "false").strip().lower()
+    return value in {"1", "true", "yes", "on"}
+
+
+def _launch_auto_train() -> None:
+    project_root = Path(__file__).resolve().parents[4]
+    args = os.getenv("AUTO_TRAIN_ARGS", "").strip()
+    cmd = ["python", "scripts/auto_train.py"]
+    if args:
+        cmd.extend(args.split())
+    subprocess.Popen(cmd, cwd=str(project_root))
 
 
 @router.post("", dependencies=[Depends(require_permissions("training-samples:create"))])
@@ -105,14 +130,20 @@ async def list_my_samples(
 
 
 @router.post("/export", dependencies=[Depends(require_roles("admin"))])
-async def export_training_samples(includeImages: bool = Query(True)):
+async def export_training_samples(
+    includeImages: bool = Query(True),
+    background_tasks: BackgroundTasks = None,
+):
     species_records = await repo_list_active_species()
     samples = await repo_list_all_samples()
-    return training_exporter.export_dataset(
+    result = training_exporter.export_dataset(
         samples=samples,
         species_records=species_records,
         include_images=includeImages,
     )
+    if background_tasks is not None and _auto_train_enabled():
+        background_tasks.add_task(_launch_auto_train)
+    return result
 
 
 @router.delete("/{sample_id}", dependencies=[Depends(require_roles("admin"))])

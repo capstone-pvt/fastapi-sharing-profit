@@ -70,3 +70,16 @@ users without a role.
 - Collections use the same names as the NestJS implementation.
 - Fish analysis uses a placeholder response in FastAPI; training sample export is implemented.
 - ML training/inference is still handled by the Python scripts under `ml_training/`.
+
+## Automated Training
+
+You can automate export → dataset build → train → model copy:
+
+```
+python scripts/auto_train.py
+```
+
+Options:
+- `--export-root exports/fish-training/<timestamp>` to use an existing export
+- `--skip-detect` when you have no bboxes yet
+- `--skip-regression` to skip weight/price models
