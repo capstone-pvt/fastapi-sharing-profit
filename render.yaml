@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: profit-sharing-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    region: singapore
+    plan: starter
+    healthCheckPath: /
+    envVars:
+      - key: MONGODB_URI
+        sync: false
+      - key: DATABASE_NAME
+        value: profit_sharing_db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION
+        value: 15m
+      - key: JWT_REFRESH_EXPIRATION
+        value: 7d
+      - key: JWT_REFRESH_EXPIRATION_DAYS
+        value: "7"
+      - key: UPLOAD_ROOT
+        value: uploads
+      - key: MODEL_ROOT
+        value: models
+      - key: CLASSIFIER_MODEL_PATH
+        value: models/classifier/best.pt
+      - key: DETECTOR_MODEL_PATH
+        value: models/detector/best.pt
+      - key: WEIGHT_MODEL_PATH
+        value: models/weight/weight_model.joblib
+      - key: PRICE_MODEL_PATH
+        value: models/price/price_model.joblib
+      - key: DETECTOR_CONFIDENCE
+        value: "0.25"
+      - key: DETECTOR_IOU
+        value: "0.45"
+      - key: WORKERS
+        value: "2"
+      - key: TIMEOUT
+        value: "120"
