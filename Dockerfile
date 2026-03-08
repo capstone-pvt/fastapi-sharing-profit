@@ -58,12 +58,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libstdc++6 \
     curl \
     ca-certificates \
-    openssl \
-    && rm -rf /var/lib/apt/lists/* \
-    && update-ca-certificates
-
-# Lower OpenSSL security level so MongoDB Atlas TLS handshake succeeds
-RUN sed -i 's/CipherString = DEFAULT:@SECLEVEL=2/CipherString = DEFAULT:@SECLEVEL=1/' /etc/ssl/openssl.cnf || true
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy virtual environment from builder
 COPY --from=builder /opt/venv /opt/venv
