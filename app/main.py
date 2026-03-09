@@ -14,6 +14,7 @@ from app.seeders.roles_permissions import (
     seed_fisherman_role_with_permissions,
 )
 from app.seeders.users import backfill_default_user_role, seed_default_role_users
+from app.seeders.fish_models import seed_fish_models, seed_fish_species
 
 
 env_path = Path(__file__).resolve().parents[1] / ".env"
@@ -31,6 +32,8 @@ async def startup_event() -> None:
     await seed_admin_role_with_all_permissions()
     await backfill_default_user_role()
     await seed_default_role_users()
+    await seed_fish_species()
+    await seed_fish_models()
 
 
 @app.on_event("shutdown")

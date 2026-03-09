@@ -1,4 +1,9 @@
 import asyncio
+from pathlib import Path
+
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 from app.db import connect_db, disconnect_db
 from app.seeders.roles_permissions import (
@@ -8,6 +13,7 @@ from app.seeders.roles_permissions import (
     seed_fisherman_role_with_permissions,
 )
 from app.seeders.users import backfill_default_user_role, seed_default_role_users
+from app.seeders.fish_models import seed_fish_models, seed_fish_species
 
 
 async def main() -> None:
@@ -22,6 +28,9 @@ async def main() -> None:
         print(
             "Broker, Boat Owner, Fisherman, and Admin roles/permissions seeded."
         )
+        await seed_fish_species()
+        await seed_fish_models()
+        print("Fish species and pre-trained models seeded.")
     finally:
         await disconnect_db()
 

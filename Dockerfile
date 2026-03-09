@@ -44,7 +44,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PORT=8000 \
     WORKERS=4 \
     MAX_WORKERS=8 \
-    TIMEOUT=120
+    TIMEOUT=120 \
+    UPLOAD_ROOT=uploads \
+    MODEL_ROOT=models \
+    CLASSIFIER_MODEL_PATH=models/classifier/best.pt \
+    DETECTOR_MODEL_PATH=models/detector/best.pt \
+    WEIGHT_MODEL_PATH=models/weight/weight_model.joblib \
+    PRICE_MODEL_PATH=models/price/price_model.joblib \
+    DETECTOR_CONFIDENCE=0.25 \
+    DETECTOR_IOU=0.45 \
+    AUTO_TRAIN_ON_SAMPLE=false \
+    OPENWEATHER_API_KEY=""
 
 # Install runtime dependencies only
 RUN apt-get update && apt-get install -y --no-install-recommends \

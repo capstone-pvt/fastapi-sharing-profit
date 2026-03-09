@@ -9,6 +9,7 @@ from app.seeders.roles_permissions import (
 )
 from app.seeders.users import backfill_default_user_role, seed_default_role_users
 from app.seeders.companies import seed_default_companies
+from app.seeders.fish_models import seed_fish_models, seed_fish_species
 
 
 async def main() -> None:
@@ -25,6 +26,9 @@ async def main() -> None:
             "Broker, Boat Owner, Fisherman, and Admin roles/permissions seeded."
         )
         print(f"Default companies created: {created_count}.")
+        await seed_fish_species()
+        await seed_fish_models()
+        print("Fish species and pre-trained models seeded.")
     finally:
         await disconnect_db()
 
