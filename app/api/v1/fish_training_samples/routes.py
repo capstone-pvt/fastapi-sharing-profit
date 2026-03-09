@@ -53,6 +53,9 @@ def _launch_auto_train() -> None:
 async def create_sample(
     image: UploadFile = File(...),
     species: str | None = Form(None),
+    scientificName: str | None = Form(None),
+    englishName: str | None = Form(None),
+    localName: str | None = Form(None),
     weightKg: float | None = Form(None),
     pricePerKg: float | None = Form(None),
     lengthCm: float | None = Form(None),
@@ -79,6 +82,9 @@ async def create_sample(
     trained_by = full_name if full_name else user.get("email")
     payload = {
         "species": species,
+        "scientificName": scientificName,
+        "englishName": englishName,
+        "localName": localName,
         "weightKg": weightKg,
         "pricePerKg": pricePerKg,
         "lengthCm": lengthCm,

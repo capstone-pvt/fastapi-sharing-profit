@@ -16,6 +16,21 @@ async def get_species_index(species: str | None) -> int:
     return 0
 
 
+async def get_species_info(species: str | None) -> dict[str, Any] | None:
+    """Return full species info including scientific, english, and local names."""
+    if not species:
+        return None
+    db = get_db()
+    record = await db["fish_species"].find_one({"name": species})
+    if not record:
+        return None
+    return {
+        "scientificName": record.get("scientificName"),
+        "englishName": record.get("englishName"),
+        "localName": record.get("localName"),
+    }
+
+
 async def save_analysis(analysis: dict[str, Any]) -> dict[str, Any]:
     db = get_db()
     result = await db["fish_analyses"].insert_one(analysis)

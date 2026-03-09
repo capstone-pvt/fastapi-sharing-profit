@@ -36,6 +36,7 @@ async def apply_estimates_to_detections(
     *,
     scale_reference_cm: float | None,
     get_species_index: Callable[[str | None], Awaitable[int]],
+    get_species_info: Callable[[str | None], Awaitable[dict[str, Any] | None]] | None = None,
     estimate_weight: Callable[
         [int, float, float, float | None, float | None, float | None], float
     ],
@@ -71,20 +72,26 @@ async def apply_estimates_to_detections(
             width_cm,
         )
         size_category = classify_size(estimated_weight)
-        enriched.append(
-            {
-                **detection,
-                "estimatedWeight": estimated_weight,
-                "sizeCategory": size_category,
-                "lengthCm": length_cm,
-                "widthCm": width_cm,
-                "pixelLength": pixel_length,
-                "keypoints": {
-                    "mouth": mouth,
-                    "tail": tail,
-                },
-            }
-        )
+        entry = {
+            **detection,
+            "estimatedWeight": estimated_weight,
+            "sizeCategory": size_category,
+            "lengthCm": length_cm,
+            "widthCm": width_cm,
+            "pixelLength": pixel_length,
+            "keypoints": {
+                "mouth": mouth,
+                "tail": tail,
+            },
+        }
+        # Enrich with species names (scientific, english, local)
+        if get_species_info:
+            info = await get_species_info(species)
+            if info:
+                entry["scientificName"] = info.get("scientificName")
+                entry["englishName"] = info.get("englishName")
+                entry["localName"] = info.get("localName")
+        enriched.append(entry)
     return enriched
 
 

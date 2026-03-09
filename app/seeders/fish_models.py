@@ -10,7 +10,13 @@ from app.db import get_db
 
 # Fish species detected/classified by the current models
 DEFAULT_SPECIES: list[dict] = [
-    {"name": "Tuna", "classIndex": 0},
+    {
+        "name": "Tuna",
+        "classIndex": 0,
+        "scientificName": "Thunnus albacares",
+        "englishName": "Yellowfin Tuna",
+        "localName": "Barilis / Tambakol",
+    },
 ]
 
 # Pre-trained models that ship with the project
@@ -50,21 +56,31 @@ async def seed_fish_species() -> int:
     for sp in DEFAULT_SPECIES:
         existing = await db["fish_species"].find_one({"name": sp["name"]})
         if existing:
-            # Ensure classIndex is up-to-date
+            # Ensure classIndex and species names are up-to-date
+            update_fields: dict = {
+                "classIndex": sp["classIndex"],
+                "isActive": True,
+                "updatedAt": now,
+            }
+            for field in ("scientificName", "englishName", "localName"):
+                if field in sp:
+                    update_fields[field] = sp[field]
             await db["fish_species"].update_one(
                 {"_id": existing["_id"]},
-                {"$set": {"classIndex": sp["classIndex"], "isActive": True, "updatedAt": now}},
+                {"$set": update_fields},
             )
         else:
-            await db["fish_species"].insert_one(
-                {
-                    "name": sp["name"],
-                    "classIndex": sp["classIndex"],
-                    "isActive": True,
-                    "createdAt": now,
-                    "updatedAt": now,
-                }
-            )
+            doc: dict = {
+                "name": sp["name"],
+                "classIndex": sp["classIndex"],
+                "isActive": True,
+                "createdAt": now,
+                "updatedAt": now,
+            }
+            for field in ("scientificName", "englishName", "localName"):
+                if field in sp:
+                    doc[field] = sp[field]
+            await db["fish_species"].insert_one(doc)
             created += 1
     print(f"  Fish species: {created} created, {len(DEFAULT_SPECIES) - created} updated.")
     return created

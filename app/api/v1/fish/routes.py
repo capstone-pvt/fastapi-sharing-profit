@@ -21,6 +21,7 @@ from app.core.config import get_settings
 from app.infrastructure.fish.repository import (
     count_analyses,
     get_species_index,
+    get_species_info,
     list_analysis_history,
     list_active_species_names,
     save_analysis,
@@ -133,6 +134,7 @@ async def analyze_fish(
                 detections,
                 scale_reference_cm=scaleReferenceCm,
                 get_species_index=get_species_index,
+                get_species_info=get_species_info,
                 estimate_weight=estimate_weight,
                 estimate_price=estimate_price,
                 classify_size=lambda weight: classify_size_by_weight(
