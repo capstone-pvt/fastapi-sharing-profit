@@ -83,6 +83,7 @@ def build_auth_response(
     company_address: str | None = None,
     company_phone: str | None = None,
     company_tax_id: str | None = None,
+    company_theme_color: str | None = None,
     permissions: list[str] | None = None,
     access_token: str = "",
     refresh_token: str = "",
@@ -98,6 +99,7 @@ def build_auth_response(
         "companyAddress": company_address,
         "companyPhone": company_phone,
         "companyTaxId": company_tax_id,
+        "companyThemeColor": company_theme_color,
         "permissions": permissions or [],
     }
     if company_id:

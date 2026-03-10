@@ -16,11 +16,26 @@ from app.infrastructure.profile.repository import (
     update_profile,
 )
 from app.infrastructure.roles.repository import get_role_permissions_names
-from app.infrastructure.auth.repository import get_role_by_id
+from app.infrastructure.auth.repository import get_company_by_id, get_role_by_id
 from app.infrastructure.profile.storage import save_profile_avatar
 
 
 router = APIRouter(prefix="/profile", tags=["profile"])
+
+
+async def _enrich_with_company(profile: dict[str, Any]) -> None:
+    """Attach company fields (including themeColor) to the profile dict."""
+    company_id = str(profile["companyId"]) if profile.get("companyId") else None
+    if not company_id:
+        return
+    company = await get_company_by_id(company_id)
+    if company:
+        profile["companyName"] = company.get("companyName")
+        profile["companyAddress"] = company.get("companyAddress")
+        profile["companyPhone"] = company.get("companyPhone")
+        profile["companyTaxId"] = company.get("companyTaxId")
+        profile["companyThemeColor"] = company.get("themeColor")
+
 
 def _get_role_id(profile: dict[str, Any]) -> str | None:
     role_id = profile.get("roleId")
@@ -46,6 +61,7 @@ async def fetch_profile(user: dict[str, Any] = Depends(get_current_user)):
     profile["permissions"] = (
         await get_role_permissions_names(role_id) if role_id else []
     )
+    await _enrich_with_company(profile)
     return profile
 
 
@@ -69,6 +85,7 @@ async def patch_profile(
     profile["permissions"] = (
         await get_role_permissions_names(role_id) if role_id else []
     )
+    await _enrich_with_company(profile)
     return profile
 
 
@@ -92,6 +109,7 @@ async def upload_avatar(
     profile["permissions"] = (
         await get_role_permissions_names(role_id) if role_id else []
     )
+    await _enrich_with_company(profile)
     return profile
 
 

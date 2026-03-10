@@ -151,13 +151,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--weight-output",
-        default="models/weight/weight_model.joblib",
-        help="Output path for weight model (default: models/weight/weight_model.joblib).",
+        default="app/models/weight/weight_model.joblib",
+        help="Output path for weight model (default: app/models/weight/weight_model.joblib).",
     )
     parser.add_argument(
         "--price-output",
-        default="models/price/price_model.joblib",
-        help="Output path for price model (default: models/price/price_model.joblib).",
+        default="app/models/price/price_model.joblib",
+        help="Output path for price model (default: app/models/price/price_model.joblib).",
     )
     args = parser.parse_args()
 
