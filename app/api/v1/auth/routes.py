@@ -1,8 +1,13 @@
+import secrets
+import string
+from datetime import datetime
 from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, Body, Depends, HTTPException, status
 from jose import JWTError, jwt
+
+from app.db import get_db
 
 from app.core.config import get_settings
 from app.core.security import (
@@ -38,6 +43,12 @@ from app.infrastructure.roles.repository import get_role_permissions_names
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
+def _generate_company_code() -> str:
+    """Generate a short alphanumeric company code like ``AB12CD``."""
+    chars = string.ascii_uppercase + string.digits
+    return "".join(secrets.choice(chars) for _ in range(6))
+
+
 @router.post("/register")
 async def register(payload: dict[str, Any] = Body(...)):
     try:
@@ -51,19 +62,71 @@ async def register(payload: dict[str, Any] = Body(...)):
     last_name = fields["lastName"]
     role_id = fields["roleId"]
     company_code = fields.get("companyCode")
+    company_name = fields.get("companyName")
 
     existing = await get_user_by_email(email)
     if existing:
         raise HTTPException(status_code=409, detail="Email already registered")
 
+    db = get_db()
     company_id: str | None = None
-    if company_code:
+
+    if company_name:
+        # Admin registration — create a new company
+        admin_role = await get_role_by_name("admin")
+        if not admin_role:
+            raise HTTPException(
+                status_code=404, detail='Role "admin" not found'
+            )
+        role_id = str(admin_role["_id"])
+
+        # Generate a unique company code
+        new_code = _generate_company_code()
+        while await db["companies"].find_one(
+            {"companyCode": {"$regex": f"^{new_code}$", "$options": "i"}}
+        ):
+            new_code = _generate_company_code()
+
+        now = datetime.utcnow()
+        company_doc = {
+            "companyName": company_name,
+            "companyCode": new_code,
+            "companyAddress": None,
+            "companyPhone": None,
+            "companyTaxId": None,
+            "createdAt": now,
+            "updatedAt": now,
+        }
+        result = await db["companies"].insert_one(company_doc)
+        company_id = str(result.inserted_id)
+    elif company_code:
+        # User registration — join existing company
         company = await get_company_by_code(company_code)
         if not company:
             raise HTTPException(
                 status_code=400, detail="Company code not found"
             )
         company_id = str(company["_id"])
+
+        # Enforce max 20 users per company (license may override with a lower limit)
+        max_users = 20
+        license_doc = await db["app_licenses"].find_one(
+            {"companyId": company["_id"], "status": "active"},
+            sort=[("expiresAt", -1)],
+        )
+        if license_doc:
+            license_max = license_doc.get("maxUsers", 20)
+            if 0 < license_max < max_users:
+                max_users = license_max
+
+        current_count = await db["users"].count_documents(
+            {"companyId": company["_id"]}
+        )
+        if current_count >= max_users:
+            raise HTTPException(
+                status_code=403,
+                detail=f"Company has reached the maximum number of users ({max_users})",
+            )
 
     if not role_id:
         default_role = await get_role_by_name("user")
@@ -75,6 +138,8 @@ async def register(payload: dict[str, Any] = Body(...)):
 
     hashed = hash_password(password)
     session_id = uuid4().hex
+    # Admin who creates company is auto-approved; users joining are pending
+    is_company_creator = bool(company_name)
     user_doc = build_user_doc(
         email=email,
         hashed_password=hashed,
@@ -83,6 +148,7 @@ async def register(payload: dict[str, Any] = Body(...)):
         role_id=role_id,
         session_id=session_id,
         company_id=company_id,
+        company_approved=True if is_company_creator else None,
     )
     user_id = await create_user(user_doc)
 
@@ -103,7 +169,7 @@ async def register(payload: dict[str, Any] = Body(...)):
     role = await get_role_by_id(role_id)
     permissions = await get_role_permissions_names(role_id)
     company = await get_company_by_id(company_id) if company_id else None
-    company_approved = False if company_id else True  # New sign-up with company = pending
+    company_approved = True if is_company_creator else (False if company_id else True)
     return build_auth_response(
         user_id=user_id,
         email=email,
@@ -118,6 +184,7 @@ async def register(payload: dict[str, Any] = Body(...)):
         company_phone=company.get("companyPhone") if company else None,
         company_tax_id=company.get("companyTaxId") if company else None,
         company_theme_color=company.get("themeColor") if company else None,
+        company_code=company.get("companyCode") if company else None,
         permissions=permissions,
         access_token=access_token,
         refresh_token=refresh_token,
@@ -173,6 +240,7 @@ async def login(payload: dict[str, Any] = Body(...)):
         company_phone=company.get("companyPhone") if company else user.get("companyPhone"),
         company_tax_id=company.get("companyTaxId") if company else user.get("companyTaxId"),
         company_theme_color=company.get("themeColor") if company else None,
+        company_code=company.get("companyCode") if company else None,
         permissions=permissions,
         access_token=access_token,
         refresh_token=refresh_token,
@@ -245,6 +313,7 @@ async def refresh(payload: dict[str, Any] = Body(...)):
         company_phone=company.get("companyPhone") if company else user.get("companyPhone"),
         company_tax_id=company.get("companyTaxId") if company else user.get("companyTaxId"),
         company_theme_color=company.get("themeColor") if company else None,
+        company_code=company.get("companyCode") if company else None,
         permissions=permissions,
         access_token=access_token,
         refresh_token=new_refresh_token,

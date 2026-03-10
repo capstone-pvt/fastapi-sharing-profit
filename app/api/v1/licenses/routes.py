@@ -205,7 +205,7 @@ async def generate_license(
     if plan not in ("trial", "standard", "premium"):
         raise HTTPException(status_code=400, detail="Plan must be trial, standard, or premium")
 
-    max_users = int(payload.get("maxUsers", 50))
+    max_users = int(payload.get("maxUsers", 20))
     duration_days = int(payload.get("durationDays", 365 if plan != "trial" else 30))
 
     db = get_db()

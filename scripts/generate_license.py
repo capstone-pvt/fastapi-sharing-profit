@@ -70,7 +70,7 @@ async def main(plan: str, max_users: int, duration_days: int) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Generate an activation code.")
     parser.add_argument("--plan", default="standard", choices=["trial", "standard", "premium"])
-    parser.add_argument("--max-users", type=int, default=50)
+    parser.add_argument("--max-users", type=int, default=20)
     parser.add_argument("--days", type=int, default=365)
     args = parser.parse_args()
 

@@ -15,6 +15,7 @@ def validate_register_payload(payload: dict[str, Any]) -> dict[str, str | None]:
     last_name = payload.get("lastName")
     role_id = payload.get("roleId")
     company_code = payload.get("companyCode")
+    company_name = payload.get("companyName")
     if not email or not password or not first_name or not last_name:
         raise ValueError("Missing required fields")
     return {
@@ -24,6 +25,7 @@ def validate_register_payload(payload: dict[str, Any]) -> dict[str, str | None]:
         "lastName": last_name,
         "roleId": role_id,
         "companyCode": (company_code or "").strip() or None,
+        "companyName": (company_name or "").strip() or None,
     }
 
 
@@ -50,6 +52,7 @@ def build_user_doc(
     role_id: str,
     session_id: str | None = None,
     company_id: str | None = None,
+    company_approved: bool | None = None,
 ) -> dict[str, Any]:
     now = datetime.utcnow()
     user_doc = {
@@ -65,7 +68,7 @@ def build_user_doc(
         user_doc["sessionId"] = session_id
     if company_id:
         user_doc["companyId"] = company_id
-        user_doc["companyApproved"] = False  # Pending until admin approves
+        user_doc["companyApproved"] = company_approved if company_approved is not None else False
     return user_doc
 
 
@@ -84,6 +87,7 @@ def build_auth_response(
     company_phone: str | None = None,
     company_tax_id: str | None = None,
     company_theme_color: str | None = None,
+    company_code: str | None = None,
     permissions: list[str] | None = None,
     access_token: str = "",
     refresh_token: str = "",
@@ -100,6 +104,7 @@ def build_auth_response(
         "companyPhone": company_phone,
         "companyTaxId": company_tax_id,
         "companyThemeColor": company_theme_color,
+        "companyCode": company_code,
         "permissions": permissions or [],
     }
     if company_id:

@@ -35,6 +35,7 @@ async def _enrich_with_company(profile: dict[str, Any]) -> None:
         profile["companyPhone"] = company.get("companyPhone")
         profile["companyTaxId"] = company.get("companyTaxId")
         profile["companyThemeColor"] = company.get("themeColor")
+        profile["companyCode"] = company.get("companyCode")
 
 
 def _get_role_id(profile: dict[str, Any]) -> str | None:
