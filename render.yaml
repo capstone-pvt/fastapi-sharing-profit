@@ -25,20 +25,20 @@ services:
       - key: UPLOAD_ROOT
         value: uploads
       - key: MODEL_ROOT
-        value: models
+        value: app/models
       - key: CLASSIFIER_MODEL_PATH
-        value: models/classifier/best.pt
+        value: app/models/classifier/best.pt
       - key: DETECTOR_MODEL_PATH
-        value: models/detector/best.pt
+        value: app/models/detector/best.pt
       - key: WEIGHT_MODEL_PATH
-        value: models/weight/weight_model.joblib
+        value: app/models/weight/weight_model.joblib
       - key: PRICE_MODEL_PATH
-        value: models/price/price_model.joblib
+        value: app/models/price/price_model.joblib
       - key: DETECTOR_CONFIDENCE
         value: "0.25"
       - key: DETECTOR_IOU
         value: "0.45"
       - key: WORKERS
-        value: "2"
+        value: "1"
       - key: TIMEOUT
         value: "120"
