@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Any
 
+from bson import ObjectId
+
 
 def refresh_expiry_date(expiration_days: int) -> datetime:
     return datetime.utcnow() + timedelta(days=expiration_days)
@@ -67,7 +69,7 @@ def build_user_doc(
     if session_id:
         user_doc["sessionId"] = session_id
     if company_id:
-        user_doc["companyId"] = company_id
+        user_doc["companyId"] = ObjectId(company_id) if ObjectId.is_valid(company_id) else company_id
         user_doc["companyApproved"] = company_approved if company_approved is not None else False
     return user_doc
 

@@ -120,7 +120,7 @@ async def register(payload: dict[str, Any] = Body(...)):
                 max_users = license_max
 
         current_count = await db["users"].count_documents(
-            {"companyId": company["_id"]}
+            {"companyId": {"$in": [company["_id"], str(company["_id"])]}}
         )
         if current_count >= max_users:
             raise HTTPException(

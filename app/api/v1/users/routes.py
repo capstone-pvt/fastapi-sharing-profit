@@ -77,13 +77,14 @@ async def list_users(
     search = request.query_params.get("search")
     pending = request.query_params.get("pending", "").lower() in ("1", "true", "yes")
     query = build_user_query(search=search, pending=pending)
-    _, is_super, is_company_admin = await _get_role_flags(user)
-    if is_company_admin and not is_super:
+    _, is_super, _ = await _get_role_flags(user)
+    if not is_super:
         company_id = _company_id_value(user)
         object_id = _company_object_id(company_id)
         if not object_id:
             return {"results": [], "total": 0, "limit": limit, "offset": offset}
-        query["companyId"] = object_id
+        # Match both ObjectId and string stored companyId (legacy compat)
+        query["companyId"] = {"$in": [object_id, str(object_id)]}
     results, total = await repo_list_users(query, limit=limit, offset=offset)
     return {"results": results, "total": total, "limit": limit, "offset": offset}
 
@@ -177,7 +178,7 @@ async def update_user(
     is_admin = is_super or is_company_admin
 
     # Prevent super users from editing their own account
-    current_user_id = str(user.get("_id"))
+    current_user_id = str(user.get("id") or user.get("_id"))
     if is_super and user_id == current_user_id:
         raise HTTPException(
             status_code=403,
@@ -238,7 +239,7 @@ async def delete_user(
     _, is_super, is_company_admin = await _get_role_flags(user)
 
     # Prevent super users from deleting their own account
-    current_user_id = str(user.get("_id"))
+    current_user_id = str(user.get("id") or user.get("_id"))
     if is_super and user_id == current_user_id:
         raise HTTPException(
             status_code=403,

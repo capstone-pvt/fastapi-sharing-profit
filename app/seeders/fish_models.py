@@ -8,15 +8,50 @@ from pathlib import Path
 from app.core.config import get_settings
 from app.db import get_db
 
-# Fish species detected/classified by the current models
+# Fish species detected/classified by the current models.
+# classIndex values match the classifier model's class indices.
 DEFAULT_SPECIES: list[dict] = [
-    {
-        "name": "Tuna",
-        "classIndex": 0,
-        "scientificName": "Thunnus albacares",
-        "englishName": "Yellowfin Tuna",
-        "localName": "Barilis / Tambakol",
-    },
+    {"name": "Bangus", "classIndex": 0, "scientificName": "Chanos chanos", "englishName": "Milkfish", "localName": "Bangus"},
+    {"name": "Big Head Carp", "classIndex": 1, "scientificName": "Hypophthalmichthys nobilis", "englishName": "Big Head Carp", "localName": "Big Head Carp"},
+    {"name": "Black Sea Sprat", "classIndex": 2, "scientificName": "Clupeonella cultriventris", "englishName": "Black Sea Sprat", "localName": "Black Sea Sprat"},
+    {"name": "Black Spotted Barb", "classIndex": 3, "scientificName": "Dawkinsia filamentosa", "englishName": "Black Spotted Barb", "localName": "Black Spotted Barb"},
+    {"name": "Catfish", "classIndex": 4, "scientificName": "Clarias batrachus", "englishName": "Catfish", "localName": "Hito"},
+    {"name": "Climbing Perch", "classIndex": 5, "scientificName": "Anabas testudineus", "englishName": "Climbing Perch", "localName": "Martiniko"},
+    {"name": "Fourfinger Threadfin", "classIndex": 6, "scientificName": "Eleutheronema tetradactylum", "englishName": "Fourfinger Threadfin", "localName": "Mamali"},
+    {"name": "Freshwater Eel", "classIndex": 7, "scientificName": "Anguilla marmorata", "englishName": "Freshwater Eel", "localName": "Igat"},
+    {"name": "Gilt-Head Bream", "classIndex": 8, "scientificName": "Sparus aurata", "englishName": "Gilt-Head Bream", "localName": "Gilt-Head Bream"},
+    {"name": "Glass Perchlet", "classIndex": 9, "scientificName": "Ambassis urotaenia", "englishName": "Glass Perchlet", "localName": "Glass Perchlet"},
+    {"name": "Goby", "classIndex": 10, "scientificName": "Glossogobius giuris", "englishName": "Goby", "localName": "Biya"},
+    {"name": "Gold Fish", "classIndex": 11, "scientificName": "Carassius auratus", "englishName": "Gold Fish", "localName": "Gold Fish"},
+    {"name": "Gourami", "classIndex": 12, "scientificName": "Osphronemus goramy", "englishName": "Gourami", "localName": "Gurami"},
+    {"name": "Grass Carp", "classIndex": 13, "scientificName": "Ctenopharyngodon idella", "englishName": "Grass Carp", "localName": "Grass Carp"},
+    {"name": "Green Spotted Puffer", "classIndex": 14, "scientificName": "Tetraodon nigroviridis", "englishName": "Green Spotted Puffer", "localName": "Butete"},
+    {"name": "Hourse Mackerel", "classIndex": 15, "scientificName": "Trachurus trachurus", "englishName": "Horse Mackerel", "localName": "Galunggong"},
+    {"name": "Indian Carp", "classIndex": 16, "scientificName": "Catla catla", "englishName": "Indian Carp", "localName": "Indian Carp"},
+    {"name": "Indo-Pacific Tarpon", "classIndex": 17, "scientificName": "Megalops cyprinoides", "englishName": "Indo-Pacific Tarpon", "localName": "Buan-buan"},
+    {"name": "Jaguar Gapote", "classIndex": 18, "scientificName": "Parachromis managuensis", "englishName": "Jaguar Gapote", "localName": "Jaguar Gapote"},
+    {"name": "Janitor Fish", "classIndex": 19, "scientificName": "Pterygoplichthys disjunctivus", "englishName": "Janitor Fish", "localName": "Janitor Fish"},
+    {"name": "Knifefish", "classIndex": 20, "scientificName": "Chitala ornata", "englishName": "Knifefish", "localName": "Knifefish"},
+    {"name": "Long-Snouted Pipefish", "classIndex": 21, "scientificName": "Syngnathus temminckii", "englishName": "Long-Snouted Pipefish", "localName": "Long-Snouted Pipefish"},
+    {"name": "Mosquito Fish", "classIndex": 22, "scientificName": "Gambusia affinis", "englishName": "Mosquito Fish", "localName": "Mosquito Fish"},
+    {"name": "Mudfish", "classIndex": 23, "scientificName": "Channa striata", "englishName": "Mudfish", "localName": "Dalag"},
+    {"name": "Mullet", "classIndex": 24, "scientificName": "Mugil cephalus", "englishName": "Mullet", "localName": "Banak"},
+    {"name": "Pangasius", "classIndex": 25, "scientificName": "Pangasianodon hypophthalmus", "englishName": "Pangasius", "localName": "Pangasius"},
+    {"name": "Perch", "classIndex": 26, "scientificName": "Perca fluviatilis", "englishName": "Perch", "localName": "Perch"},
+    {"name": "Red Mullet", "classIndex": 27, "scientificName": "Mullus barbatus", "englishName": "Red Mullet", "localName": "Red Mullet"},
+    {"name": "Red Sea Bream", "classIndex": 28, "scientificName": "Pagrus major", "englishName": "Red Sea Bream", "localName": "Red Sea Bream"},
+    {"name": "Scat Fish", "classIndex": 29, "scientificName": "Scatophagus argus", "englishName": "Scat Fish", "localName": "Kitang"},
+    {"name": "Sea Bass", "classIndex": 30, "scientificName": "Lates calcarifer", "englishName": "Sea Bass", "localName": "Apahap"},
+    {"name": "Shrimp", "classIndex": 31, "scientificName": "Penaeus monodon", "englishName": "Shrimp", "localName": "Hipon / Sugpo"},
+    {"name": "Silver Barb", "classIndex": 32, "scientificName": "Barbonymus gonionotus", "englishName": "Silver Barb", "localName": "Silver Barb"},
+    {"name": "Silver Carp", "classIndex": 33, "scientificName": "Hypophthalmichthys molitrix", "englishName": "Silver Carp", "localName": "Silver Carp"},
+    {"name": "Silver Perch", "classIndex": 34, "scientificName": "Leiopotherapon plumbeus", "englishName": "Silver Perch", "localName": "Ayungin"},
+    {"name": "Snakehead", "classIndex": 35, "scientificName": "Channa striata", "englishName": "Snakehead", "localName": "Dalag"},
+    {"name": "Striped Red Mullet", "classIndex": 36, "scientificName": "Mullus surmuletus", "englishName": "Striped Red Mullet", "localName": "Striped Red Mullet"},
+    {"name": "Tenpounder", "classIndex": 37, "scientificName": "Elops machnata", "englishName": "Tenpounder", "localName": "Bidbid"},
+    {"name": "Tilapia", "classIndex": 38, "scientificName": "Oreochromis niloticus", "englishName": "Tilapia", "localName": "Tilapia"},
+    {"name": "Trout", "classIndex": 39, "scientificName": "Oncorhynchus mykiss", "englishName": "Trout", "localName": "Trout"},
+    {"name": "Tuna", "classIndex": 40, "scientificName": "Thunnus albacares", "englishName": "Yellowfin Tuna", "localName": "Barilis / Tambakol"},
 ]
 
 # Pre-trained models that ship with the project

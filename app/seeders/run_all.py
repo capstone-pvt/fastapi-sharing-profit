@@ -1,4 +1,9 @@
 import asyncio
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load .env before any app imports that read os.getenv
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 from app.db import connect_db, disconnect_db
 from app.seeders.roles_permissions import (

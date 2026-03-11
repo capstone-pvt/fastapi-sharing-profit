@@ -76,7 +76,7 @@ def build_crud_router(
                         "limit": limit,
                         "offset": offset,
                     }
-                query["companyId"] = object_id
+                query["companyId"] = {"$in": [object_id, str(object_id)]}
             cursor = (
                 db[collection_name]
                 .find(query)

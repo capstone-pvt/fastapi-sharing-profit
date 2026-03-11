@@ -41,6 +41,11 @@ async def seed_broker_role_with_permissions() -> None:
         permission_ids.get("forecasts:create"),
         permission_ids.get("forecasts:update"),
         permission_ids.get("forecasts:delete"),
+        permission_ids.get("user:read"),
+        permission_ids.get("catches:create"),
+        permission_ids.get("catches:read"),
+        permission_ids.get("catches:update"),
+        permission_ids.get("catches:delete"),
     ]
     await ensure_default_roles(
         {

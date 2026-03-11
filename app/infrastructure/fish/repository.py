@@ -10,7 +10,9 @@ async def get_species_index(species: str | None) -> int:
     if not species:
         return 0
     db = get_db()
-    record = await db["fish_species"].find_one({"name": species})
+    record = await db["fish_species"].find_one(
+        {"name": {"$regex": f"^{species}$", "$options": "i"}}
+    )
     if record and record.get("classIndex") is not None:
         return int(record.get("classIndex"))
     return 0
@@ -21,7 +23,9 @@ async def get_species_info(species: str | None) -> dict[str, Any] | None:
     if not species:
         return None
     db = get_db()
-    record = await db["fish_species"].find_one({"name": species})
+    record = await db["fish_species"].find_one(
+        {"name": {"$regex": f"^{species}$", "$options": "i"}}
+    )
     if not record:
         return None
     return {
@@ -55,3 +59,14 @@ async def list_active_species_names() -> set[str]:
     db = get_db()
     cursor = db["fish_species"].find({"isActive": True})
     return {doc.get("name") async for doc in cursor if doc.get("name")}
+
+
+async def list_active_species_name_map() -> dict[str, str]:
+    """Return a lowercase→original name map for case-insensitive matching."""
+    db = get_db()
+    cursor = db["fish_species"].find({"isActive": True})
+    return {
+        doc["name"].lower(): doc["name"]
+        async for doc in cursor
+        if doc.get("name")
+    }

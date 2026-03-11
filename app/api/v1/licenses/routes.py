@@ -90,7 +90,7 @@ async def validate_activation_code(
     db = get_db()
     doc = await db[COLLECTION].find_one({"activationCode": code})
     if not doc:
-        raise HTTPException(status_code=404, detail="Invalid activation code")
+        raise HTTPException(status_code=422, detail="Invalid activation code. Please check and try again.")
 
     status = doc.get("status", "")
     if status == "revoked":

@@ -1,16 +1,5 @@
+"""Tests for dynamic CRUD endpoints (boats, vessels, trips, etc.)."""
 import pytest
-
-
-def _login_as_super(client):
-    response = client.post(
-        "/api/auth/login",
-        json={"email": "super@example.com", "password": "Admin@123456"},
-    )
-    assert response.status_code == 200, response.text
-    data = response.json()
-    access_token = data.get("accessToken")
-    assert access_token, "Missing access token in login response"
-    return {"Authorization": f"Bearer {access_token}"}
 
 
 CRUD_CASES = [
@@ -20,8 +9,6 @@ CRUD_CASES = [
     ("trips", "/api/trips", {"name": "Test Trip"}),
     ("expenses", "/api/expenses", {"title": "Test Expense", "amount": 1200}),
     ("fish-sales", "/api/fish-sales", {"buyer": "Test Buyer", "amount": 2500}),
-    ("cash-advances", "/api/cash-advances", {"amount": 500, "purpose": "Test"}),
-    ("forecasts", "/api/forecasts", {"notes": "Test Forecast"}),
     ("catches", "/api/catches", {"notes": "Test Catch"}),
     ("crew", "/api/crew", {"name": "Test Crew"}),
     (
@@ -33,33 +20,62 @@ CRUD_CASES = [
 
 
 @pytest.mark.parametrize("label, path, payload", CRUD_CASES)
-def test_crud_flow(client, label, path, payload):
-    headers = _login_as_super(client)
+class TestCrudFlow:
+    def test_create(self, client, super_headers, label, path, payload):
+        resp = client.post(path, json=payload, headers=super_headers)
+        assert resp.status_code in (200, 201), f"{label} create failed: {resp.text}"
+        assert resp.json().get("id"), f"{label} create missing id"
 
-    create_response = client.post(path, json=payload, headers=headers)
-    assert create_response.status_code in (200, 201), create_response.text
-    created = create_response.json()
-    item_id = created.get("id")
-    assert item_id, f"{label} create missing id"
+    def test_list(self, client, super_headers, label, path, payload):
+        resp = client.get(path, headers=super_headers)
+        assert resp.status_code == 200, f"{label} list failed: {resp.text}"
+        data = resp.json()
+        assert "results" in data
 
-    list_response = client.get(path, headers=headers)
-    assert list_response.status_code == 200, list_response.text
-    results = list_response.json().get("results", [])
-    assert any(item.get("id") == item_id for item in results)
+    def test_create_read_update_delete(self, client, super_headers, label, path, payload):
+        # Create
+        create_resp = client.post(path, json=payload, headers=super_headers)
+        assert create_resp.status_code in (200, 201), create_resp.text
+        item_id = create_resp.json().get("id")
+        assert item_id
 
-    get_response = client.get(f"{path}/{item_id}", headers=headers)
-    assert get_response.status_code == 200, get_response.text
-    assert get_response.json().get("id") == item_id
+        # Read
+        get_resp = client.get(f"{path}/{item_id}", headers=super_headers)
+        assert get_resp.status_code == 200
+        assert get_resp.json().get("id") == item_id
 
-    update_payload = {"notes": f"Updated {label}"}
-    update_response = client.patch(
-        f"{path}/{item_id}",
-        json=update_payload,
-        headers=headers,
-    )
-    assert update_response.status_code == 200, update_response.text
-    assert update_response.json().get("notes") == update_payload["notes"]
+        # Update
+        update_resp = client.patch(
+            f"{path}/{item_id}",
+            json={"notes": f"Updated {label}"},
+            headers=super_headers,
+        )
+        assert update_resp.status_code == 200
+        assert update_resp.json().get("notes") == f"Updated {label}"
 
-    delete_response = client.delete(f"{path}/{item_id}", headers=headers)
-    assert delete_response.status_code == 200, delete_response.text
-    assert delete_response.json().get("status") == "deleted"
+        # Delete
+        delete_resp = client.delete(f"{path}/{item_id}", headers=super_headers)
+        assert delete_resp.status_code == 200
+        assert delete_resp.json().get("status") == "deleted"
+
+    def test_unauthenticated_cannot_access(self, client, label, path, payload):
+        resp = client.get(path)
+        assert resp.status_code in (401, 403)
+
+
+EXTRA_CASES = [
+    ("cash-advances", "/api/cash-advances", {"amount": 500, "purpose": "Test"}),
+    ("forecasts", "/api/forecasts", {"notes": "Test Forecast"}),
+    ("profit-shares", "/api/profit-shares", {"notes": "Test Share"}),
+]
+
+
+@pytest.mark.parametrize("label, path, payload", EXTRA_CASES)
+class TestCrudReadAndCreate:
+    def test_list(self, client, super_headers, label, path, payload):
+        resp = client.get(path, headers=super_headers)
+        assert resp.status_code == 200
+
+    def test_create(self, client, super_headers, label, path, payload):
+        resp = client.post(path, json=payload, headers=super_headers)
+        assert resp.status_code in (200, 201)

@@ -32,7 +32,7 @@ services:
     restart: always
     environment:
       - MONGODB_URI=${MONGODB_URI}
-      - DATABASE_NAME=${DATABASE_NAME:-profit_sharing_db}
+      - DATABASE_NAME=${DATABASE_NAME:-smart_catch}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - JWT_EXPIRATION=${JWT_EXPIRATION:-15m}

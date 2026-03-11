@@ -23,7 +23,7 @@ from app.infrastructure.fish.repository import (
     get_species_index,
     get_species_info,
     list_analysis_history,
-    list_active_species_names,
+    list_active_species_name_map,
     save_analysis,
 )
 from app.infrastructure.fish.storage import save_upload
@@ -75,12 +75,21 @@ async def analyze_fish(
             print(f"ERROR processing image: {str(e)}")
             raise HTTPException(status_code=400, detail="Invalid image format")
 
-        # Get active species and detect fish
+        # Get active species (case-insensitive map: lowercase -> canonical name)
+        species_map: dict[str, str] = {}
         try:
-            active_species = await list_active_species_names()
+            species_map = await list_active_species_name_map()
         except Exception as e:
             print(f"WARNING: Failed to load active species: {str(e)}")
-            active_species = set()
+
+        # Known typos / aliases in model class names
+        _SPECIES_ALIASES = {"tune": "tuna"}
+
+        def _normalize_species(name: str) -> str:
+            """Map model species name to canonical DB name (case-insensitive)."""
+            key = name.lower()
+            key = _SPECIES_ALIASES.get(key, key)
+            return species_map.get(key, name)
 
         try:
             detections = detect_fish(pil_image, confidence=confidence, iou=iou)
@@ -89,17 +98,23 @@ async def analyze_fish(
             print(f"ERROR in fish detection: {str(e)}")
             detections = []
 
-        if active_species:
+        # Normalize species names from model to match DB names
+        for det in detections:
+            det["species"] = _normalize_species(det.get("species", "Unknown"))
+
+        if species_map:
+            canonical_names = set(species_map.values())
             detections = [
                 detection
                 for detection in detections
-                if detection.get("species") in active_species
+                if detection.get("species") in canonical_names
             ]
             print(f"INFO: After filtering by active species: {len(detections)} detection(s)")
 
         if not detections:
             try:
                 species, confidence_score = classify_fish(pil_image)
+                species = _normalize_species(species)
                 print(f"INFO: Classifier returned: {species} with confidence {confidence_score}")
             except Exception as e:
                 print(f"ERROR in fish classification: {str(e)}")
@@ -112,7 +127,8 @@ async def analyze_fish(
                 species = "Generic Fish"
                 confidence_score = 0.5
 
-            if active_species and species not in active_species and species != "Generic Fish":
+            canonical_names = set(species_map.values()) if species_map else set()
+            if canonical_names and species not in canonical_names and species != "Generic Fish":
                 raise HTTPException(
                     status_code=400,
                     detail="No fish detected in the image.",
