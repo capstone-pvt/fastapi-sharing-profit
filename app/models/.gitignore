@@ -1,13 +1,3 @@
-# Ignore all model files (they are usually large binary files)
-*.pt
-*.pth
-*.onnx
-*.joblib
-*.pkl
-*.pickle
-*.h5
-*.pb
-
-# But keep the directory structure
+# Keep the directory structure
 !.gitkeep
 !README.md

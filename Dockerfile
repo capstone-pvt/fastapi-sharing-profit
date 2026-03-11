@@ -45,12 +45,13 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     WORKERS=4 \
     MAX_WORKERS=8 \
     TIMEOUT=120 \
+    YOLO_CONFIG_DIR=/tmp \
     UPLOAD_ROOT=uploads \
-    MODEL_ROOT=models \
-    CLASSIFIER_MODEL_PATH=models/classifier/best.pt \
-    DETECTOR_MODEL_PATH=models/detector/best.pt \
-    WEIGHT_MODEL_PATH=models/weight/weight_model.joblib \
-    PRICE_MODEL_PATH=models/price/price_model.joblib \
+    MODEL_ROOT=app/models \
+    CLASSIFIER_MODEL_PATH=app/models/classifier/best.pt \
+    DETECTOR_MODEL_PATH=app/models/detector/best.pt \
+    WEIGHT_MODEL_PATH=app/models/weight/weight_model.joblib \
+    PRICE_MODEL_PATH=app/models/price/price_model.joblib \
     DETECTOR_CONFIDENCE=0.25 \
     DETECTOR_IOU=0.45 \
     AUTO_TRAIN_ON_SAMPLE=false \
@@ -77,7 +78,7 @@ COPY --from=builder /opt/venv /opt/venv
 COPY --chown=appuser:appuser . .
 
 # Create necessary directories with proper permissions
-RUN mkdir -p uploads models/classifier models/detector models/weight models/price logs && \
+RUN mkdir -p uploads app/models/classifier app/models/detector app/models/weight app/models/price logs && \
     chown -R appuser:appuser /app
 
 # Switch to non-root user
