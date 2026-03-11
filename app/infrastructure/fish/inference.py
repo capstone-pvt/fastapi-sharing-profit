@@ -148,7 +148,10 @@ def detect_fish(
                         },
                     }
                 )
-    except Exception:
+    except Exception as e:
+        import traceback
+        print(f"ERROR in detect_fish prediction: {e}")
+        traceback.print_exc()
         return []
     return detections
 
@@ -166,7 +169,10 @@ def classify_fish(pil_image) -> tuple[str, float]:
                 species = result.names.get(top_idx, "Unknown")
                 confidence = float(result.probs.top1conf)
                 return species, confidence
-    except Exception:
+    except Exception as e:
+        import traceback
+        print(f"ERROR in classify_fish prediction: {e}")
+        traceback.print_exc()
         return "Unknown", 0.0
     return "Unknown", 0.0
 
@@ -199,6 +205,27 @@ def estimate_weight(
         except Exception:
             pass
     return float(width * height) * 0.000001
+
+
+def preload_models() -> dict[str, bool]:
+    """Eagerly load all ML models. Returns a status dict."""
+    status = {}
+    for name, loader in [
+        ("detector", _load_detector),
+        ("classifier", _load_classifier),
+        ("weight", _load_weight_model),
+        ("price", _load_price_model),
+    ]:
+        try:
+            model = loader()
+            status[name] = model is not None
+            if model is None:
+                print(f"WARNING: {name} model returned None")
+        except Exception as e:
+            status[name] = False
+            print(f"ERROR preloading {name} model: {e}")
+    print(f"Model preload status: {status}")
+    return status
 
 
 def estimate_price(species_index: int, estimated_weight: float) -> float:

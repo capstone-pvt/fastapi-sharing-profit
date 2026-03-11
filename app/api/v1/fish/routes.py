@@ -50,7 +50,12 @@ async def analyze_fish(
 
         # Read and save image
         try:
-            image_bytes = image.file.read()
+            image_bytes = await image.read()
+            if not image_bytes:
+                print("ERROR: image.read() returned empty bytes")
+                raise HTTPException(status_code=400, detail="Image file is empty")
+        except HTTPException:
+            raise
         except Exception as e:
             print(f"ERROR reading image file: {str(e)}")
             raise HTTPException(status_code=400, detail="Failed to read image file")
@@ -79,6 +84,7 @@ async def analyze_fish(
         species_map: dict[str, str] = {}
         try:
             species_map = await list_active_species_name_map()
+            print(f"INFO: Loaded {len(species_map)} active species from DB")
         except Exception as e:
             print(f"WARNING: Failed to load active species: {str(e)}")
 
@@ -91,6 +97,7 @@ async def analyze_fish(
             key = _SPECIES_ALIASES.get(key, key)
             return species_map.get(key, name)
 
+        print(f"INFO: Image size={pil_image.size}, mode={pil_image.mode}, bytes={len(image_bytes)}")
         try:
             detections = detect_fish(pil_image, confidence=confidence, iou=iou)
             print(f"INFO: Detector found {len(detections)} detection(s)")
@@ -117,7 +124,9 @@ async def analyze_fish(
                 species = _normalize_species(species)
                 print(f"INFO: Classifier returned: {species} with confidence {confidence_score}")
             except Exception as e:
+                import traceback
                 print(f"ERROR in fish classification: {str(e)}")
+                traceback.print_exc()
                 species = "Unknown"
                 confidence_score = 0.0
 
@@ -212,6 +221,56 @@ async def analyze_fish(
             status_code=500,
             detail=f"Image analysis failed: {str(e)}"
         )
+
+
+@router.get("/diagnostic")
+async def diagnostic(user: dict[str, Any] = Depends(get_current_user)):
+    """Diagnostic endpoint to verify model loading and species DB."""
+    import os
+    from PIL import Image
+
+    settings = get_settings()
+    result = {"models": {}, "species": {}, "testPrediction": {}}
+
+    # Check model files
+    for name, path in [
+        ("detector", settings.detector_model_path),
+        ("classifier", settings.classifier_model_path),
+        ("weight", settings.weight_model_path),
+        ("price", settings.price_model_path),
+    ]:
+        result["models"][name] = {
+            "path": path,
+            "exists": os.path.exists(path),
+        }
+
+    # Check species in DB
+    species_map = await list_active_species_name_map()
+    result["species"]["count"] = len(species_map)
+    result["species"]["names"] = sorted(species_map.values())
+
+    # Test model loading and prediction with a blank image
+    test_img = Image.new("RGB", (640, 480), color="blue")
+    try:
+        detections = detect_fish(test_img, confidence=0.25, iou=0.45)
+        result["testPrediction"]["detector"] = {
+            "status": "ok",
+            "detections": len(detections),
+        }
+    except Exception as e:
+        result["testPrediction"]["detector"] = {"status": "error", "error": str(e)}
+
+    try:
+        species, conf = classify_fish(test_img)
+        result["testPrediction"]["classifier"] = {
+            "status": "ok",
+            "species": species,
+            "confidence": conf,
+        }
+    except Exception as e:
+        result["testPrediction"]["classifier"] = {"status": "error", "error": str(e)}
+
+    return result
 
 
 @router.get("/analytics")
