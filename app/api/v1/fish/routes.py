@@ -40,6 +40,8 @@ async def analyze_fish(
     scaleReferenceCm: float | None = None,
     confidence: float | None = None,
     iou: float | None = None,
+    caughtBy: str | None = None,
+    caughtByName: str | None = None,
 ):
     try:
         settings = get_settings()
@@ -165,6 +167,8 @@ async def analyze_fish(
                 image_width=width,
                 image_height=height,
                 scanned_by=scanned_by,
+                caught_by=caughtBy,
+                caught_by_name=caughtByName,
                 get_species_index=get_species_index,
                 estimate_price=estimate_price,
             )

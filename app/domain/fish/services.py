@@ -105,6 +105,8 @@ async def build_analysis(
     image_width: int | None = None,
     image_height: int | None = None,
     scanned_by: str | None = None,
+    caught_by: str | None = None,
+    caught_by_name: str | None = None,
     get_species_index: Callable[[str | None], Awaitable[int]],
     estimate_price: Callable[[int, float], float],
 ) -> dict[str, Any]:
@@ -133,4 +135,6 @@ async def build_analysis(
         "imageWidth": image_width,
         "imageHeight": image_height,
         "scannedBy": scanned_by,
+        "caughtBy": caught_by,
+        "caughtByName": caught_by_name,
     }
