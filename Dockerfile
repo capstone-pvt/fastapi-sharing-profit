@@ -54,6 +54,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PRICE_MODEL_PATH=app/models/price/price_model.joblib \
     DETECTOR_CONFIDENCE=0.25 \
     DETECTOR_IOU=0.45 \
+    PRELOAD_MODELS=true \
+    STORAGE_BACKEND=local \
+    CLOUDINARY_URL="" \
     AUTO_TRAIN_ON_SAMPLE=false \
     OPENWEATHER_API_KEY=""
 

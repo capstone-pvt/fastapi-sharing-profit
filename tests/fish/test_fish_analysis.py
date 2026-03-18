@@ -60,6 +60,32 @@ class TestAnalyzeFish:
         )
         assert resp.status_code == 401
 
+    def test_crew_can_analyze(self, client, crew_headers):
+        image_bytes = _create_test_image()
+        resp = client.post(
+            "/api/fish/analyze",
+            headers=crew_headers,
+            files={"image": ("crew_fish.jpg", image_bytes, "image/jpeg")},
+        )
+        assert resp.status_code in (200, 400, 500), resp.text
+
+
+class TestFishDiagnostic:
+    def test_broker_can_access_diagnostic(self, client, broker_headers):
+        resp = client.get("/api/fish/diagnostic", headers=broker_headers)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "models" in data
+        assert "species" in data
+
+    def test_crew_cannot_access_diagnostic(self, client, crew_headers):
+        resp = client.get("/api/fish/diagnostic", headers=crew_headers)
+        assert resp.status_code == 403
+
+    def test_unauthenticated_cannot_access_diagnostic(self, client):
+        resp = client.get("/api/fish/diagnostic")
+        assert resp.status_code == 401
+
 
 class TestFishAnalytics:
     def test_get_analytics(self, client, broker_headers):
@@ -68,6 +94,10 @@ class TestFishAnalytics:
         data = resp.json()
         assert "totalAnalyses" in data
         assert "userAnalyses" in data
+
+    def test_crew_cannot_access_analytics(self, client, crew_headers):
+        resp = client.get("/api/fish/analytics", headers=crew_headers)
+        assert resp.status_code == 403
 
     def test_unauthenticated_cannot_get_analytics(self, client):
         resp = client.get("/api/fish/analytics")
@@ -79,7 +109,27 @@ class TestAnalysisHistory:
         resp = client.get("/api/fish/analysis-history", headers=broker_headers)
         assert resp.status_code == 200
         data = resp.json()
-        assert isinstance(data, list)
+        assert "results" in data
+        assert "total" in data
+        assert "limit" in data
+        assert "offset" in data
+        assert isinstance(data["results"], list)
+
+    def test_history_with_pagination(self, client, broker_headers):
+        resp = client.get(
+            "/api/fish/analysis-history?limit=2&offset=0",
+            headers=broker_headers,
+        )
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["limit"] == 2
+        assert data["offset"] == 0
+
+    def test_crew_can_access_own_history(self, client, crew_headers):
+        resp = client.get("/api/fish/analysis-history", headers=crew_headers)
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "results" in data
 
     def test_unauthenticated_cannot_get_history(self, client):
         resp = client.get("/api/fish/analysis-history")

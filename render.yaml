@@ -42,3 +42,9 @@ services:
         value: "1"
       - key: TIMEOUT
         value: "120"
+      - key: PRELOAD_MODELS
+        value: "true"
+      - key: STORAGE_BACKEND
+        value: "local"
+      - key: CLOUDINARY_URL
+        sync: false

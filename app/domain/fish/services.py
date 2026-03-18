@@ -107,6 +107,7 @@ async def build_analysis(
     scanned_by: str | None = None,
     caught_by: str | None = None,
     caught_by_name: str | None = None,
+    company_id: str | None = None,
     get_species_index: Callable[[str | None], Awaitable[int]],
     estimate_price: Callable[[int, float], float],
 ) -> dict[str, Any]:
@@ -124,6 +125,7 @@ async def build_analysis(
     return {
         "imageUrl": image_url,
         "userId": user_id,
+        "companyId": company_id,
         "createdAt": datetime.utcnow(),
         "detections": detections,
         "totalEstimatedWeight": total_weight,

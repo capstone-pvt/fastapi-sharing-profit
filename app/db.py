@@ -10,7 +10,10 @@ client: AsyncIOMotorClient | None = None
 async def connect_db() -> None:
     global client
     settings = get_settings()
-    client = AsyncIOMotorClient(settings.mongodb_uri, tlsCAFile=certifi.where())
+    kwargs = {}
+    if settings.mongodb_uri.startswith("mongodb+srv"):
+        kwargs["tlsCAFile"] = certifi.where()
+    client = AsyncIOMotorClient(settings.mongodb_uri, **kwargs)
 
 
 async def disconnect_db() -> None:

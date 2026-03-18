@@ -431,6 +431,36 @@ async def ensure_default_permissions() -> dict[str, str]:
             "action": "update",
             "description": "Update cash advance requests",
         },
+        {
+            "name": "cash-advances:delete",
+            "resource": "cash-advances",
+            "action": "delete",
+            "description": "Delete cash advance requests",
+        },
+        {
+            "name": "fish:analyze",
+            "resource": "fish",
+            "action": "analyze",
+            "description": "Run fish image analysis",
+        },
+        {
+            "name": "fish:diagnostic",
+            "resource": "fish",
+            "action": "diagnostic",
+            "description": "View fish diagnostic info",
+        },
+        {
+            "name": "fish:analytics",
+            "resource": "fish",
+            "action": "analytics",
+            "description": "View fish analytics",
+        },
+        {
+            "name": "fish:history",
+            "resource": "fish",
+            "action": "history",
+            "description": "View fish analysis history",
+        },
     ]
     permission_ids: dict[str, str] = {}
     for perm in defaults:

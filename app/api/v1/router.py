@@ -122,7 +122,7 @@ api_router.include_router(
             "create": "cash-advances:create",
             "read": "cash-advances:read",
             "update": "cash-advances:update",
-            "delete": "cash-advances:update",
+            "delete": "cash-advances:delete",
         },
     ),
     prefix="/cash-advances",

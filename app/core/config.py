@@ -50,6 +50,8 @@ class Settings:
     size_small_max_kg = float(os.getenv("SIZE_SMALL_MAX_KG", "0.5"))
     size_medium_max_kg = float(os.getenv("SIZE_MEDIUM_MAX_KG", "1.5"))
     openweather_api_key = os.getenv("OPENWEATHER_API_KEY", "")
+    storage_backend = os.getenv("STORAGE_BACKEND", "local")
+    cloudinary_url = os.getenv("CLOUDINARY_URL", "")
 
 
 @lru_cache()

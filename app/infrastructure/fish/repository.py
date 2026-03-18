@@ -49,10 +49,27 @@ async def count_analyses(user_id: str) -> tuple[int, int]:
     return total, mine
 
 
-async def list_analysis_history(user_id: str) -> list[dict[str, Any]]:
+async def list_analysis_history(
+    user_id: str,
+    company_id: str | None = None,
+    limit: int = 50,
+    offset: int = 0,
+) -> tuple[list[dict[str, Any]], int]:
     db = get_db()
-    cursor = db["fish_analyses"].find({"userId": user_id}).sort("createdAt", -1)
-    return [serialize_doc(doc) async for doc in cursor]
+    if company_id:
+        query: dict[str, Any] = {"companyId": company_id}
+    else:
+        query = {"userId": user_id}
+    total = await db["fish_analyses"].count_documents(query)
+    cursor = (
+        db["fish_analyses"]
+        .find(query)
+        .sort("createdAt", -1)
+        .skip(offset)
+        .limit(limit)
+    )
+    results = [serialize_doc(doc) async for doc in cursor]
+    return results, total
 
 
 async def list_active_species_names() -> set[str]:

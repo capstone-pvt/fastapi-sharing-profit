@@ -2,10 +2,10 @@ from datetime import datetime
 from io import BytesIO
 from typing import Any
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from PIL import Image
 
-from app.deps import get_current_user
+from app.deps import get_current_user, require_permissions
 from app.domain.fish.services import (
     apply_estimates_to_detections,
     build_analysis,
@@ -27,15 +27,24 @@ from app.infrastructure.fish.repository import (
     save_analysis,
 )
 from app.infrastructure.fish.storage import save_upload
+from app.infrastructure.roles.repository import get_role
 
 
 router = APIRouter(prefix="/fish", tags=["fish"])
 
 
+async def _get_role_name(user: dict[str, Any]) -> str:
+    role_id = user.get("roleId")
+    if not role_id:
+        return ""
+    role = await get_role(str(role_id))
+    return (role.get("name") or "").strip().lower() if role else ""
+
+
 @router.post("/analyze")
 async def analyze_fish(
     image: UploadFile = File(...),
-    user: dict[str, Any] = Depends(get_current_user),
+    user: dict[str, Any] = Depends(require_permissions("fish:analyze")),
     singleFish: bool | None = None,
     scaleReferenceCm: float | None = None,
     confidence: float | None = None,
@@ -182,6 +191,11 @@ async def analyze_fish(
         ).strip()
         scanned_by = full_name if full_name else user.get("email")
 
+        # Resolve company ID for scoping
+        company_id = user.get("companyId")
+        if company_id:
+            company_id = str(company_id)
+
         try:
             analysis = await build_analysis(
                 detections,
@@ -194,6 +208,7 @@ async def analyze_fish(
                 scanned_by=scanned_by,
                 caught_by=caughtBy,
                 caught_by_name=caughtByName,
+                company_id=company_id,
                 get_species_index=get_species_index,
                 estimate_price=estimate_price,
             )
@@ -224,7 +239,7 @@ async def analyze_fish(
 
 
 @router.get("/diagnostic")
-async def diagnostic(user: dict[str, Any] = Depends(get_current_user)):
+async def diagnostic(user: dict[str, Any] = Depends(require_permissions("fish:diagnostic"))):
     """Diagnostic endpoint to verify model loading and species DB."""
     import os
     from PIL import Image
@@ -274,11 +289,34 @@ async def diagnostic(user: dict[str, Any] = Depends(get_current_user)):
 
 
 @router.get("/analytics")
-async def analytics(user: dict[str, Any] = Depends(get_current_user)):
+async def analytics(user: dict[str, Any] = Depends(require_permissions("fish:analytics"))):
     total, mine = await count_analyses(user["id"])
     return {"totalAnalyses": total, "userAnalyses": mine}
 
 
 @router.get("/analysis-history")
-async def analysis_history(user: dict[str, Any] = Depends(get_current_user)):
-    return await list_analysis_history(user["id"])
+async def analysis_history(
+    limit: int = Query(50, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+    user: dict[str, Any] = Depends(require_permissions("fish:history")),
+):
+    role_name = await _get_role_name(user)
+
+    company_id = None
+    if role_name in ("broker", "admin", "super", "owner"):
+        cid = user.get("companyId")
+        if cid:
+            company_id = str(cid)
+
+    results, total = await list_analysis_history(
+        user_id=user["id"],
+        company_id=company_id,
+        limit=limit,
+        offset=offset,
+    )
+    return {
+        "results": results,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }

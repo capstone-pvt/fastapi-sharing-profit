@@ -208,7 +208,19 @@ def estimate_weight(
 
 
 def preload_models() -> dict[str, bool]:
-    """Eagerly load all ML models. Returns a status dict."""
+    """Eagerly load all ML models. Returns a status dict.
+
+    Set PRELOAD_MODELS=false to skip preloading (lazy-load on first request).
+    This reduces startup memory on constrained plans like Render starter.
+    """
+    import os
+
+    if os.getenv("PRELOAD_MODELS", "true").lower() == "false":
+        print("INFO: PRELOAD_MODELS=false — models will lazy-load on first request")
+        return {}
+
+    import gc
+
     status = {}
     for name, loader in [
         ("detector", _load_detector),
@@ -224,6 +236,7 @@ def preload_models() -> dict[str, bool]:
         except Exception as e:
             status[name] = False
             print(f"ERROR preloading {name} model: {e}")
+    gc.collect()
     print(f"Model preload status: {status}")
     return status
 
