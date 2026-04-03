@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from typing import Any
 
@@ -25,7 +26,7 @@ async def get_role_by_id(role_id: str) -> dict[str, Any] | None:
 async def get_role_by_name(name: str) -> dict[str, Any] | None:
     db = get_db()
     return await db["roles"].find_one(
-        {"name": {"$regex": f"^{name}$", "$options": "i"}}
+        {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}}
     )
 
 
@@ -55,7 +56,7 @@ async def get_company_by_code(company_code: str) -> dict[str, Any] | None:
     db = get_db()
     code = (company_code or "").strip()
     return await db["companies"].find_one(
-        {"companyCode": {"$regex": f"^{code}$", "$options": "i"}}
+        {"companyCode": {"$regex": f"^{re.escape(code)}$", "$options": "i"}}
     )
 
 

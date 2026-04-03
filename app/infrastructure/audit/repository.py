@@ -2,7 +2,7 @@
 Audit logging repository for tracking company assignments and other administrative actions.
 """
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 from bson import ObjectId
 from app.db import get_db
@@ -32,7 +32,7 @@ async def create_audit_log(
         The created audit log document
     """
     db = get_db()
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     audit_doc = {
         "action": action,
@@ -198,7 +198,7 @@ async def delete_old_audit_logs(days: int = 90) -> int:
         Number of deleted documents
     """
     db = get_db()
-    cutoff_date = datetime.utcnow() - timedelta(days=days)
+    cutoff_date = datetime.now(timezone.utc) - timedelta(days=days)
 
     result = await db["audit_logs"].delete_many({"timestamp": {"$lt": cutoff_date}})
     return result.deleted_count

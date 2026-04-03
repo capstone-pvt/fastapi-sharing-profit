@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -33,7 +33,7 @@ def build_profile_update_payload(payload: dict[str, Any]) -> dict[str, Any]:
     ):
         if field in payload and payload[field] is not None:
             update_payload[field] = payload[field]
-    update_payload["updatedAt"] = datetime.utcnow()
+    update_payload["updatedAt"] = datetime.now(timezone.utc)
     return update_payload
 
 

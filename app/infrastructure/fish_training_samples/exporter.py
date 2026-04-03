@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +14,7 @@ def export_dataset(
     species_records: list[dict[str, Any]],
     include_images: bool,
 ) -> dict[str, Any]:
-    timestamp = int(datetime.utcnow().timestamp() * 1000)
+    timestamp = int(datetime.now(timezone.utc).timestamp() * 1000)
     export_root = Path("exports") / "fish-training" / str(timestamp)
     images_dir = export_root / "images"
     labels_dir = export_root / "labels"
@@ -122,7 +122,7 @@ def export_dataset(
     (export_root / "manifest.json").write_text(
         json.dumps(
             {
-                "createdAt": datetime.utcnow().isoformat(),
+                "createdAt": datetime.now(timezone.utc).isoformat(),
                 "samples": len(samples),
                 "images": images_count,
                 "labels": labels_count,

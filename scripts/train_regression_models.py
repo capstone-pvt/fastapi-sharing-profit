@@ -12,7 +12,9 @@ Output:
     models/price/price_model.joblib
 
 Weight model features (matching inference.py):
-    [species_index, bbox_width, bbox_height, scale_reference_cm, length_cm, width_cm]
+    Base (6):       [species_index, bbox_width, bbox_height, scale_reference_cm, length_cm, width_cm]
+    Engineered (3): [area (bbox_w*bbox_h), aspect_ratio (bbox_w/bbox_h), area_cm (length_cm*width_cm)]
+    Total: 9 features — WEIGHT_MODEL_EXPECTED_FEATURES in inference.py must match this count.
 
 Price model features (matching inference.py):
     [species_index, weight_kg]
@@ -26,8 +28,10 @@ from pathlib import Path
 
 import joblib
 import numpy as np
-from sklearn.ensemble import GradientBoostingRegressor
-from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+from sklearn.model_selection import cross_val_score, GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 
 
 def _safe_float(val: str, default: float = 0.0) -> float:
@@ -38,10 +42,37 @@ def _safe_float(val: str, default: float = 0.0) -> float:
         return default
 
 
+def _add_engineered_features(X: np.ndarray) -> np.ndarray:
+    """Add engineered features for better weight/price prediction.
+
+    Input columns: [species_index, bbox_width, bbox_height, scale_ref, length_cm, width_cm]
+    Added columns: [area, aspect_ratio, area_cm]
+    """
+    species_idx = X[:, 0:1]
+    bbox_w = X[:, 1]
+    bbox_h = X[:, 2]
+    scale_ref = X[:, 3]
+    length_cm = X[:, 4]
+    width_cm = X[:, 5]
+
+    # Pixel area (proxy for fish size)
+    area = (bbox_w * bbox_h).reshape(-1, 1)
+
+    # Aspect ratio (distinguishes long thin fish from round ones)
+    aspect = np.where(
+        bbox_h > 0, bbox_w / np.maximum(bbox_h, 1.0), 1.0
+    ).reshape(-1, 1)
+
+    # Area in cm^2 (when scale reference is available)
+    area_cm = (length_cm * width_cm).reshape(-1, 1)
+
+    return np.hstack([X, area, aspect, area_cm])
+
+
 def train_weight_model(export_root: Path, output_path: Path) -> None:
     csv_path = export_root / "weight_data.csv"
     if not csv_path.exists():
-        print("weight_data.csv not found – skipping weight model training.")
+        print("weight_data.csv not found -- skipping weight model training.")
         return
 
     X_rows: list[list[float]] = []
@@ -65,26 +96,77 @@ def train_weight_model(export_root: Path, output_path: Path) -> None:
             y_rows.append(weight)
 
     if len(X_rows) < 2:
-        print(f"Not enough weight samples ({len(X_rows)}) – need at least 2. Skipping.")
+        print(f"Not enough weight samples ({len(X_rows)}) -- need at least 2. Skipping.")
         return
 
     X = np.array(X_rows, dtype=float)
     y = np.array(y_rows, dtype=float)
 
-    model = GradientBoostingRegressor(
-        n_estimators=100,
-        max_depth=4,
-        learning_rate=0.1,
-        random_state=42,
-    )
+    # Add engineered features
+    X = _add_engineered_features(X)
+    print(f"Weight model: {len(X)} samples, {X.shape[1]} features (6 base + 3 engineered)")
 
-    # Cross-validation score if enough samples
-    if len(X) >= 5:
+    # Select best model via cross-validation
+    if len(X) >= 10:
         cv_folds = min(5, len(X))
-        scores = cross_val_score(model, X, y, cv=cv_folds, scoring="r2")
-        print(f"Weight model CV R²: {scores.mean():.4f} (+/- {scores.std():.4f})")
 
-    model.fit(X, y)
+        # Compare GradientBoosting with tuned hyperparameters
+        param_grid = {
+            "regressor__n_estimators": [100, 200, 300],
+            "regressor__max_depth": [3, 4, 5, 6],
+            "regressor__learning_rate": [0.05, 0.1, 0.15],
+            "regressor__subsample": [0.8, 1.0],
+        }
+        pipeline = Pipeline([
+            ("scaler", StandardScaler()),
+            ("regressor", GradientBoostingRegressor(random_state=42)),
+        ])
+        grid = GridSearchCV(
+            pipeline,
+            param_grid,
+            cv=cv_folds,
+            scoring="r2",
+            n_jobs=-1,
+            refit=True,
+        )
+        grid.fit(X, y)
+        best_gbr = grid.best_estimator_
+        best_gbr_score = grid.best_score_
+
+        # Compare with RandomForest
+        rf_pipeline = Pipeline([
+            ("scaler", StandardScaler()),
+            ("regressor", RandomForestRegressor(
+                n_estimators=200, max_depth=6, random_state=42, n_jobs=-1
+            )),
+        ])
+        rf_scores = cross_val_score(rf_pipeline, X, y, cv=cv_folds, scoring="r2")
+        rf_score = rf_scores.mean()
+
+        print(f"Weight model GBR CV R²: {best_gbr_score:.4f} (best params: {grid.best_params_})")
+        print(f"Weight model RF  CV R²: {rf_score:.4f} (+/- {rf_scores.std():.4f})")
+
+        if rf_score > best_gbr_score:
+            print("  -> Using RandomForest (better R²)")
+            rf_pipeline.fit(X, y)
+            model = rf_pipeline
+        else:
+            print("  -> Using GradientBoosting (better R²)")
+            model = best_gbr
+    else:
+        # Too few samples for grid search
+        model = Pipeline([
+            ("scaler", StandardScaler()),
+            ("regressor", GradientBoostingRegressor(
+                n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42
+            )),
+        ])
+        model.fit(X, y)
+
+        if len(X) >= 5:
+            cv_folds = min(5, len(X))
+            scores = cross_val_score(model, X, y, cv=cv_folds, scoring="r2")
+            print(f"Weight model CV R²: {scores.mean():.4f} (+/- {scores.std():.4f})")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, output_path)
@@ -94,7 +176,7 @@ def train_weight_model(export_root: Path, output_path: Path) -> None:
 def train_price_model(export_root: Path, output_path: Path) -> None:
     csv_path = export_root / "price_data.csv"
     if not csv_path.exists():
-        print("price_data.csv not found – skipping price model training.")
+        print("price_data.csv not found -- skipping price model training.")
         return
 
     X_rows: list[list[float]] = []
@@ -115,25 +197,49 @@ def train_price_model(export_root: Path, output_path: Path) -> None:
             y_rows.append(price)
 
     if len(X_rows) < 2:
-        print(f"Not enough price samples ({len(X_rows)}) – need at least 2. Skipping.")
+        print(f"Not enough price samples ({len(X_rows)}) -- need at least 2. Skipping.")
         return
 
     X = np.array(X_rows, dtype=float)
     y = np.array(y_rows, dtype=float)
 
-    model = GradientBoostingRegressor(
-        n_estimators=100,
-        max_depth=4,
-        learning_rate=0.1,
-        random_state=42,
-    )
-
-    if len(X) >= 5:
+    # Select best model via cross-validation
+    if len(X) >= 10:
         cv_folds = min(5, len(X))
-        scores = cross_val_score(model, X, y, cv=cv_folds, scoring="r2")
-        print(f"Price model CV R²: {scores.mean():.4f} (+/- {scores.std():.4f})")
 
-    model.fit(X, y)
+        param_grid = {
+            "regressor__n_estimators": [100, 200, 300],
+            "regressor__max_depth": [3, 4, 5],
+            "regressor__learning_rate": [0.05, 0.1, 0.15],
+        }
+        pipeline = Pipeline([
+            ("scaler", StandardScaler()),
+            ("regressor", GradientBoostingRegressor(random_state=42)),
+        ])
+        grid = GridSearchCV(
+            pipeline,
+            param_grid,
+            cv=cv_folds,
+            scoring="r2",
+            n_jobs=-1,
+            refit=True,
+        )
+        grid.fit(X, y)
+        model = grid.best_estimator_
+        print(f"Price model CV R²: {grid.best_score_:.4f} (best params: {grid.best_params_})")
+    else:
+        model = Pipeline([
+            ("scaler", StandardScaler()),
+            ("regressor", GradientBoostingRegressor(
+                n_estimators=100, max_depth=4, learning_rate=0.1, random_state=42
+            )),
+        ])
+        model.fit(X, y)
+
+        if len(X) >= 5:
+            cv_folds = min(5, len(X))
+            scores = cross_val_score(model, X, y, cv=cv_folds, scoring="r2")
+            print(f"Price model CV R²: {scores.mean():.4f} (+/- {scores.std():.4f})")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, output_path)

@@ -6,7 +6,11 @@ services:
     dockerContext: .
     region: singapore
     plan: starter
-    healthCheckPath: /
+    healthCheckPath: /health
+    disk:
+      name: uploads
+      mountPath: /app/uploads
+      sizeGB: 10
     envVars:
       - key: MONGODB_URI
         sync: false
@@ -47,4 +51,8 @@ services:
       - key: STORAGE_BACKEND
         value: "local"
       - key: CLOUDINARY_URL
+        sync: false
+      - key: OPENWEATHER_API_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
         sync: false

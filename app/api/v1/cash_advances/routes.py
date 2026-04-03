@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException
@@ -21,8 +21,8 @@ async def approve_cash_advance(
     update_payload: dict[str, Any] = {
         "status": "approved",
         "approvedBy": user["id"],
-        "approvedDate": datetime.utcnow(),
-        "updatedAt": datetime.utcnow(),
+        "approvedDate": datetime.now(timezone.utc),
+        "updatedAt": datetime.now(timezone.utc),
     }
     if isinstance(payload, dict) and payload.get("notes") is not None:
         update_payload["notes"] = payload["notes"]
@@ -50,8 +50,8 @@ async def decline_cash_advance(
     update_payload = {
         "status": "declined",
         "declineReason": decline_reason,
-        "declinedDate": datetime.utcnow(),
-        "updatedAt": datetime.utcnow(),
+        "declinedDate": datetime.now(timezone.utc),
+        "updatedAt": datetime.now(timezone.utc),
     }
     if isinstance(payload, dict) and payload.get("notes") is not None:
         update_payload["notes"] = payload["notes"]

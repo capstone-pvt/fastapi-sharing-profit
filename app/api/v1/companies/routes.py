@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
@@ -87,7 +87,7 @@ async def create_company(
     name = (payload.get("companyName") or "").strip()
     if not name:
         raise HTTPException(status_code=400, detail="companyName is required")
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     db = get_db()
     existing = await db["companies"].find_one(
         {"companyName": {"$regex": f"^{name}$", "$options": "i"}}
@@ -139,7 +139,7 @@ async def update_company(
         user_company_id = _company_id_value(user)
         if not user_company_id or user_company_id != str(object_id):
             raise HTTPException(status_code=403, detail="Forbidden")
-    payload["updatedAt"] = datetime.utcnow()
+    payload["updatedAt"] = datetime.now(timezone.utc)
     await db["companies"].update_one({"_id": object_id}, {"$set": payload})
     doc = await db["companies"].find_one({"_id": object_id})
     if not doc:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.core.security import hash_password
 from app.db import get_db
@@ -111,7 +111,7 @@ async def seed_default_role_users(
             update_fields = {
                 "password": hashed,
                 "role": role["_id"],
-                "updatedAt": datetime.utcnow(),
+                "updatedAt": datetime.now(timezone.utc),
                 "companyApproved": True,
             }
             unset_fields: dict[str, str] = {

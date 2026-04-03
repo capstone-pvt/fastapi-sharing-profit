@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from app.db import get_db
@@ -11,7 +12,7 @@ async def get_species_index(species: str | None) -> int:
         return 0
     db = get_db()
     record = await db["fish_species"].find_one(
-        {"name": {"$regex": f"^{species}$", "$options": "i"}}
+        {"name": {"$regex": f"^{re.escape(species)}$", "$options": "i"}}
     )
     if record and record.get("classIndex") is not None:
         return int(record.get("classIndex"))
@@ -19,19 +20,26 @@ async def get_species_index(species: str | None) -> int:
 
 
 async def get_species_info(species: str | None) -> dict[str, Any] | None:
-    """Return full species info including scientific, english, and local names."""
+    """Return full species info including scientific, english, local names,
+    and reference data (weight ranges, price ranges, peak months)."""
     if not species:
         return None
     db = get_db()
     record = await db["fish_species"].find_one(
-        {"name": {"$regex": f"^{species}$", "$options": "i"}}
+        {"name": {"$regex": f"^{re.escape(species)}$", "$options": "i"}}
     )
     if not record:
         return None
     return {
         "scientificName": record.get("scientificName"),
+        "genus": record.get("genus"),
+        "family": record.get("family"),
         "englishName": record.get("englishName"),
         "localName": record.get("localName"),
+        "weightRange": record.get("weightRange"),
+        "pricePerKg": record.get("pricePerKg"),
+        "peakMonths": record.get("peakMonths"),
+        "habitat": record.get("habitat"),
     }
 
 

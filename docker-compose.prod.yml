@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   mongodb:
     image: mongo:7
@@ -8,8 +6,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
-    ports:
-      - "${MONGO_PORT:-27017}:27017"
+    # MongoDB is only accessible within the Docker network (not exposed to host)
     volumes:
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
@@ -47,6 +44,7 @@ services:
       - DETECTOR_CONFIDENCE=${DETECTOR_CONFIDENCE:-0.25}
       - DETECTOR_IOU=${DETECTOR_IOU:-0.45}
       - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY:-}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000}
       - WORKERS=${WORKERS:-4}
       - MAX_WORKERS=${MAX_WORKERS:-8}
       - TIMEOUT=${TIMEOUT:-120}
@@ -62,7 +60,7 @@ services:
     networks:
       - profit-sharing-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -93,7 +91,7 @@ services:
     networks:
       - profit-sharing-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
       interval: 30s
       timeout: 10s
       retries: 3

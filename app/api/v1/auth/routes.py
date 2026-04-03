@@ -1,6 +1,6 @@
 import secrets
 import string
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 from uuid import uuid4
 
@@ -87,7 +87,7 @@ async def register(payload: dict[str, Any] = Body(...)):
         ):
             new_code = _generate_company_code()
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         company_doc = {
             "companyName": company_name,
             "companyCode": new_code,
@@ -203,7 +203,8 @@ async def login(payload: dict[str, Any] = Body(...)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     user_id = str(user["_id"])
-    role_id = str(user.get("role")) if user.get("role") else ""
+    _role_val = user.get("role") or user.get("roleId")
+    role_id = str(_role_val) if _role_val else ""
     session_id = uuid4().hex
     access_token = create_access_token(
         {"sub": user_id, "email": email, "roleId": role_id, "sid": session_id}
@@ -291,7 +292,8 @@ async def refresh(payload: dict[str, Any] = Body(...)):
         refresh_expiry_date(settings.jwt_refresh_expiration_days),
     )
 
-    role_id = str(user.get("role")) if user.get("role") else ""
+    _role_val = user.get("role") or user.get("roleId")
+    role_id = str(_role_val) if _role_val else ""
     role = await get_role_by_id(role_id) if role_id else None
     permissions = await get_role_permissions_names(role_id) if role_id else []
     company_id = str(user["companyId"]) if user.get("companyId") else None

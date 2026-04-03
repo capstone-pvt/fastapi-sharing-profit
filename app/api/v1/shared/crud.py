@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request
@@ -9,14 +9,21 @@ from app.infrastructure.roles.repository import get_role
 from app.utils import serialize_doc, to_object_id
 
 
+# Query param keys that callers may pass to filter list results.
+# Each collection can expand this set via the `filter_fields` argument.
+_DEFAULT_FILTER_FIELDS: frozenset[str] = frozenset({"status", "tripId", "boatId"})
+
+
 def build_crud_router(
     collection_name: str,
     permissions: dict[str, str] | None = None,
     allowed_actions: set[str] | None = None,
+    filter_fields: frozenset[str] | None = None,
 ) -> APIRouter:
     router = APIRouter()
     permissions = permissions or {}
     allowed_actions = allowed_actions or {"create", "read", "update", "delete"}
+    _allowed_filter_fields = (filter_fields or frozenset()) | _DEFAULT_FILTER_FIELDS
 
     def _deps(action: str) -> list:
         perm = permissions.get(action)
@@ -65,7 +72,10 @@ def build_crud_router(
             for key, value in request.query_params.items():
                 if key in {"limit", "offset"}:
                     continue
-                query[key] = value
+                # Only accept explicitly allowlisted field names to prevent
+                # NoSQL injection via arbitrary query parameter keys.
+                if key in _allowed_filter_fields:
+                    query[key] = value
             if not await _is_super_user(user):
                 company_id = _company_id_value(user)
                 object_id = _company_object_id(company_id)
@@ -118,8 +128,8 @@ def build_crud_router(
             user: dict[str, Any] = Depends(get_current_user),
         ):
             db = get_db()
-            payload["createdAt"] = datetime.utcnow()
-            payload["updatedAt"] = datetime.utcnow()
+            payload["createdAt"] = datetime.now(timezone.utc)
+            payload["updatedAt"] = datetime.now(timezone.utc)
             is_super = await _is_super_user(user)
             if not is_super:
                 company_id = _company_id_value(user)
@@ -156,7 +166,7 @@ def build_crud_router(
                 if not object_id:
                     raise HTTPException(status_code=400, detail="Invalid companyId")
                 payload["companyId"] = object_id
-            payload["updatedAt"] = datetime.utcnow()
+            payload["updatedAt"] = datetime.now(timezone.utc)
             doc = await db[collection_name].find_one(
                 {"_id": to_object_id(item_id)}
             )

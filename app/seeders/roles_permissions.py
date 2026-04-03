@@ -11,7 +11,6 @@ async def seed_broker_role_with_permissions() -> None:
         permission_ids.get("boats:read"),
         permission_ids.get("boats:update"),
         permission_ids.get("boats:delete"),
-        permission_ids.get("vessels:create"),
         permission_ids.get("vessels:read"),
         permission_ids.get("vessels:update"),
         permission_ids.get("vessels:delete"),
@@ -50,6 +49,12 @@ async def seed_broker_role_with_permissions() -> None:
         permission_ids.get("fish:diagnostic"),
         permission_ids.get("fish:analytics"),
         permission_ids.get("fish:history"),
+        permission_ids.get("vessels:create"),
+        permission_ids.get("cash-advances:create"),
+        permission_ids.get("profit-shares:read"),
+        permission_ids.get("profit-shares:generate"),
+        permission_ids.get("profit-sharing-policies:read"),
+        permission_ids.get("profit-sharing-policies:create"),
     ]
     await ensure_default_roles(
         {
@@ -65,6 +70,10 @@ async def seed_boat_owner_role_with_permissions() -> None:
         permission_ids.get("boats:read"),
         permission_ids.get("boats:update"),
         permission_ids.get("boats:delete"),
+        permission_ids.get("vessels:create"),
+        permission_ids.get("vessels:read"),
+        permission_ids.get("vessels:update"),
+        permission_ids.get("vessels:delete"),
         permission_ids.get("fishermen:create"),
         permission_ids.get("fishermen:read"),
         permission_ids.get("fishermen:update"),
@@ -107,6 +116,7 @@ async def seed_fisherman_role_with_permissions() -> None:
         permission_ids.get("fish-sales:read"),
         permission_ids.get("fish:analyze"),
         permission_ids.get("fish:history"),
+        permission_ids.get("forecasts:read"),
     ]
     await ensure_default_roles(
         {

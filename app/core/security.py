@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from jose import jwt
@@ -32,13 +32,13 @@ def _parse_expiration(value: str) -> timedelta:
 
 def create_access_token(payload: dict[str, Any]) -> str:
     settings = get_settings()
-    expire = datetime.utcnow() + _parse_expiration(settings.jwt_expiration)
+    expire = datetime.now(timezone.utc) + _parse_expiration(settings.jwt_expiration)
     to_encode = {**payload, "exp": expire}
     return jwt.encode(to_encode, settings.jwt_secret, algorithm="HS256")
 
 
 def create_refresh_token(payload: dict[str, Any]) -> str:
     settings = get_settings()
-    expire = datetime.utcnow() + _parse_expiration(settings.jwt_refresh_expiration)
+    expire = datetime.now(timezone.utc) + _parse_expiration(settings.jwt_refresh_expiration)
     to_encode = {**payload, "exp": expire}
     return jwt.encode(to_encode, settings.jwt_refresh_secret, algorithm="HS256")

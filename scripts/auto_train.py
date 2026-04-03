@@ -145,18 +145,87 @@ async def _save_training_record(
     print(f"  Species: {species_count}, Images: {image_count}, Epochs: {epochs}")
 
 
+def _select_model_size(num_images: int, model_type: str, requested: str | None) -> str:
+    """Auto-select YOLO model size based on dataset size and type.
+
+    Larger datasets can support larger models without overfitting.
+    - < 100 images: nano (yolov8n) - prevents overfitting on tiny datasets
+    - 100-500 images: small (yolov8s) - good balance
+    - 500-2000 images: medium (yolov8m) - better accuracy
+    - > 2000 images: large (yolov8l) - best accuracy for large datasets
+    """
+    if requested:
+        return requested
+
+    suffix = "-cls.pt" if model_type == "classify" else ".pt"
+
+    if num_images < 100:
+        return f"yolov8n{suffix}"
+    elif num_images < 500:
+        return f"yolov8s{suffix}"
+    elif num_images < 2000:
+        return f"yolov8m{suffix}"
+    else:
+        return f"yolov8l{suffix}"
+
+
+def _select_epochs(num_images: int, requested: int | None) -> int:
+    """Auto-adjust epochs based on dataset size when not explicitly set.
+
+    Small datasets need more epochs; large datasets converge faster.
+    Pass --epochs-classify / --epochs-detect to override.
+    """
+    if requested is not None:
+        return requested
+
+    if num_images < 50:
+        return 50
+    elif num_images < 200:
+        return 40
+    elif num_images < 500:
+        return 30
+    elif num_images < 2000:
+        return 25
+    else:
+        return 20
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Automate dataset + model training.")
     parser.add_argument(
         "--export-root",
         help="Use existing export (exports/fish-training/<timestamp>).",
     )
-    parser.add_argument("--epochs-classify", type=int, default=10)
-    parser.add_argument("--epochs-detect", type=int, default=10)
+    parser.add_argument("--epochs-classify", type=int, default=None,
+                        help="Training epochs for classifier. Auto-selected by dataset size if omitted.")
+    parser.add_argument("--epochs-detect", type=int, default=None,
+                        help="Training epochs for detector. Auto-selected by dataset size if omitted.")
     parser.add_argument("--imgsz", type=int, default=640)
+    parser.add_argument(
+        "--model-classify",
+        default=None,
+        help="YOLO classification model (e.g. yolov8s-cls.pt). Auto-selected if omitted.",
+    )
+    parser.add_argument(
+        "--model-detect",
+        default=None,
+        help="YOLO detection model (e.g. yolov8s.pt). Auto-selected if omitted.",
+    )
     parser.add_argument("--skip-detect", action="store_true")
     parser.add_argument("--skip-classify", action="store_true")
     parser.add_argument("--skip-regression", action="store_true")
+    parser.add_argument(
+        "--patience",
+        type=int,
+        default=10,
+        help="Early stopping patience: stop if no improvement for N epochs (default: 10).",
+    )
+    parser.add_argument(
+        "--min-accuracy",
+        type=float,
+        default=0.0,
+        help="Minimum classifier accuracy (0.0-1.0). Prints warning if below (default: 0 = no check).",
+    )
     parser.add_argument(
         "--cleanup",
         action="store_true",
@@ -181,6 +250,10 @@ def main() -> None:
 
     print(f"Export root: {export_root}")
 
+    # Count dataset size for auto-tuning
+    num_images = _count_images(export_root)
+    print(f"Dataset size: {num_images} images")
+
     # Build datasets
     _run(
         [
@@ -203,7 +276,18 @@ def main() -> None:
             ]
         )
 
-    # Train models
+    # Auto-select model sizes
+    classify_model = _select_model_size(num_images, "classify", args.model_classify)
+    detect_model = _select_model_size(num_images, "detect", args.model_detect)
+    classify_epochs = _select_epochs(num_images, args.epochs_classify)
+    detect_epochs = _select_epochs(num_images, args.epochs_detect)
+
+    print(f"Training config:")
+    print(f"  Classifier: model={classify_model}, epochs={classify_epochs}, imgsz={args.imgsz}")
+    print(f"  Detector:   model={detect_model}, epochs={detect_epochs}, imgsz={args.imgsz}")
+    print(f"  Patience:   {args.patience}")
+
+    # Train classification model with enhanced settings
     if not args.skip_classify:
         _run(
             [
@@ -211,11 +295,34 @@ def main() -> None:
                 "classify",
                 "train",
                 "data=datasets/fish_species",
-                "model=yolov8n-cls.pt",
-                f"epochs={args.epochs_classify}",
+                f"model={classify_model}",
+                f"epochs={classify_epochs}",
+                f"imgsz={args.imgsz}",
+                f"patience={args.patience}",
+                # Data augmentation for better generalization
+                "augment=True",
+                "hsv_h=0.015",      # Hue variation (lighting changes)
+                "hsv_s=0.7",        # Saturation variation (water color)
+                "hsv_v=0.4",        # Value/brightness variation
+                "degrees=10",       # Slight rotation
+                "translate=0.1",    # Slight translation
+                "scale=0.5",        # Scale variation
+                "fliplr=0.5",       # Horizontal flip (fish face both ways)
+                "flipud=0.0",       # No vertical flip (fish don't swim upside down)
+                "mosaic=0.5",       # Mosaic augmentation (mix multiple images)
+                "mixup=0.1",        # MixUp augmentation
+                "erasing=0.1",      # Random erasing (occlusion robustness)
+                # Optimization
+                "optimizer=AdamW",   # Better convergence than SGD for small datasets
+                "lr0=0.001",         # Initial learning rate
+                "lrf=0.01",          # Final learning rate factor
+                "warmup_epochs=3",   # Warmup for stable training
+                "cos_lr=True",       # Cosine learning rate schedule
+                "label_smoothing=0.1",  # Prevents overconfident predictions
             ]
         )
 
+    # Train detection model with enhanced settings
     if can_detect:
         _run(
             [
@@ -223,12 +330,36 @@ def main() -> None:
                 "detect",
                 "train",
                 "data=fish_dataset.yaml",
-                "model=yolov8n.pt",
-                f"epochs={args.epochs_detect}",
+                f"model={detect_model}",
+                f"epochs={detect_epochs}",
                 f"imgsz={args.imgsz}",
+                f"patience={args.patience}",
+                # Data augmentation
+                "augment=True",
+                "hsv_h=0.015",
+                "hsv_s=0.7",
+                "hsv_v=0.4",
+                "degrees=10",
+                "translate=0.1",
+                "scale=0.5",
+                "fliplr=0.5",
+                "flipud=0.0",
+                "mosaic=1.0",        # Full mosaic for detection
+                "mixup=0.1",
+                "copy_paste=0.1",    # Copy-paste augmentation for detection
+                # Optimization
+                "optimizer=AdamW",
+                "lr0=0.001",
+                "lrf=0.01",
+                "warmup_epochs=3",
+                "cos_lr=True",
+                "label_smoothing=0.05",
+                # Detection-specific
+                "nms=True",
             ]
         )
 
+    # Train regression models
     if not args.skip_regression:
         _run(
             [
@@ -260,6 +391,39 @@ def main() -> None:
     else:
         print("No detector weights found (skipped or no labels).")
 
+    # Post-training accuracy validation
+    classifier_path = models_dir / "classifier" / "best.pt"
+    val_dir = Path("datasets/fish_species/val")
+    if classify_best and not args.skip_classify and val_dir.exists():
+        print(f"\n{'='*60}")
+        print("  POST-TRAINING ACCURACY EVALUATION")
+        print(f"{'='*60}")
+        eval_result = subprocess.run(
+            [
+                "python", "scripts/evaluate_models.py",
+                "--classifier-model", str(classifier_path),
+                "--val-dir", str(val_dir),
+                "--output-json", "eval_results.json",
+            ],
+            check=False,
+        )
+        if eval_result.returncode == 0:
+            import json
+            try:
+                eval_data = json.loads(Path("eval_results.json").read_text(encoding="utf-8"))
+                accuracy = eval_data.get("top1_accuracy", 0.0)
+                print(f"\n  Classifier Top-1 Accuracy: {accuracy:.1%}")
+                if args.min_accuracy > 0:
+                    if accuracy >= args.min_accuracy:
+                        print(f"  PASSED: {accuracy:.1%} >= {args.min_accuracy:.0%}")
+                    else:
+                        print(f"  WARNING: {accuracy:.1%} < {args.min_accuracy:.0%} target")
+                        print(f"  Consider: more data, larger model, or more epochs")
+            except Exception:
+                pass
+            finally:
+                Path("eval_results.json").unlink(missing_ok=True)
+
     # Save training records to database
     asyncio.run(connect_db())
     try:
@@ -271,7 +435,7 @@ def main() -> None:
                     model_path=str(models_dir / "classifier" / "best.pt"),
                     export_root=export_root,
                     train_dir=classify_train_dir,
-                    epochs=args.epochs_classify,
+                    epochs=classify_epochs,
                 )
             )
 
@@ -283,7 +447,7 @@ def main() -> None:
                     model_path=str(models_dir / "detector" / "best.pt"),
                     export_root=export_root,
                     train_dir=detect_train_dir,
-                    epochs=args.epochs_detect,
+                    epochs=detect_epochs,
                 )
             )
     finally:

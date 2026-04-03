@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from bson import ObjectId
 
 
 def refresh_expiry_date(expiration_days: int) -> datetime:
-    return datetime.utcnow() + timedelta(days=expiration_days)
+    return datetime.now(timezone.utc) + timedelta(days=expiration_days)
 
 
 def validate_register_payload(payload: dict[str, Any]) -> dict[str, str | None]:
@@ -56,7 +56,7 @@ def build_user_doc(
     company_id: str | None = None,
     company_approved: bool | None = None,
 ) -> dict[str, Any]:
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     user_doc = {
         "email": email,
         "password": hashed_password,

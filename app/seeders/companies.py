@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.db import get_db
 
@@ -35,7 +35,7 @@ async def seed_default_companies() -> tuple[int, dict[str, dict]]:
     created_count = 0
     companies_by_key: dict[str, dict] = {}
     for payload in DEFAULT_COMPANIES:
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         name = payload["companyName"].strip()
         code = (payload.get("companyCode") or "").strip()
         query = {"companyName": {"$regex": f"^{name}$", "$options": "i"}}

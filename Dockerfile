@@ -90,9 +90,10 @@ USER appuser
 # Expose port (Render assigns PORT dynamically)
 EXPOSE ${PORT}
 
-# Health check with retry logic
+# Health check with retry logic — hits /health which verifies DB + model status
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:${PORT}/ || exit 1
+    CMD curl -f http://localhost:${PORT}/health || exit 1
 
 # Run the application with production settings
-CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers ${WORKERS} --timeout-keep-alive ${TIMEOUT} --proxy-headers --forwarded-allow-ips='*'"]
+# --forwarded-allow-ips is set to the Docker bridge network range (nginx proxy)
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --workers ${WORKERS} --timeout-keep-alive ${TIMEOUT} --proxy-headers --forwarded-allow-ips='127.0.0.1,172.16.0.0/12'"]

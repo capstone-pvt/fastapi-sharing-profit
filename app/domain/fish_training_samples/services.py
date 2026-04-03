@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
@@ -12,7 +12,7 @@ def build_sample_doc(
     image_url: str,
     trained_by: str | None = None,
 ) -> dict[str, Any]:
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     doc = {
         "userId": user_id,
         "imageUrl": image_url,

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 import re
 
@@ -45,7 +45,13 @@ async def delete_permission(perm_id: str) -> bool:
 
 async def ensure_default_permissions() -> dict[str, str]:
     db = get_db()
-    now = datetime.utcnow()
+    # Fast path: if permissions already exist, just load their IDs
+    existing = {}
+    async for doc in db["permissions"].find({}, {"name": 1}):
+        existing[doc["name"]] = str(doc["_id"])
+    if existing:
+        return existing
+    now = datetime.now(timezone.utc)
     defaults = [
         {
             "name": "vessels:create",
@@ -462,22 +468,22 @@ async def ensure_default_permissions() -> dict[str, str]:
             "description": "View fish analysis history",
         },
     ]
-    permission_ids: dict[str, str] = {}
-    for perm in defaults:
-        name = perm["name"]
-        payload = {
-            **perm,
-            "createdAt": now,
-            "updatedAt": now,
-        }
-        await db["permissions"].update_one(
-            {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}},
-            {"$setOnInsert": payload},
+    from pymongo import UpdateOne
+
+    # Bulk upsert all permissions in one round-trip
+    bulk_ops = [
+        UpdateOne(
+            {"name": perm["name"]},
+            {"$setOnInsert": {**perm, "createdAt": now, "updatedAt": now}},
             upsert=True,
         )
-        doc = await db["permissions"].find_one(
-            {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}}
-        )
-        if doc:
-            permission_ids[name] = str(doc["_id"])
+        for perm in defaults
+    ]
+    if bulk_ops:
+        await db["permissions"].bulk_write(bulk_ops, ordered=False)
+
+    # Load all permission IDs
+    permission_ids: dict[str, str] = {}
+    async for doc in db["permissions"].find({}, {"name": 1}):
+        permission_ids[doc["name"]] = str(doc["_id"])
     return permission_ids

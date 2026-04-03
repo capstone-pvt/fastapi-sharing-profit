@@ -17,6 +17,7 @@ from app.api.v1.users.routes import router as users_router
 from app.api.v1.audit.routes import router as audit_router
 from app.api.v1.weather.routes import router as weather_router
 from app.api.v1.licenses.routes import router as licenses_router
+from app.api.v1.forecast.routes import router as forecast_router
 from app.deps import require_roles
 
 
@@ -36,6 +37,7 @@ api_router.include_router(cash_advances_router)
 api_router.include_router(audit_router)
 api_router.include_router(weather_router)
 api_router.include_router(licenses_router)
+api_router.include_router(forecast_router)
 
 api_router.include_router(
     build_crud_router(

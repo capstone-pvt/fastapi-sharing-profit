@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import secrets
 import string
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from bson.errors import InvalidId
@@ -95,7 +95,7 @@ async def validate_activation_code(
     status = doc.get("status", "")
     if status == "revoked":
         raise HTTPException(status_code=400, detail="This activation code has been revoked")
-    if status == "expired" or (doc.get("expiresAt") and doc["expiresAt"] < datetime.utcnow()):
+    if status == "expired" or (doc.get("expiresAt") and doc["expiresAt"] < datetime.now(timezone.utc)):
         raise HTTPException(status_code=400, detail="This activation code has expired")
     if status == "active" and doc.get("companyId"):
         raise HTTPException(status_code=400, detail="This activation code is already in use")
@@ -107,7 +107,7 @@ async def validate_activation_code(
         company = await db["companies"].find_one({"_id": to_object_id(str(company_id))})
         company_name = company.get("companyName") if company else None
 
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     expires_at = doc.get("expiresAt")
     if not expires_at:
         # Default: 1 year from activation
@@ -169,10 +169,10 @@ async def get_license_status(
         return {"hasLicense": False, "status": "none", "plan": None, "expiresAt": None}
 
     expires_at = license_doc.get("expiresAt")
-    if expires_at and expires_at < datetime.utcnow():
+    if expires_at and expires_at < datetime.now(timezone.utc):
         await db[COLLECTION].update_one(
             {"_id": license_doc["_id"]},
-            {"$set": {"status": "expired", "updatedAt": datetime.utcnow()}},
+            {"$set": {"status": "expired", "updatedAt": datetime.now(timezone.utc)}},
         )
         return {
             "hasLicense": False,
@@ -209,7 +209,7 @@ async def generate_license(
     duration_days = int(payload.get("durationDays", 365 if plan != "trial" else 30))
 
     db = get_db()
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     code = _generate_code()
 
     # Ensure uniqueness
@@ -278,7 +278,7 @@ async def revoke_license(
 
     result = await db[COLLECTION].update_one(
         {"_id": oid},
-        {"$set": {"status": "revoked", "updatedAt": datetime.utcnow()}},
+        {"$set": {"status": "revoked", "updatedAt": datetime.now(timezone.utc)}},
     )
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="License not found")

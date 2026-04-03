@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
 def build_create_role_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     role_payload = dict(payload)
     role_payload["permissions"] = role_payload.get("permissions", [])
     role_payload["createdAt"] = now
@@ -15,5 +15,5 @@ def build_create_role_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 def build_update_role_payload(payload: dict[str, Any]) -> dict[str, Any]:
     role_payload = dict(payload)
-    role_payload["updatedAt"] = datetime.utcnow()
+    role_payload["updatedAt"] = datetime.now(timezone.utc)
     return role_payload

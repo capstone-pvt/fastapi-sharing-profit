@@ -106,7 +106,8 @@ class TestLogin:
             "email": "nonexistent@test.com",
             "password": "Test@123456",
         })
-        assert resp.status_code in (401, 404)
+        # Must be 401 — never 404 (which would reveal whether the email exists)
+        assert resp.status_code == 401
 
 
 class TestRefreshToken:

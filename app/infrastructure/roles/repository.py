@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 import re
 
@@ -115,6 +115,7 @@ async def get_role_permissions_names(role_id: str) -> list[str]:
         ids = [
             perm if isinstance(perm, ObjectId) else to_object_id(str(perm))
             for perm in role_perms
+            if isinstance(perm, ObjectId) or ObjectId.is_valid(str(perm))
         ]
         cursor = db["permissions"].find({"_id": {"$in": ids}})
         return [perm.get("name") async for perm in cursor if perm.get("name")]
@@ -125,7 +126,8 @@ async def ensure_default_roles(
     role_permissions: dict[str, list[str]] | None = None,
 ) -> None:
     db = get_db()
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
+
     defaults = [
         {
             "name": RoleNames.USER,
@@ -176,22 +178,31 @@ async def ensure_default_roles(
             "updatedAt": now,
         },
     ]
-    for payload in defaults:
-        name = payload["name"]
-        await db["roles"].update_one(
-            {"name": {"$regex": f"^{re.escape(name)}$", "$options": "i"}},
+    from pymongo import UpdateOne
+
+    # Bulk upsert all default roles
+    bulk_ops = [
+        UpdateOne(
+            {"name": payload["name"]},
             {"$setOnInsert": payload},
             upsert=True,
         )
+        for payload in defaults
+    ]
+    if bulk_ops:
+        await db["roles"].bulk_write(bulk_ops, ordered=False)
 
     if role_permissions:
-        for role_name, permissions in role_permissions.items():
-            if not permissions:
-                continue
-            await db["roles"].update_one(
-                {"name": {"$regex": f"^{re.escape(role_name)}$", "$options": "i"}},
+        perm_ops = [
+            UpdateOne(
+                {"name": role_name},
                 {
                     "$addToSet": {"permissions": {"$each": permissions}},
                     "$set": {"updatedAt": now},
                 },
             )
+            for role_name, permissions in role_permissions.items()
+            if permissions
+        ]
+        if perm_ops:
+            await db["roles"].bulk_write(perm_ops, ordered=False)

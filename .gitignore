@@ -1,7 +1,69 @@
+# Virtual environment
 .venv
+venv/
+env/
+
+# Environment files (NEVER commit secrets)
 .env
+.env.*
+!.env.example
+
+# Python bytecode
 __pycache__/
 *.pyc
-/uploads
+*.pyo
+*.pyd
+
+# ML model files (use Git LFS or external storage)
+*.pt
+*.pth
+*.onnx
+*.joblib
+*.pkl
+*.h5
+*.tflite
+yolov8*.pt
+
+# Model directories
+app/models/classifier/
+app/models/detector/
+app/models/weight/
+app/models/price/
+
+# Uploaded files
+/uploads/
+uploads/
+
+# Downloads and exports
 /downloads/
-/exports/kaggle/
+/exports/
+exports/
+
+# Datasets (large files)
+datasets/
+
+# IDE
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Test / Coverage
+.pytest_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Evaluation results
+eval_results.json

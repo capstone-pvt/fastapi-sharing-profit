@@ -10,7 +10,10 @@ def _encode_value(value: Any) -> Any:
     if isinstance(value, datetime):
         return value.isoformat()
     if isinstance(value, dict):
-        return serialize_doc(value)
+        # Only apply _id→id renaming if the dict looks like a MongoDB document
+        if "_id" in value:
+            return serialize_doc(value)
+        return {k: _encode_value(v) for k, v in value.items()}
     if isinstance(value, list):
         return [_encode_value(item) for item in value]
     return value

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 
 def build_create_model_payload(payload: dict[str, Any]) -> dict[str, Any]:
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     model_payload = dict(payload)
     model_payload["createdAt"] = now
     model_payload["updatedAt"] = now
@@ -14,7 +14,7 @@ def build_create_model_payload(payload: dict[str, Any]) -> dict[str, Any]:
 
 def build_update_model_payload(payload: dict[str, Any]) -> dict[str, Any]:
     model_payload = dict(payload)
-    model_payload["updatedAt"] = datetime.utcnow()
+    model_payload["updatedAt"] = datetime.now(timezone.utc)
     return model_payload
 
 
@@ -26,7 +26,7 @@ def build_upload_record(
     is_active: bool,
     model_path: str,
 ) -> dict[str, Any]:
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     return {
         "modelType": model_type,
         "version": version,
