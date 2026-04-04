@@ -32,51 +32,23 @@ async def backfill_default_user_role() -> int:
 
 DEFAULT_ROLE_USERS = [
     {
-        "role_names": [RoleNames.BROKER],
-        "email": "broker@example.com",
-        "first_name": "Broker",
-        "last_name": "User",
-        "company_key": "company_a",
-    },
-    {
-        "role_names": [RoleNames.OWNER],
-        "email": "owner@example.com",
-        "first_name": "Vessel",
-        "last_name": "Owner",
-        "company_key": "company_a",
-    },
-    {
-        "role_names": [RoleNames.CREW],
-        "email": "crew@example.com",
-        "first_name": "Crew",
-        "last_name": "Member",
-        "company_key": "company_a",
-    },
-    {
-        "role_names": [RoleNames.ADMIN],
-        "email": "admin@example.com",
-        "first_name": "Admin",
-        "last_name": "User",
-        "company_key": "company_a",
-    },
-    {
-        "role_names": [RoleNames.ADMIN],
-        "email": "admin2@example.com",
-        "first_name": "Admin",
-        "last_name": "Two",
-        "company_key": "company_b",
-    },
-    {
         "role_names": [RoleNames.SUPER],
-        "email": "super@example.com",
+        "email": "super@demo.com",
         "first_name": "Super",
         "last_name": "Admin",
+    },
+    {
+        "role_names": [RoleNames.ADMIN],
+        "email": "admin@demo.com",
+        "first_name": "Admin",
+        "last_name": "User",
+        "company_key": "company_a",
     },
 ]
 
 
 async def seed_default_role_users(
-    default_password: str = "Admin@123456",
+    default_password: str = "P@ssw0rd123",
 ) -> int:
     db = get_db()
     created = 0

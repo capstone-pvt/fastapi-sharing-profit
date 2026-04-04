@@ -8,7 +8,7 @@ class TestGetProfile:
         assert resp.status_code == 200
         data = resp.json()
         assert "email" in data
-        assert data["email"] == "super@example.com"
+        assert data["email"] == "super@demo.com"
 
     def test_admin_profile_has_company(self, client, admin_headers):
         resp = client.get("/api/profile", headers=admin_headers)
@@ -31,7 +31,7 @@ class TestUpdateProfile:
 
     def test_cannot_update_email_to_existing(self, client, admin_headers):
         resp = client.patch("/api/profile", headers=admin_headers, json={
-            "email": "super@example.com",
+            "email": "super@demo.com",
         })
         # Should reject or ignore since email belongs to another user
         assert resp.status_code in (200, 400, 409)

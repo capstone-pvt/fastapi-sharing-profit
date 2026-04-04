@@ -12,8 +12,8 @@ LOGIN_ENDPOINT = f"{API_BASE_URL}/auth/login"
 ANALYZE_ENDPOINT = f"{API_BASE_URL}/fish/analyze"
 
 # Test credentials (adjust as needed)
-TEST_EMAIL = "admin@example.com"  # Change this to your test user email
-TEST_PASSWORD = "password"  # Change this to your test user password
+TEST_EMAIL = "admin@demo.com"
+TEST_PASSWORD = "P@ssw0rd123"
 
 
 def login():

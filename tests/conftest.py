@@ -71,18 +71,18 @@ def client(test_db_name: str):
 
 # ── Auth helpers ──────────────────────────────────────────────
 
-SUPER_EMAIL = "super@example.com"
-SUPER_PASSWORD = "Admin@123456"
+SUPER_EMAIL = "super@demo.com"
+SUPER_PASSWORD = "P@ssw0rd123"
 
-ADMIN_EMAIL = "testadmin@example.com"
-ADMIN_PASSWORD = "Admin@123456"
+ADMIN_EMAIL = "testadmin@demo.com"
+ADMIN_PASSWORD = "P@ssw0rd123"
 ADMIN_COMPANY = "Test Company"
 
-BROKER_EMAIL = "testbroker@example.com"
-BROKER_PASSWORD = "Broker@123456"
+BROKER_EMAIL = "testbroker@demo.com"
+BROKER_PASSWORD = "P@ssw0rd123"
 
-CREW_EMAIL = "testcrew@example.com"
-CREW_PASSWORD = "Crew@123456"
+CREW_EMAIL = "testcrew@demo.com"
+CREW_PASSWORD = "P@ssw0rd123"
 
 
 def _get_role_id(client, name: str, headers: dict) -> str | None:
