@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 # Number of features the weight model must accept.
 # Changing this constant requires retraining and redeploying the model file.
-WEIGHT_MODEL_EXPECTED_FEATURES = 9
+WEIGHT_MODEL_EXPECTED_FEATURES = 6
 
 # Confidence threshold below which detector species is verified by classifier
 ENSEMBLE_CONFIDENCE_THRESHOLD = 0.6

@@ -12,6 +12,15 @@ async def get_profile(user_id: str) -> dict[str, Any] | None:
     return serialize_doc(doc) if doc else None
 
 
+async def get_password_hash(user_id: str) -> str | None:
+    """Return the raw password hash for verification (not exposed to clients)."""
+    db = get_db()
+    doc = await db["users"].find_one(
+        {"_id": to_object_id(user_id)}, {"password": 1}
+    )
+    return doc.get("password") if doc else None
+
+
 async def update_profile(user_id: str, payload: dict[str, Any]) -> dict[str, Any] | None:
     db = get_db()
     await db["users"].update_one({"_id": to_object_id(user_id)}, {"$set": payload})

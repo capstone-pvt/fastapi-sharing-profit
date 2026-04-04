@@ -324,24 +324,6 @@ async def ensure_default_permissions() -> dict[str, str]:
             "description": "Delete forecasts and predictions",
         },
         {
-            "name": "forecasts:create",
-            "resource": "forecasts",
-            "action": "create",
-            "description": "Create forecasts and predictions",
-        },
-        {
-            "name": "forecasts:update",
-            "resource": "forecasts",
-            "action": "update",
-            "description": "Update forecasts and predictions",
-        },
-        {
-            "name": "forecasts:delete",
-            "resource": "forecasts",
-            "action": "delete",
-            "description": "Delete forecasts and predictions",
-        },
-        {
             "name": "fishermen:create",
             "resource": "fishermen",
             "action": "create",
@@ -466,6 +448,12 @@ async def ensure_default_permissions() -> dict[str, str]:
             "resource": "fish",
             "action": "history",
             "description": "View fish analysis history",
+        },
+        {
+            "name": "audit:read",
+            "resource": "audit",
+            "action": "read",
+            "description": "View audit logs",
         },
     ]
     from pymongo import UpdateOne

@@ -34,15 +34,10 @@ def estimate_weight(
         lc = float(length_cm or 0)
         wc = float(width_cm or 0)
 
-        # Base features
+        # Base features (must match the trained model — currently 6 features)
         base = [species_index, w, h, sr, lc, wc]
 
-        # Engineered features (must match train_regression_models.py)
-        area = w * h
-        aspect = w / max(h, 1.0) if h > 0 else 1.0
-        area_cm = lc * wc
-
-        features = np.array([base + [area, aspect, area_cm]], dtype=float)
+        features = np.array([base], dtype=float)
 
         # Validate feature count before predict to produce an actionable error
         # instead of a cryptic sklearn shape mismatch buried in a silent except.

@@ -10,6 +10,7 @@ from app.domain.profile.services import (
     validate_profile_update,
 )
 from app.infrastructure.profile.repository import (
+    get_password_hash,
     get_profile,
     update_avatar,
     update_password,
@@ -132,10 +133,10 @@ async def change_password(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    stored = await get_profile(user["id"])
-    if not stored or not stored.get("password"):
+    stored_hash = await get_password_hash(user["id"])
+    if not stored_hash:
         raise HTTPException(status_code=404, detail="User not found")
-    if not verify_password(current_password, stored.get("password", "")):
+    if not verify_password(current_password, stored_hash):
         raise HTTPException(status_code=401, detail="Current password is incorrect")
 
     await update_password(user["id"], hash_password(new_password))
