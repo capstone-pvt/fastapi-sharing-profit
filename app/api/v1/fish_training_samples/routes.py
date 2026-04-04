@@ -71,6 +71,14 @@ async def create_sample(
 ):
     if not image:
         raise HTTPException(status_code=400, detail="Image file is required")
+
+    # Validate required fields BEFORE saving the file to avoid orphan uploads
+    if not species or weightKg is None:
+        raise HTTPException(
+            status_code=400,
+            detail="species and weightKg are required",
+        )
+
     settings = get_settings()
     image_path = save_training_upload(
         image, Path(settings.upload_root) / "fish-training"
@@ -97,12 +105,6 @@ async def create_sample(
         "notes": notes,
         "capturedAt": capturedAt,
     }
-
-    if not species or weightKg is None:
-        raise HTTPException(
-            status_code=400,
-            detail="species and weightKg are required",
-        )
 
     doc = build_sample_doc(
         payload=payload,

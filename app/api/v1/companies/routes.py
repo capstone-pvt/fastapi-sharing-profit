@@ -7,7 +7,7 @@ from bson.errors import InvalidId
 from app.db import get_db
 from app.deps import get_current_user, require_permissions
 from app.infrastructure.roles.repository import get_role
-from app.utils import serialize_doc, to_object_id
+from app.utils import escape_regex, serialize_doc, to_object_id
 
 
 router = APIRouter(prefix="/companies", tags=["companies"])
@@ -63,7 +63,7 @@ async def list_companies(
         except InvalidId:
             return {"results": [], "total": 0, "limit": limit, "offset": offset}
     if search:
-        query["companyName"] = {"$regex": search, "$options": "i"}
+        query["companyName"] = {"$regex": escape_regex(search), "$options": "i"}
     cursor = (
         db["companies"]
         .find(query)
@@ -90,7 +90,7 @@ async def create_company(
     now = datetime.now(timezone.utc)
     db = get_db()
     existing = await db["companies"].find_one(
-        {"companyName": {"$regex": f"^{name}$", "$options": "i"}}
+        {"companyName": {"$regex": f"^{escape_regex(name)}$", "$options": "i"}}
     )
     if existing:
         await db["companies"].update_one(
@@ -139,8 +139,10 @@ async def update_company(
         user_company_id = _company_id_value(user)
         if not user_company_id or user_company_id != str(object_id):
             raise HTTPException(status_code=403, detail="Forbidden")
-    payload["updatedAt"] = datetime.now(timezone.utc)
-    await db["companies"].update_one({"_id": object_id}, {"$set": payload})
+    allowed_fields = {"companyName", "companyCode", "companyAddress", "companyPhone", "companyTaxId", "themeColor"}
+    update_data = {k: v for k, v in payload.items() if k in allowed_fields}
+    update_data["updatedAt"] = datetime.now(timezone.utc)
+    await db["companies"].update_one({"_id": object_id}, {"$set": update_data})
     doc = await db["companies"].find_one({"_id": object_id})
     if not doc:
         raise HTTPException(status_code=404, detail="Company not found")

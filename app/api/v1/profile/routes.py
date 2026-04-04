@@ -90,6 +90,9 @@ async def patch_profile(
     return profile
 
 
+_ALLOWED_AVATAR_TYPES = {"image/jpeg", "image/png", "image/webp"}
+
+
 @router.post("/avatar")
 async def upload_avatar(
     image: UploadFile = File(...),
@@ -97,7 +100,12 @@ async def upload_avatar(
 ):
     if not image:
         raise HTTPException(status_code=400, detail="Image file is required")
-    image_bytes = image.file.read()
+    if image.content_type not in _ALLOWED_AVATAR_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid image type. Allowed: {', '.join(_ALLOWED_AVATAR_TYPES)}",
+        )
+    image_bytes = await image.read()
     image_name = image.filename or f"avatar_{user['id']}.jpg"
     image_url = save_profile_avatar(image_bytes, image_name)
     profile = await update_avatar(user["id"], image_url)

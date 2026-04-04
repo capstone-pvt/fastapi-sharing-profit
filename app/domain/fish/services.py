@@ -9,15 +9,21 @@ def estimate_cm_from_scale(
     height: int,
     scale_reference_cm: float | None,
 ) -> tuple[float | None, float | None]:
+    """Estimate fish dimensions in cm using a scale reference.
+
+    The scale_reference_cm represents the known real-world length (cm) that
+    corresponds to the longest bounding-box dimension in pixels.  We derive
+    a pixels-per-cm ratio from it and apply it to both axes.
+    """
     if not scale_reference_cm or scale_reference_cm <= 0:
         return None, None
     longest = max(width, height)
     shortest = min(width, height)
-    pixels_per_cm = longest / scale_reference_cm
-    if pixels_per_cm <= 0:
+    if longest <= 0:
         return None, None
-    length_cm = longest / pixels_per_cm
-    width_cm = shortest / pixels_per_cm
+    # scale_reference_cm IS the real-world length of the longest side
+    length_cm = scale_reference_cm
+    width_cm = (shortest / longest) * scale_reference_cm
     return length_cm, width_cm
 
 

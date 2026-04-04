@@ -128,6 +128,9 @@ def build_crud_router(
             user: dict[str, Any] = Depends(get_current_user),
         ):
             db = get_db()
+            # Prevent injection of internal fields
+            payload.pop("_id", None)
+            payload.pop("id", None)
             payload["createdAt"] = datetime.now(timezone.utc)
             payload["updatedAt"] = datetime.now(timezone.utc)
             is_super = await _is_super_user(user)
@@ -157,6 +160,10 @@ def build_crud_router(
             user: dict[str, Any] = Depends(get_current_user),
         ):
             db = get_db()
+            # Prevent injection of internal fields
+            payload.pop("_id", None)
+            payload.pop("id", None)
+            payload.pop("createdAt", None)
             payload.pop("companyName", None)
             is_super = await _is_super_user(user)
             if not is_super:

@@ -78,7 +78,7 @@ async def activate_model(model_id: str):
 
 @router.delete("/{model_id}", dependencies=[Depends(require_roles("admin"))])
 async def delete_model(
-    model_id: str, status: str = Query("cancelled", regex="^(cancelled|rejected)$")
+    model_id: str, status: str = Query("cancelled", pattern="^(cancelled|rejected)$")
 ):
     model_payload = build_update_model_payload(
         {"status": status, "isActive": False}

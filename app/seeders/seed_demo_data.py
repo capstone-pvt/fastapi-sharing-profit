@@ -58,7 +58,7 @@ async def seed_demo_data():
     print("Seeding users...")
     users_data = [
         {"email": "super@demo.com", "firstName": "Super", "lastName": "Admin",
-         "role": "admin"},
+         "role": "super"},
         {"email": "admin@demo.com", "firstName": "Admin", "lastName": "User",
          "role": "admin"},
     ]

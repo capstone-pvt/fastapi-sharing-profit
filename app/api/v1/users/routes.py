@@ -21,7 +21,7 @@ from app.infrastructure.roles.repository import get_role
 from app.infrastructure.auth.repository import get_role_by_name
 from app.infrastructure.audit.repository import log_company_assignment
 from app.db import get_db
-from app.utils import to_object_id
+from app.utils import escape_regex, to_object_id
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -144,7 +144,7 @@ async def create_user(
         name = payload.get("companyName", "").strip()
         if name:
             await db["companies"].update_one(
-                {"companyName": {"$regex": f"^{name}$", "$options": "i"}},
+                {"companyName": {"$regex": f"^{escape_regex(name)}$", "$options": "i"}},
                 {
                     "$setOnInsert": {
                         "companyName": name,
@@ -157,7 +157,7 @@ async def create_user(
             )
             # Get the company _id and set it in the payload
             company = await db["companies"].find_one(
-                {"companyName": {"$regex": f"^{name}$", "$options": "i"}}
+                {"companyName": {"$regex": f"^{escape_regex(name)}$", "$options": "i"}}
             )
             if company:
                 payload["companyId"] = company["_id"]
@@ -205,7 +205,7 @@ async def update_user(
         name = payload.get("companyName", "").strip()
         if name:
             result = await db["companies"].update_one(
-                {"companyName": {"$regex": f"^{name}$", "$options": "i"}},
+                {"companyName": {"$regex": f"^{escape_regex(name)}$", "$options": "i"}},
                 {
                     "$setOnInsert": {
                         "companyName": name,
@@ -218,7 +218,7 @@ async def update_user(
             )
             # Get the company _id and set it in the payload
             company = await db["companies"].find_one(
-                {"companyName": {"$regex": f"^{name}$", "$options": "i"}}
+                {"companyName": {"$regex": f"^{escape_regex(name)}$", "$options": "i"}}
             )
             if company:
                 payload["companyId"] = company["_id"]

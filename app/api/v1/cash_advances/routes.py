@@ -3,6 +3,8 @@ from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException
 
+from bson.errors import InvalidId
+
 from app.db import get_db
 from app.deps import get_current_user, require_permissions
 from app.utils import serialize_doc, to_object_id
@@ -18,6 +20,10 @@ async def approve_cash_advance(
     user: dict[str, Any] = Depends(get_current_user),
 ):
     db = get_db()
+    try:
+        oid = to_object_id(item_id)
+    except InvalidId:
+        raise HTTPException(status_code=404, detail="Not found")
     update_payload: dict[str, Any] = {
         "status": "approved",
         "approvedBy": user["id"],
@@ -27,12 +33,12 @@ async def approve_cash_advance(
     if isinstance(payload, dict) and payload.get("notes") is not None:
         update_payload["notes"] = payload["notes"]
 
-    await db["cash_advances"].update_one(
-        {"_id": to_object_id(item_id)}, {"$set": update_payload}
+    result = await db["cash_advances"].update_one(
+        {"_id": oid}, {"$set": update_payload}
     )
-    doc = await db["cash_advances"].find_one({"_id": to_object_id(item_id)})
-    if not doc:
+    if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Not found")
+    doc = await db["cash_advances"].find_one({"_id": oid})
     return serialize_doc(doc)
 
 
@@ -47,6 +53,10 @@ async def decline_cash_advance(
         raise HTTPException(status_code=400, detail="declineReason is required")
 
     db = get_db()
+    try:
+        oid = to_object_id(item_id)
+    except InvalidId:
+        raise HTTPException(status_code=404, detail="Not found")
     update_payload = {
         "status": "declined",
         "declineReason": decline_reason,
@@ -56,10 +66,10 @@ async def decline_cash_advance(
     if isinstance(payload, dict) and payload.get("notes") is not None:
         update_payload["notes"] = payload["notes"]
 
-    await db["cash_advances"].update_one(
-        {"_id": to_object_id(item_id)}, {"$set": update_payload}
+    result = await db["cash_advances"].update_one(
+        {"_id": oid}, {"$set": update_payload}
     )
-    doc = await db["cash_advances"].find_one({"_id": to_object_id(item_id)})
-    if not doc:
+    if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Not found")
+    doc = await db["cash_advances"].find_one({"_id": oid})
     return serialize_doc(doc)
