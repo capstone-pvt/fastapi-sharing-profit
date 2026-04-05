@@ -19,7 +19,7 @@ from app.infrastructure.fish_species.repository import (
 router = APIRouter(prefix="/fish/species", tags=["fish-species"])
 
 
-@router.get("", dependencies=[Depends(require_roles("admin"))])
+@router.get("", dependencies=[Depends(require_roles("admin", "super"))])
 async def list_species():
     return await repo_list_species()
 
@@ -29,13 +29,13 @@ async def list_active_species():
     return await repo_list_active_species()
 
 
-@router.post("", dependencies=[Depends(require_roles("admin"))])
+@router.post("", dependencies=[Depends(require_roles("admin", "super"))])
 async def create_species(payload: dict[str, Any] = Body(...)):
     species_payload = build_create_species_payload(payload)
     return await repo_create_species(species_payload)
 
 
-@router.patch("/{species_id}", dependencies=[Depends(require_roles("admin"))])
+@router.patch("/{species_id}", dependencies=[Depends(require_roles("admin", "super", "broker"))])
 async def update_species(species_id: str, payload: dict[str, Any] = Body(...)):
     species_payload = build_update_species_payload(payload)
     doc = await repo_update_species(species_id, species_payload)
@@ -44,7 +44,7 @@ async def update_species(species_id: str, payload: dict[str, Any] = Body(...)):
     return doc
 
 
-@router.delete("/{species_id}", dependencies=[Depends(require_roles("admin"))])
+@router.delete("/{species_id}", dependencies=[Depends(require_roles("admin", "super"))])
 async def delete_species(species_id: str):
     deleted = await repo_delete_species(species_id)
     if not deleted:

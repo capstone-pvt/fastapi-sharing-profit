@@ -45,8 +45,8 @@ DEFAULT_SPECIES: list[dict] = [
      "weightRange": [1.0, 15.0], "pricePerKg": [80, 160], "peakMonths": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "habitat": "freshwater"},
     {"name": "Green Spotted Puffer", "classIndex": 14, "scientificName": "Tetraodon nigroviridis", "genus": "Tetraodon", "family": "Tetraodontidae", "englishName": "Green Spotted Puffer", "localName": "Butete",
      "weightRange": [0.01, 0.1], "pricePerKg": [40, 80], "peakMonths": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "habitat": "brackish"},
-    {"name": "Hourse Mackerel", "classIndex": 15, "scientificName": "Trachurus trachurus", "genus": "Trachurus", "family": "Carangidae", "englishName": "Horse Mackerel", "localName": "Galunggong",
-     "weightRange": [0.1, 0.5], "pricePerKg": [120, 200], "peakMonths": [10, 11, 12, 1, 2, 3, 4], "habitat": "marine"},
+    {"name": "Galunggong", "classIndex": 15, "scientificName": "Decapterus macrosoma", "genus": "Decapterus", "family": "Carangidae", "englishName": "Roundscad", "localName": "Galunggong",
+     "weightRange": [0.05, 0.3], "pricePerKg": [80, 160], "peakMonths": [10, 11, 12, 1, 2, 3, 4], "habitat": "marine"},
     {"name": "Indian Carp", "classIndex": 16, "scientificName": "Catla catla", "genus": "Catla", "family": "Cyprinidae", "englishName": "Indian Carp", "localName": "Indian Carp",
      "weightRange": [1.0, 10.0], "pricePerKg": [80, 150], "peakMonths": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "habitat": "freshwater"},
     {"name": "Indo-Pacific Tarpon", "classIndex": 17, "scientificName": "Megalops cyprinoides", "genus": "Megalops", "family": "Megalopidae", "englishName": "Indo-Pacific Tarpon", "localName": "Buan-buan",
@@ -97,6 +97,69 @@ DEFAULT_SPECIES: list[dict] = [
      "weightRange": [0.3, 5.0], "pricePerKg": [350, 600], "peakMonths": [10, 11, 12, 1, 2, 3], "habitat": "freshwater"},
     {"name": "Tuna", "classIndex": 40, "scientificName": "Thunnus albacares", "genus": "Thunnus", "family": "Scombridae", "englishName": "Yellowfin Tuna", "localName": "Barilis / Tambakol",
      "weightRange": [1.0, 80.0], "pricePerKg": [250, 500], "peakMonths": [3, 4, 5, 10, 11, 12], "habitat": "marine"},
+    # ────────────────────────────────────────────────────────────────
+    # PSA 2024 Top Commercial Fisheries Species (Table 3.22)
+    # Source: Philippine Statistics Authority, retrieved June 26, 2025
+    # Price per kg derived from PSA Value ('000 PHP) / Volume (MT)
+    # ────────────────────────────────────────────────────────────────
+    # --- TUNA sub-species (PSA Rank #1: 42.29% of volume, P37.9B) ---
+    {"name": "Skipjack Tuna", "classIndex": 41, "scientificName": "Katsuwonus pelamis", "genus": "Katsuwonus", "family": "Scombridae", "englishName": "Skipjack Tuna", "localName": "Gulyasan",
+     "weightRange": [1.5, 15.0], "pricePerKg": [80, 180], "peakMonths": [3, 4, 5, 10, 11, 12], "habitat": "marine"},
+    {"name": "Bigeye Tuna", "classIndex": 42, "scientificName": "Thunnus obesus", "genus": "Thunnus", "family": "Scombridae", "englishName": "Bigeye Tuna", "localName": "Tambakol",
+     "weightRange": [2.0, 100.0], "pricePerKg": [200, 450], "peakMonths": [3, 4, 5, 10, 11, 12], "habitat": "marine"},
+    {"name": "Eastern Little Tuna", "classIndex": 43, "scientificName": "Euthynnus affinis", "genus": "Euthynnus", "family": "Scombridae", "englishName": "Eastern Little Tuna", "localName": "Tulingan",
+     "weightRange": [0.5, 5.0], "pricePerKg": [100, 200], "peakMonths": [2, 3, 4, 5, 10, 11, 12], "habitat": "marine"},
+    {"name": "Frigate Tuna", "classIndex": 44, "scientificName": "Auxis thazard", "genus": "Auxis", "family": "Scombridae", "englishName": "Frigate Tuna", "localName": "Tulingan Puti",
+     "weightRange": [0.3, 3.0], "pricePerKg": [80, 160], "peakMonths": [1, 2, 3, 4, 5, 10, 11, 12], "habitat": "marine"},
+    # --- SARDINES (PSA Rank #2: 24.11% of volume, P8.0B) ---
+    {"name": "Sardine", "classIndex": 45, "scientificName": "Sardinella lemuru", "genus": "Sardinella", "family": "Clupeidae", "englishName": "Bali Sardinella", "localName": "Tamban",
+     "weightRange": [0.02, 0.1], "pricePerKg": [30, 80], "peakMonths": [9, 10, 11, 12, 1, 2], "habitat": "marine"},
+    {"name": "Fimbriated Sardine", "classIndex": 46, "scientificName": "Sardinella fimbriata", "genus": "Sardinella", "family": "Clupeidae", "englishName": "Fimbriated Sardine", "localName": "Tunsoy",
+     "weightRange": [0.01, 0.08], "pricePerKg": [30, 70], "peakMonths": [9, 10, 11, 12, 1, 2, 3], "habitat": "marine"},
+    {"name": "Tawilis", "classIndex": 47, "scientificName": "Sardinella tawilis", "genus": "Sardinella", "family": "Clupeidae", "englishName": "Freshwater Sardine", "localName": "Tawilis",
+     "weightRange": [0.01, 0.06], "pricePerKg": [100, 250], "peakMonths": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "habitat": "freshwater"},
+    {"name": "Round Herring", "classIndex": 48, "scientificName": "Etrumeus teres", "genus": "Etrumeus", "family": "Dussumieriidae", "englishName": "Round Herring", "localName": "Turay",
+     "weightRange": [0.02, 0.1], "pricePerKg": [40, 90], "peakMonths": [10, 11, 12, 1, 2, 3], "habitat": "marine"},
+    # --- MACKEREL (PSA Rank #4: 3.29% of volume, P3.5B) ---
+    {"name": "Indian Mackerel", "classIndex": 49, "scientificName": "Rastrelliger kanagurta", "genus": "Rastrelliger", "family": "Scombridae", "englishName": "Indian Mackerel", "localName": "Alumahan",
+     "weightRange": [0.1, 0.4], "pricePerKg": [100, 180], "peakMonths": [10, 11, 12, 1, 2, 3, 4], "habitat": "marine"},
+    {"name": "Indo-Pacific Mackerel", "classIndex": 50, "scientificName": "Rastrelliger brachysoma", "genus": "Rastrelliger", "family": "Scombridae", "englishName": "Indo-Pacific Mackerel", "localName": "Hasa-hasa",
+     "weightRange": [0.05, 0.3], "pricePerKg": [80, 160], "peakMonths": [10, 11, 12, 1, 2, 3], "habitat": "marine"},
+    {"name": "Spanish Mackerel", "classIndex": 51, "scientificName": "Scomberomorus commerson", "genus": "Scomberomorus", "family": "Scombridae", "englishName": "Spanish Mackerel", "localName": "Tangigue",
+     "weightRange": [1.0, 20.0], "pricePerKg": [300, 550], "peakMonths": [11, 12, 1, 2, 3, 4], "habitat": "marine"},
+    # --- BIG-EYED SCAD (PSA Rank #5: 3.20%, P3.1B) ---
+    {"name": "Big-eyed Scad", "classIndex": 52, "scientificName": "Selar crumenophthalmus", "genus": "Selar", "family": "Carangidae", "englishName": "Big-eyed Scad", "localName": "Matang-baka",
+     "weightRange": [0.05, 0.3], "pricePerKg": [90, 170], "peakMonths": [10, 11, 12, 1, 2, 3, 4, 5], "habitat": "marine"},
+    # --- ANCHOVIES (PSA Rank #6: 1.14%, P837M) ---
+    {"name": "Anchovy", "classIndex": 53, "scientificName": "Stolephorus commersonnii", "genus": "Stolephorus", "family": "Engraulidae", "englishName": "Anchovy", "localName": "Dilis",
+     "weightRange": [0.002, 0.02], "pricePerKg": [60, 150], "peakMonths": [10, 11, 12, 1, 2, 3, 4], "habitat": "marine"},
+    # --- SQUID (PSA Rank #7: 0.95%, P1.4B) ---
+    {"name": "Squid", "classIndex": 54, "scientificName": "Loligo chinensis", "genus": "Loligo", "family": "Loliginidae", "englishName": "Squid", "localName": "Pusit",
+     "weightRange": [0.05, 1.0], "pricePerKg": [150, 350], "peakMonths": [10, 11, 12, 1, 2, 3], "habitat": "marine"},
+    # --- THREADFIN BREAM (PSA Rank #8: 0.77%, P1.2B) ---
+    {"name": "Threadfin Bream", "classIndex": 55, "scientificName": "Nemipterus japonicus", "genus": "Nemipterus", "family": "Nemipteridae", "englishName": "Threadfin Bream", "localName": "Bisugo",
+     "weightRange": [0.05, 0.4], "pricePerKg": [150, 280], "peakMonths": [10, 11, 12, 1, 2, 3, 4, 5], "habitat": "marine"},
+    # --- CREVALLE (PSA Rank #9: 0.67%, P576M) ---
+    {"name": "Crevalle Jack", "classIndex": 56, "scientificName": "Caranx ignobilis", "genus": "Caranx", "family": "Carangidae", "englishName": "Crevalle Jack", "localName": "Talakitok",
+     "weightRange": [0.3, 15.0], "pricePerKg": [80, 200], "peakMonths": [3, 4, 5, 6, 10, 11, 12], "habitat": "marine"},
+    # --- SLIPMOUTH (PSA Rank #10: 0.61%, P452M) ---
+    {"name": "Slipmouth", "classIndex": 57, "scientificName": "Leiognathus equulus", "genus": "Leiognathus", "family": "Leiognathidae", "englishName": "Slipmouth", "localName": "Sapsap",
+     "weightRange": [0.01, 0.1], "pricePerKg": [60, 140], "peakMonths": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "habitat": "marine"},
+    # --- OTHER COMMERCIALLY IMPORTANT SPECIES ---
+    {"name": "Blue Marlin", "classIndex": 58, "scientificName": "Makaira nigricans", "genus": "Makaira", "family": "Istiophoridae", "englishName": "Blue Marlin", "localName": "Malasugi",
+     "weightRange": [10.0, 200.0], "pricePerKg": [200, 400], "peakMonths": [3, 4, 5, 6, 10, 11], "habitat": "marine"},
+    {"name": "Grouper", "classIndex": 59, "scientificName": "Epinephelus coioides", "genus": "Epinephelus", "family": "Serranidae", "englishName": "Grouper", "localName": "Lapu-lapu",
+     "weightRange": [0.5, 15.0], "pricePerKg": [350, 700], "peakMonths": [3, 4, 5, 6, 7, 8, 9, 10], "habitat": "marine"},
+    {"name": "Rabbitfish", "classIndex": 60, "scientificName": "Siganus guttatus", "genus": "Siganus", "family": "Siganidae", "englishName": "Rabbitfish", "localName": "Samaral / Danggit",
+     "weightRange": [0.05, 0.4], "pricePerKg": [200, 450], "peakMonths": [3, 4, 5, 6, 7, 8], "habitat": "marine"},
+    {"name": "Flying Fish", "classIndex": 61, "scientificName": "Cheilopogon spp.", "genus": "Cheilopogon", "family": "Exocoetidae", "englishName": "Flying Fish", "localName": "Bangsi / Iliw",
+     "weightRange": [0.05, 0.3], "pricePerKg": [80, 160], "peakMonths": [3, 4, 5, 6, 7], "habitat": "marine"},
+    {"name": "Barracuda", "classIndex": 62, "scientificName": "Sphyraena barracuda", "genus": "Sphyraena", "family": "Sphyraenidae", "englishName": "Barracuda", "localName": "Barakuda / Panghalwan",
+     "weightRange": [0.5, 20.0], "pricePerKg": [150, 300], "peakMonths": [3, 4, 5, 6, 10, 11, 12], "habitat": "marine"},
+    {"name": "Moonfish", "classIndex": 63, "scientificName": "Mene maculata", "genus": "Mene", "family": "Menidae", "englishName": "Moonfish", "localName": "Chabita / Salay-salay",
+     "weightRange": [0.05, 0.3], "pricePerKg": [80, 160], "peakMonths": [10, 11, 12, 1, 2, 3], "habitat": "marine"},
+    {"name": "Milkfish Fry", "classIndex": 64, "scientificName": "Chanos chanos", "genus": "Chanos", "family": "Chanidae", "englishName": "Milkfish Fry", "localName": "Bangus Fry / Sabiid",
+     "weightRange": [0.001, 0.01], "pricePerKg": [500, 2000], "peakMonths": [3, 4, 5, 6, 7], "habitat": "marine"},
 ]
 
 # Pre-trained models that ship with the project

@@ -36,12 +36,12 @@ async def list_user_samples(
 
 async def list_all_samples() -> list[dict[str, Any]]:
     db = get_db()
-    return [doc async for doc in db["fish_training_samples"].find({})]
+    return [serialize_doc(doc) async for doc in db["fish_training_samples"].find({})]
 
 
 async def list_active_species() -> list[dict[str, Any]]:
     db = get_db()
-    return [doc async for doc in db["fish_species"].find({"isActive": True})]
+    return [serialize_doc(doc) async for doc in db["fish_species"].find({"isActive": True})]
 
 
 async def delete_sample(sample_id: str) -> bool:
