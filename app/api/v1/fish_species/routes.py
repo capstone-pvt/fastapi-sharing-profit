@@ -29,7 +29,7 @@ async def list_active_species():
     return await repo_list_active_species()
 
 
-@router.post("", dependencies=[Depends(require_roles("admin", "super"))])
+@router.post("", dependencies=[Depends(require_roles("admin", "super", "broker"))])
 async def create_species(payload: dict[str, Any] = Body(...)):
     species_payload = build_create_species_payload(payload)
     return await repo_create_species(species_payload)
