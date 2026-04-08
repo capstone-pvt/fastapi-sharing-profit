@@ -169,6 +169,8 @@ async def get_license_status(
         return {"hasLicense": False, "status": "none", "plan": None, "expiresAt": None}
 
     expires_at = license_doc.get("expiresAt")
+    if expires_at is not None and expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
     if expires_at and expires_at < datetime.now(timezone.utc):
         await db[COLLECTION].update_one(
             {"_id": license_doc["_id"]},

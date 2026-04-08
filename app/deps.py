@@ -49,6 +49,9 @@ def require_roles(*roles: str) -> Callable:
             db = get_db()
             role = await db["roles"].find_one({"_id": to_object_id(user["roleId"])})
             role_name = role.get("name") if role else None
+        # Super always passes any role guard.
+        if role_name == "super":
+            return user
         if role_name not in roles:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         return user
@@ -59,6 +62,10 @@ def require_roles(*roles: str) -> Callable:
 def require_permissions(*permissions: str) -> Callable:
     async def _guard(user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
         if not permissions:
+            return user
+        # Super always has every permission.
+        role_value = user.get("role")
+        if isinstance(role_value, dict) and role_value.get("name") == "super":
             return user
         db = get_db()
         role_id = user.get("roleId") or user.get("role", {}).get("id")

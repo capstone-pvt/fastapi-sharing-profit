@@ -18,6 +18,7 @@ from app.api.v1.audit.routes import router as audit_router
 from app.api.v1.weather.routes import router as weather_router
 from app.api.v1.licenses.routes import router as licenses_router
 from app.api.v1.forecast.routes import router as forecast_router
+from app.api.v1.trips.routes import router as trips_router
 from app.deps import require_roles
 
 
@@ -78,19 +79,7 @@ api_router.include_router(
     prefix="/vessel-owners",
     tags=["vessel-owners"],
 )
-api_router.include_router(
-    build_crud_router(
-        "trips",
-        permissions={
-            "create": "trips:create",
-            "read": "trips:read",
-            "update": "trips:update",
-            "delete": "trips:delete",
-        },
-    ),
-    prefix="/trips",
-    tags=["trips"],
-)
+api_router.include_router(trips_router)
 api_router.include_router(
     build_crud_router(
         "expenses",

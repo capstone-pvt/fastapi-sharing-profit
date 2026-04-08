@@ -44,6 +44,27 @@ DEFAULT_ROLE_USERS = [
         "last_name": "User",
         "company_key": "company_a",
     },
+    {
+        "role_names": [RoleNames.BROKER],
+        "email": "broker@demo.com",
+        "first_name": "Broker",
+        "last_name": "Demo",
+        "company_key": "company_a",
+    },
+    {
+        "role_names": [RoleNames.OWNER],
+        "email": "owner@demo.com",
+        "first_name": "Owner",
+        "last_name": "Demo",
+        "company_key": "company_a",
+    },
+    {
+        "role_names": [RoleNames.CREW],
+        "email": "crew@demo.com",
+        "first_name": "Crew",
+        "last_name": "Demo",
+        "company_key": "company_a",
+    },
 ]
 
 

@@ -57,15 +57,15 @@ See `.env.example` for the full list of optional variables (CORS origins, ML mod
 ### 4. Run the API
 
 ```bash
-uvicorn app.main:app --reload --port 5000
+uvicorn app.main:app --reload --port 8000
 ```
 
-The API will be available at `http://localhost:5000` and interactive docs at `http://localhost:5000/docs`.
+The API will be available at `http://localhost:8000` and interactive docs at `http://localhost:8000/docs`.
 
 To expose the API to devices on your local network (e.g. a phone running the Flutter app):
 
 ```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 5000
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ## Seed Broker Role/Permissions
