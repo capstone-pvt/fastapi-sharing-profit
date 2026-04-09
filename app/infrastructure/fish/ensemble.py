@@ -14,6 +14,16 @@ from app.infrastructure.fish.preprocessing import _crop_detection
 
 logger = logging.getLogger(__name__)
 
+# Ensemble weighting — configurable via environment or constants.
+# Detector (YOLO object detection) provides spatial localization; classifier
+# (YOLO classification) provides species-level accuracy.  The weights
+# reflect the relative reliability of each model's confidence score.
+import os
+
+DETECTOR_WEIGHT = float(os.getenv("ENSEMBLE_DETECTOR_WEIGHT", "0.6"))
+CLASSIFIER_WEIGHT = float(os.getenv("ENSEMBLE_CLASSIFIER_WEIGHT", "0.4"))
+AGREEMENT_BOOST = float(os.getenv("ENSEMBLE_AGREEMENT_BOOST", "1.1"))
+
 
 def verify_detections_with_classifier(
     pil_image: Image.Image,
@@ -69,11 +79,15 @@ def verify_detections_with_classifier(
                     cls_conf,
                 )
             else:
-                # Weighted average confidence boost
-                combined_conf = detector_conf * 0.6 + cls_conf * 0.4
+                # Weighted average of detector and classifier confidence.
+                # Detector weight is higher (0.6) because it provides spatial
+                # localization (bounding box); classifier (0.4) verifies the
+                # species label.  When both models agree, a 10% boost rewards
+                # the higher certainty of consensus.
+                combined_conf = detector_conf * DETECTOR_WEIGHT + cls_conf * CLASSIFIER_WEIGHT
                 if cls_species == detector_species:
                     # Both agree — boost confidence
-                    det["confidence"] = round(min(combined_conf * 1.1, 1.0), 4)
+                    det["confidence"] = round(min(combined_conf * AGREEMENT_BOOST, 1.0), 4)
                     det["verificationMethod"] = "ensemble_agreement"
                 else:
                     det["classifierSpecies"] = cls_species

@@ -14,6 +14,7 @@ from app.seeders.roles_permissions import (
 )
 from app.seeders.users import backfill_default_user_role, seed_default_role_users
 from app.seeders.companies import seed_default_companies
+from app.seeders.licenses import seed_default_licenses
 from app.seeders.fish_models import seed_fish_models, seed_fish_species
 
 
@@ -25,12 +26,14 @@ async def main() -> None:
         await seed_fisherman_role_with_permissions()
         await seed_admin_role_with_all_permissions()
         await backfill_default_user_role()
-        created_count, _ = await seed_default_companies()
+        created_count, companies_by_key = await seed_default_companies()
+        license_count = await seed_default_licenses(companies_by_key)
         await seed_default_role_users()
         print(
             "Broker, Boat Owner, Fisherman, and Admin roles/permissions seeded."
         )
         print(f"Default companies created: {created_count}.")
+        print(f"Pre-activated licenses seeded: {license_count}.")
         await seed_fish_species()
         await seed_fish_models()
         print("Fish species and pre-trained models seeded.")

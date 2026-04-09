@@ -258,14 +258,16 @@ async def analyze_fish(
                 confidence_score = 0.0
                 top_predictions = []
 
-            # If no species detected, create a generic detection for the whole image
+            # If no species detected, create a low-confidence generic detection
+            # so the user can still see the image and manually correct the species.
+            # The low confidence (0.1) signals to the UI that this is unreliable.
             if species == "Unknown" or confidence_score == 0.0:
-                logger.warning(" No ML detection/classification. Using fallback: Generic Fish")
-                species = "Generic Fish"
-                confidence_score = 0.5
+                logger.warning(" No ML detection/classification. Using fallback: Unidentified Fish")
+                species = "Unidentified Fish"
+                confidence_score = 0.1
 
             canonical_names = set(species_map.values()) if species_map else set()
-            if canonical_names and species not in canonical_names and species != "Generic Fish":
+            if canonical_names and species not in canonical_names and species != "Unidentified Fish":
                 raise HTTPException(
                     status_code=400,
                     detail="No fish detected in the image.",

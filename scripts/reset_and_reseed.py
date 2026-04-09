@@ -31,6 +31,7 @@ from app.seeders.users import (  # noqa: E402
 )
 from app.seeders.companies import seed_default_companies  # noqa: E402
 from app.seeders.fish_models import seed_fish_models, seed_fish_species  # noqa: E402
+from app.seeders.licenses import seed_default_licenses  # noqa: E402
 
 
 # All known collections in the database
@@ -62,6 +63,7 @@ COLLECTIONS_TO_DROP = [
     "fish_training_samples",
     # Licenses
     "licenses",
+    "app_licenses",
 ]
 
 
@@ -94,7 +96,7 @@ async def reset_and_reseed() -> None:
     print("=" * 50)
 
     # 2. Seed roles & permissions
-    print("\n[1/6] Seeding permissions & roles...")
+    print("\n[1/7] Seeding permissions & roles...")
     await seed_broker_role_with_permissions()
     await seed_boat_owner_role_with_permissions()
     await seed_fisherman_role_with_permissions()
@@ -102,27 +104,32 @@ async def reset_and_reseed() -> None:
     print("  Done - broker, owner, crew, admin, super roles created")
 
     # 3. Backfill default role
-    print("\n[2/6] Backfilling default user role...")
+    print("\n[2/7] Backfilling default user role...")
     await backfill_default_user_role()
     print("  Done")
 
     # 4. Seed companies
-    print("\n[3/6] Seeding companies...")
-    created_count, _ = await seed_default_companies()
+    print("\n[3/7] Seeding companies...")
+    created_count, companies_by_key = await seed_default_companies()
     print(f"  Done - {created_count} companies created")
 
-    # 5. Seed users
-    print("\n[4/6] Seeding default users...")
+    # 5. Seed pre-activated licenses (binds activation codes to companies)
+    print("\n[4/7] Seeding pre-activated licenses...")
+    license_count = await seed_default_licenses(companies_by_key)
+    print(f"  Done - {license_count} licenses pre-activated")
+
+    # 6. Seed users
+    print("\n[5/7] Seeding default users...")
     user_count = await seed_default_role_users()
     print(f"  Done - {user_count} users created/updated")
 
-    # 6. Seed fish species
-    print("\n[5/6] Seeding fish species...")
+    # 7. Seed fish species
+    print("\n[6/7] Seeding fish species...")
     await seed_fish_species()
     print("  Done")
 
-    # 7. Seed fish models
-    print("\n[6/6] Seeding fish models...")
+    # 8. Seed fish models
+    print("\n[7/7] Seeding fish models...")
     await seed_fish_models()
     print("  Done")
 
@@ -133,10 +140,13 @@ async def reset_and_reseed() -> None:
     print()
     print("Default users:")
     print("  super@demo.com    / P@ssw0rd123  (Super Admin)")
-    print("  admin@demo.com    / P@ssw0rd123  (Admin - Blue Ocean Co)")
-    print("  broker@demo.com   / P@ssw0rd123  (Broker - Blue Ocean Co)")
-    print("  owner@demo.com    / P@ssw0rd123  (Owner - Blue Ocean Co)")
-    print("  crew@demo.com     / P@ssw0rd123  (Crew - Blue Ocean Co)")
+    print("  admin@demo.com    / P@ssw0rd123  (Admin - Demo Fishing Co)")
+    print("  broker@demo.com   / P@ssw0rd123  (Broker - Demo Fishing Co)")
+    print("  owner@demo.com    / P@ssw0rd123  (Owner - Demo Fishing Co)")
+    print("  crew@demo.com     / P@ssw0rd123  (Crew - Demo Fishing Co)")
+    print()
+    print("Pre-activated licenses:")
+    print("  Demo Fishing Co   -> DEMO-FISH-CO00-0001  (premium, 365 days)")
     print()
 
     await disconnect_db()

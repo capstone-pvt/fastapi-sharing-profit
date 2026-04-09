@@ -18,11 +18,17 @@ logger = logging.getLogger(__name__)
 # Changing this constant requires retraining and redeploying the model file.
 WEIGHT_MODEL_EXPECTED_FEATURES = 6
 
-# Confidence threshold below which detector species is verified by classifier
-ENSEMBLE_CONFIDENCE_THRESHOLD = 0.6
+# Confidence threshold below which detector species is verified by classifier.
+# Configurable via ENSEMBLE_CONFIDENCE_THRESHOLD env var.
+ENSEMBLE_CONFIDENCE_THRESHOLD = float(
+    os.getenv("ENSEMBLE_CONFIDENCE_THRESHOLD", "0.6")
+)
 
-# Minimum detection confidence to keep (filters noise)
-MIN_DETECTION_CONFIDENCE = 0.15
+# Minimum detection confidence to keep (filters noise).
+# Configurable via MIN_DETECTION_CONFIDENCE env var.
+MIN_DETECTION_CONFIDENCE = float(
+    os.getenv("MIN_DETECTION_CONFIDENCE", "0.15")
+)
 
 # Padding factor when cropping detections for classifier verification (% of bbox)
 CROP_PADDING = 0.1

@@ -9,8 +9,8 @@ from app.db import get_db
 DEFAULT_COMPANIES = [
     {
         "key": "company_a",
-        "companyName": "Blue Ocean Co",
-        "companyCode": "BLUE",
+        "companyName": "Demo Fishing Co",
+        "companyCode": "DEMO",
         "companyAddress": "",
         "companyPhone": "",
         "companyTaxId": "",

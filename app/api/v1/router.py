@@ -19,6 +19,7 @@ from app.api.v1.weather.routes import router as weather_router
 from app.api.v1.licenses.routes import router as licenses_router
 from app.api.v1.forecast.routes import router as forecast_router
 from app.api.v1.trips.routes import router as trips_router
+from app.api.v1.profit_shares.routes import router as profit_shares_custom_router
 from app.deps import require_roles
 
 
@@ -161,6 +162,10 @@ api_router.include_router(
     prefix="/crew",
     tags=["crew"],
 )
+
+# Custom profit-shares routes (/compute, /generate, /status) — must be
+# included BEFORE the generic CRUD so the custom paths take priority.
+api_router.include_router(profit_shares_custom_router)
 
 api_router.include_router(
     build_crud_router(

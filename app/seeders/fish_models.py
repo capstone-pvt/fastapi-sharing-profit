@@ -95,7 +95,7 @@ DEFAULT_SPECIES: list[dict] = [
      "weightRange": [0.2, 1.5], "pricePerKg": [100, 180], "peakMonths": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "habitat": "freshwater"},
     {"name": "Trout", "classIndex": 39, "scientificName": "Oncorhynchus mykiss", "genus": "Oncorhynchus", "family": "Salmonidae", "englishName": "Trout", "localName": "Trout",
      "weightRange": [0.3, 5.0], "pricePerKg": [350, 600], "peakMonths": [10, 11, 12, 1, 2, 3], "habitat": "freshwater"},
-    {"name": "Tuna", "classIndex": 40, "scientificName": "Thunnus albacares", "genus": "Thunnus", "family": "Scombridae", "englishName": "Yellowfin Tuna", "localName": "Barilis / Tambakol",
+    {"name": "Yellowfin Tuna", "classIndex": 40, "scientificName": "Thunnus albacares", "genus": "Thunnus", "family": "Scombridae", "englishName": "Yellowfin Tuna", "localName": "Tambakol/Bariles/Bangkulis",
      "weightRange": [1.0, 80.0], "pricePerKg": [250, 500], "peakMonths": [3, 4, 5, 10, 11, 12], "habitat": "marine"},
     # ────────────────────────────────────────────────────────────────
     # PSA 2024 Top Commercial Fisheries Species (Table 3.22)
@@ -103,6 +103,8 @@ DEFAULT_SPECIES: list[dict] = [
     # Price per kg derived from PSA Value ('000 PHP) / Volume (MT)
     # ────────────────────────────────────────────────────────────────
     # --- TUNA sub-species (PSA Rank #1: 42.29% of volume, P37.9B) ---
+    {"name": "Bullet Tuna", "classIndex": 67, "scientificName": "Auxis rochei", "genus": "Auxis", "family": "Scombridae", "englishName": "Bullet Tuna", "localName": "Tulingan/Tangi/Pirit",
+     "weightRange": [0.2, 2.0], "pricePerKg": [80, 150], "peakMonths": [1, 2, 3, 4, 5, 10, 11, 12], "habitat": "marine"},
     {"name": "Skipjack Tuna", "classIndex": 41, "scientificName": "Katsuwonus pelamis", "genus": "Katsuwonus", "family": "Scombridae", "englishName": "Skipjack Tuna", "localName": "Gulyasan",
      "weightRange": [1.5, 15.0], "pricePerKg": [80, 180], "peakMonths": [3, 4, 5, 10, 11, 12], "habitat": "marine"},
     {"name": "Bigeye Tuna", "classIndex": 42, "scientificName": "Thunnus obesus", "genus": "Thunnus", "family": "Scombridae", "englishName": "Bigeye Tuna", "localName": "Tambakol",

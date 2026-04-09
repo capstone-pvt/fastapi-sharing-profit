@@ -197,8 +197,13 @@ async def ensure_default_roles(
             UpdateOne(
                 {"name": role_name},
                 {
-                    "$addToSet": {"permissions": {"$each": permissions}},
-                    "$set": {"updatedAt": now},
+                    "$set": {
+                        "permissions": [
+                            to_object_id(pid) if isinstance(pid, str) else pid
+                            for pid in permissions
+                        ],
+                        "updatedAt": now,
+                    },
                 },
             )
             for role_name, permissions in role_permissions.items()
