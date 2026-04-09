@@ -14,21 +14,25 @@ __pycache__/
 *.pyo
 *.pyd
 
-# ML model files (use Git LFS or external storage)
-*.pt
+# ML model files — production models tracked via Git LFS
+# (see .gitattributes for LFS patterns)
+# Ignore intermediate/temp model files but NOT the deployed ones
 *.pth
 *.onnx
-*.joblib
 *.pkl
 *.h5
 *.tflite
 yolov8*.pt
 
-# Model directories
-app/models/classifier/
-app/models/detector/
-app/models/weight/
-app/models/price/
+# Ignore training runs and temp model artifacts
+runs/
+*.pt.bak
+
+# Keep production model files (tracked by Git LFS)
+!app/models/classifier/best.pt
+!app/models/detector/best.pt
+!app/models/weight/weight_model.joblib
+!app/models/price/price_model.joblib
 
 # Uploaded files
 /uploads/
