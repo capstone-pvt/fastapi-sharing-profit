@@ -47,7 +47,9 @@ services:
       - key: TIMEOUT
         value: "120"
       - key: PRELOAD_MODELS
-        value: "true"
+        value: "false"
+      - key: MPLCONFIGDIR
+        value: /tmp
       - key: STORAGE_BACKEND
         value: "local"
       - key: CLOUDINARY_URL

@@ -82,7 +82,7 @@ async def health_check():
     health: dict = {
         "status": "ok",
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "models": _models_loaded,
+        "models": _models_loaded if _models_loaded else {"mode": "lazy-load", "note": "models load on first scan request"},
     }
     # Check MongoDB connectivity
     try:
