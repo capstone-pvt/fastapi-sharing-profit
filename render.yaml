@@ -48,6 +48,8 @@ services:
         value: "300"
       - key: PRELOAD_MODELS
         value: "false"
+      - key: CLASSIFY_ONLY
+        value: "true"
       - key: MPLCONFIGDIR
         value: /tmp
       - key: STORAGE_BACKEND

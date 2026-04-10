@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import datetime, timezone
 from io import BytesIO
 from typing import Any, Callable
@@ -211,20 +212,28 @@ async def analyze_fish(
         logger.info(f" Image size={pil_image.size}, mode={pil_image.mode}, bytes={len(image_bytes)}")
 
         # --- Step 1: Detect fish ---
-        try:
-            detections = detect_fish(pil_image, confidence=confidence, iou=iou)
-            logger.info(f" Detector found {len(detections)} detection(s)")
-        except Exception as e:
-            print(f"ERROR in fish detection: {str(e)}")
-            detections = []
+        # CLASSIFY_ONLY mode skips the heavy detector (saves ~6MB RAM).
+        # Useful on memory-constrained hosts like Render starter (512MB).
+        classify_only = os.getenv("CLASSIFY_ONLY", "false").lower() == "true"
 
-        # --- Step 2: Ensemble verification (classifier verifies each detection) ---
-        if detections:
+        detections: list[dict] = []
+        if not classify_only:
             try:
-                detections = verify_detections_with_classifier(pil_image, detections)
-                logger.info(f" Ensemble verification completed for {len(detections)} detection(s)")
+                detections = detect_fish(pil_image, confidence=confidence, iou=iou)
+                logger.info(f" Detector found {len(detections)} detection(s)")
             except Exception as e:
-                logger.warning(f" Ensemble verification failed, using detector results: {str(e)}")
+                print(f"ERROR in fish detection: {str(e)}")
+                detections = []
+
+            # --- Step 2: Ensemble verification (classifier verifies each detection) ---
+            if detections:
+                try:
+                    detections = verify_detections_with_classifier(pil_image, detections)
+                    logger.info(f" Ensemble verification completed for {len(detections)} detection(s)")
+                except Exception as e:
+                    logger.warning(f" Ensemble verification failed, using detector results: {str(e)}")
+        else:
+            logger.info(" CLASSIFY_ONLY mode — skipping detector, using classifier directly")
 
         # Normalize species names from model to match DB names
         for det in detections:
