@@ -67,11 +67,12 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     AUTO_TRAIN_ON_SAMPLE=false \
     OPENWEATHER_API_KEY=""
 
-# Runtime deps only (OpenCV needs libgl1 + glib)
+# Runtime deps only (OpenCV needs libgl1 + glib + git-lfs for model files)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 libglib2.0-0 libsm6 libxext6 libxrender1 \
     libgomp1 libgcc-s1 libstdc++6 \
-    curl ca-certificates \
+    curl ca-certificates git git-lfs \
+    && git lfs install \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy venv from builder
@@ -84,12 +85,25 @@ COPY --chown=appuser:appuser . .
 RUN mkdir -p uploads app/models/classifier app/models/detector app/models/weight app/models/price logs && \
     chown -R appuser:appuser /app
 
-# Verify model files
-RUN if [ -f app/models/classifier/best.pt ] && head -1 app/models/classifier/best.pt | grep -q "version https://git-lfs"; then \
-      echo "WARNING: Model files are LFS pointers, not actual binaries."; \
-    else \
-      echo "Model files OK"; \
-    fi
+# Resolve LFS pointers → actual model binaries
+RUN cd /app && git init && git lfs install && \
+    git remote add origin https://github.com/capstone-pvt/fastapi-sharing-profit.git && \
+    git lfs pull --include="app/models/**" && \
+    rm -rf .git
+
+# Verify model files are real binaries (not LFS pointers)
+RUN for f in app/models/classifier/best.pt app/models/detector/best.pt app/models/weight/weight_model.joblib app/models/price/price_model.joblib; do \
+      if [ -f "$f" ]; then \
+        SIZE=$(stat -c%s "$f" 2>/dev/null || stat -f%z "$f" 2>/dev/null); \
+        if [ "$SIZE" -lt 1000 ]; then \
+          echo "FAIL: $f is only ${SIZE} bytes (likely LFS pointer)"; exit 1; \
+        else \
+          echo "OK: $f (${SIZE} bytes)"; \
+        fi; \
+      else \
+        echo "WARN: $f not found"; \
+      fi; \
+    done
 
 USER appuser
 
