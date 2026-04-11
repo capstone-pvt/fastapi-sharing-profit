@@ -86,7 +86,8 @@ RUN mkdir -p uploads app/models/classifier app/models/detector app/models/weight
     chown -R appuser:appuser /app
 
 # Resolve LFS pointers → actual model binaries
-RUN cd /app && git init && git lfs install && \
+RUN git config --global --add safe.directory /app && \
+    cd /app && git init && git lfs install && \
     git remote add origin https://github.com/capstone-pvt/fastapi-sharing-profit.git && \
     git lfs pull --include="app/models/**" && \
     rm -rf .git
