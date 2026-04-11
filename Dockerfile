@@ -86,11 +86,16 @@ RUN mkdir -p uploads app/models/classifier app/models/detector app/models/weight
     chown -R appuser:appuser /app
 
 # Resolve LFS pointers → actual model binaries
-RUN git config --global --add safe.directory /app && \
-    cd /app && git init && git lfs install && \
-    git remote add origin https://github.com/capstone-pvt/fastapi-sharing-profit.git && \
-    git lfs pull --include="app/models/**" && \
-    rm -rf .git
+# Shallow-clone repo with LFS, copy model files, then remove clone
+RUN git config --global --add safe.directory /tmp/repo && \
+    GIT_LFS_SKIP_SMUDGE=0 git clone --depth 1 --filter=blob:none \
+      https://github.com/capstone-pvt/fastapi-sharing-profit.git /tmp/repo && \
+    cd /tmp/repo && git lfs pull --include="app/models/**" && \
+    cp -f /tmp/repo/app/models/classifier/best.pt /app/app/models/classifier/best.pt 2>/dev/null || true && \
+    cp -f /tmp/repo/app/models/detector/best.pt /app/app/models/detector/best.pt 2>/dev/null || true && \
+    cp -f /tmp/repo/app/models/weight/weight_model.joblib /app/app/models/weight/weight_model.joblib 2>/dev/null || true && \
+    cp -f /tmp/repo/app/models/price/price_model.joblib /app/app/models/price/price_model.joblib 2>/dev/null || true && \
+    rm -rf /tmp/repo
 
 # Verify model files are real binaries (not LFS pointers)
 RUN for f in app/models/classifier/best.pt app/models/detector/best.pt app/models/weight/weight_model.joblib app/models/price/price_model.joblib; do \
