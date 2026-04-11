@@ -19,6 +19,7 @@ from app.db import get_db
 from app.deps import get_current_user, require_permissions
 from app.domain.profit_shares.services import compute_profit_share
 from app.utils import serialize_doc, to_object_id
+from app.api.v1.notifications.routes import send_notification_to_user, send_notification_to_company_role
 
 router = APIRouter(prefix="/profit-shares", tags=["profit-shares"])
 
@@ -116,6 +117,39 @@ async def generate(
 
     insert_result = await db["profit_shares"].insert_one(doc)
     saved = await db["profit_shares"].find_one({"_id": insert_result.inserted_id})
+
+    # Notify crew members that a profit share was generated for their trip
+    crew_breakdown = result.get("crewBreakdown") or []
+    gross_revenue = result.get("grossRevenue", 0)
+    for crew in crew_breakdown:
+        crew_id = crew.get("crewId", "")
+        net_payout = crew.get("netPayout", 0)
+        if crew_id:
+            try:
+                await send_notification_to_user(
+                    crew_id,
+                    "Profit Share Generated",
+                    f"A profit share of \u20B1{net_payout:,.2f} has been computed for your trip. Review your earnings.",
+                    {"type": "profit_share_generated", "id": str(insert_result.inserted_id)},
+                )
+            except Exception:
+                pass
+
+    # Notify brokers in the company
+    company_id = user.get("companyId")
+    if company_id:
+        try:
+            await send_notification_to_company_role(
+                company_id,
+                "broker",
+                "Profit Share Generated",
+                f"A profit share (gross \u20B1{gross_revenue:,.2f}) was generated. Review the distribution.",
+                {"type": "profit_share_generated", "id": str(insert_result.inserted_id)},
+                exclude_user_id=user_id,
+            )
+        except Exception:
+            pass
+
     return serialize_doc(saved)
 
 
