@@ -102,30 +102,6 @@ async def ensure_default_permissions() -> dict[str, str]:
             "description": "Delete boats",
         },
         {
-            "name": "boats:create",
-            "resource": "boats",
-            "action": "create",
-            "description": "Create boats",
-        },
-        {
-            "name": "boats:read",
-            "resource": "boats",
-            "action": "read",
-            "description": "View boats",
-        },
-        {
-            "name": "boats:update",
-            "resource": "boats",
-            "action": "update",
-            "description": "Update boats",
-        },
-        {
-            "name": "boats:delete",
-            "resource": "boats",
-            "action": "delete",
-            "description": "Delete boats",
-        },
-        {
             "name": "vessel-owners:create",
             "resource": "vessel-owners",
             "action": "create",
