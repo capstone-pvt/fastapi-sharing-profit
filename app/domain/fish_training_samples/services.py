@@ -32,6 +32,11 @@ def build_sample_doc(
         "createdAt": now,
         "updatedAt": now,
         "trainedBy": trained_by,
+        # Correction metadata (non-null when source == "scanner_correction")
+        "source": payload.get("source"),
+        "originalSpecies": payload.get("originalSpecies"),
+        "originalConfidence": payload.get("originalConfidence"),
+        "analysisId": payload.get("analysisId"),
     }
     if all(
         key in payload

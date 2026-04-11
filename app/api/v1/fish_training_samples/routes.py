@@ -67,6 +67,11 @@ async def create_sample(
     bboxHeight: float | None = Form(None),
     notes: str | None = Form(None),
     capturedAt: str | None = Form(None),
+    # Correction metadata — populated when user corrects an AI scan result
+    source: str | None = Form(None),
+    originalSpecies: str | None = Form(None),
+    originalConfidence: float | None = Form(None),
+    analysisId: str | None = Form(None),
     user: dict[str, Any] = Depends(get_current_user),
 ):
     if not image:
@@ -104,6 +109,10 @@ async def create_sample(
         "bboxHeight": bboxHeight,
         "notes": notes,
         "capturedAt": capturedAt,
+        "source": source,
+        "originalSpecies": originalSpecies,
+        "originalConfidence": originalConfidence,
+        "analysisId": analysisId,
     }
 
     doc = build_sample_doc(

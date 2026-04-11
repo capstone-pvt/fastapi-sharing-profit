@@ -5,7 +5,7 @@ from typing import Any
 
 from PIL import Image
 
-from app.infrastructure.fish.classifier import classify_fish
+from app.infrastructure.fish.classifier import classify_fish, classify_fish_top_n
 from app.infrastructure.fish.model_loader import (
     ENSEMBLE_CONFIDENCE_THRESHOLD,
     _load_classifier,
@@ -55,6 +55,13 @@ def verify_detections_with_classifier(
 
         # Classify the cropped region with TTA
         cls_species, cls_conf = classify_fish(cropped, use_tta=True)
+
+        # Always attach top-N alternative predictions for the correction UI
+        try:
+            top_preds = classify_fish_top_n(cropped, n=5, use_tta=True)
+            det["topPredictions"] = top_preds
+        except Exception:
+            det["topPredictions"] = []
 
         if detector_conf >= ENSEMBLE_CONFIDENCE_THRESHOLD:
             # High detector confidence — trust detector, but record classifier result
