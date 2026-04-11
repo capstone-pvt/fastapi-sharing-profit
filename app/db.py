@@ -10,7 +10,10 @@ client: AsyncIOMotorClient | None = None
 async def connect_db() -> None:
     global client
     settings = get_settings()
-    kwargs = {}
+    kwargs = {
+        "serverSelectionTimeoutMS": 10_000,  # fail fast if DB unreachable
+        "connectTimeoutMS": 10_000,
+    }
     if settings.mongodb_uri.startswith("mongodb+srv"):
         kwargs["tlsCAFile"] = certifi.where()
     client = AsyncIOMotorClient(settings.mongodb_uri, **kwargs)
