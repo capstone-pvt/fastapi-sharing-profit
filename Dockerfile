@@ -12,12 +12,14 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install build dependencies
+# Install build dependencies + git-lfs for model files
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     git \
-    && rm -rf /var/lib/apt/lists/*
+    git-lfs \
+    && rm -rf /var/lib/apt/lists/* \
+    && git lfs install
 
 # Copy requirements file
 COPY requirements.txt .
@@ -85,6 +87,14 @@ COPY --chown=appuser:appuser . .
 # Create necessary directories with proper permissions
 RUN mkdir -p uploads app/models/classifier app/models/detector app/models/weight app/models/price logs && \
     chown -R appuser:appuser /app
+
+# Verify model files are real binaries (not LFS pointers)
+RUN if [ -f app/models/classifier/best.pt ] && head -1 app/models/classifier/best.pt | grep -q "version https://git-lfs"; then \
+      echo "WARNING: Model files are LFS pointers, not actual binaries."; \
+      echo "Ensure git-lfs is configured in your CI/CD pipeline."; \
+    else \
+      echo "Model files OK"; \
+    fi
 
 # Switch to non-root user
 USER appuser
