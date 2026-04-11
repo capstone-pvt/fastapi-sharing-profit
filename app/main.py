@@ -34,11 +34,20 @@ settings = get_settings()
 _models_loaded: dict[str, bool] = {}
 
 
+def _background_preload():
+    """Load ML models in a background thread so the app serves /health immediately."""
+    global _models_loaded
+    try:
+        _models_loaded = preload_models()
+        logger.info("Background model preload complete")
+    except Exception as e:
+        logger.error(f"Background model preload failed: {e}")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan: startup and shutdown logic."""
-    global _models_loaded
-    # Startup
+    # Startup — DB + seeders first (fast)
     await connect_db()
     await seed_broker_role_with_permissions()
     await seed_boat_owner_role_with_permissions()
@@ -50,8 +59,10 @@ async def lifespan(app: FastAPI):
     await seed_default_role_users()
     await seed_fish_species()
     await seed_fish_models()
-    _models_loaded = preload_models()
-    logger.info("Application startup complete")
+    logger.info("Application startup complete — models loading in background")
+    # Preload models in background thread (non-blocking)
+    import threading
+    threading.Thread(target=_background_preload, daemon=True).start()
     yield
     # Shutdown
     await disconnect_db()
