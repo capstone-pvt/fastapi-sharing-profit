@@ -254,3 +254,42 @@ async def delete_trip(
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Not found")
     return {"status": "deleted"}
+
+
+@router.patch(
+    "/{item_id}/approve-sales",
+    dependencies=[Depends(require_permissions("trips:update"))],
+)
+async def approve_trip_sales(
+    item_id: str,
+    user: dict[str, Any] = Depends(get_current_user),
+):
+    """Mark fish sales for a trip as reviewed and approved.
+
+    This is required before profit share computation can be triggered.
+    Only the Boat Owner (or Admin) should approve sales recorded by the Broker.
+    """
+    db = get_db()
+    doc = await db[COLLECTION].find_one({"_id": to_object_id(item_id)})
+    if not doc:
+        raise HTTPException(status_code=404, detail="Trip not found")
+
+    full_name = " ".join(
+        part for part in [user.get("firstName"), user.get("lastName")] if part
+    ).strip()
+    approved_by = full_name if full_name else user.get("email")
+
+    now = datetime.now(timezone.utc)
+    await db[COLLECTION].update_one(
+        {"_id": to_object_id(item_id)},
+        {
+            "$set": {
+                "salesApproved": True,
+                "salesApprovedBy": approved_by,
+                "salesApprovedAt": now,
+                "updatedAt": now,
+            }
+        },
+    )
+    updated = await db[COLLECTION].find_one({"_id": to_object_id(item_id)})
+    return serialize_doc(updated)

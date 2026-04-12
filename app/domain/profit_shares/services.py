@@ -56,6 +56,18 @@ async def compute_profit_share(
     if not trip:
         raise ValueError(f"Trip not found: {trip_id}")
 
+    # Verify trip is completed and sales are approved
+    trip_status = (trip.get("status") or "").lower()
+    if trip_status != "completed":
+        raise ValueError(
+            f"Trip must be completed before computing profit share (current: {trip_status})"
+        )
+    if not trip.get("salesApproved", False):
+        raise ValueError(
+            "Fish sales must be reviewed and approved before computing profit share. "
+            "Please approve the sales for this trip first."
+        )
+
     crew_type = (trip.get("crewType") or "pakura").lower()
     captain_id = trip.get("captainId") or trip.get("captainName")
     crew_members: list[dict] = trip.get("crewMembers") or []
@@ -236,12 +248,27 @@ async def compute_profit_share(
     crew_breakdown: list[dict[str, Any]] = []
     fisherman_shares: dict[str, float] = {}
 
+    # Sinakahan logic differs by crew type:
+    # - Pakura: flat sinakahan amount per crew (from policy)
+    # - Tongko: sinakahan = total pakura crew pool / tongko crew count
+    #   (cross-type redistribution — tongko crew receive sinakahan from pakura pool)
+    if crew_type == "tongko" and crew_count > 0:
+        # For Tongko: sinakahan is derived from what the pakura pool would have been
+        pakura_pool = round((small_remaining + big_remaining) / pakura_divisor, 2)
+        tongko_sinakahan_each = round(pakura_pool / crew_count, 2)
+    else:
+        tongko_sinakahan_each = 0.0
+
     for cid in crew_ids:
         gross = crew_share_each
         ca_deduction = cash_advance_per_crew.get(cid, 0)
 
-        # Sinakahan: per-trip fixed amount deducted per crew (configurable)
-        sinakahan_deduction = sinakahan_amount if sinakahan_amount > 0 else 0
+        # Sinakahan: depends on crew type
+        if crew_type == "pakura":
+            sinakahan_deduction = sinakahan_amount if sinakahan_amount > 0 else 0
+        else:
+            # Tongko: sinakahan = pakura pool / tongko crew count
+            sinakahan_deduction = tongko_sinakahan_each
 
         # Kusinero: flat deduction if configured
         kusinero_deduction = kusinero_amount if kusinero_amount > 0 else 0
