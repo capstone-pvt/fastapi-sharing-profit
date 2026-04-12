@@ -15,9 +15,11 @@ async def seed_broker_role_with_permissions() -> None:
     """
     permission_ids = await ensure_default_permissions()
     broker_permissions = [
-        # Read-only access to operational entities (assigned by owner)
+        # Vessel management — create + read (broker registers vessels for owners)
+        permission_ids.get("vessels:create"),
         permission_ids.get("vessels:read"),
         permission_ids.get("vessel-owners:read"),
+        permission_ids.get("boats:create"),
         permission_ids.get("boats:read"),
         permission_ids.get("trips:read"),
         permission_ids.get("fishermen:read"),
