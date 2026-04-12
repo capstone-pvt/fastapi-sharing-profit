@@ -51,8 +51,18 @@ def build_sample_doc(
     return doc
 
 
-def build_samples_query(species: str | None) -> dict[str, Any]:
+def build_samples_query(
+    species: str | None = None,
+    source: str | None = None,
+    review_status: str | None = None,
+) -> dict[str, Any]:
     query: dict[str, Any] = {}
     if species:
         query["species"] = species
+    if source:
+        query["source"] = source
+    if review_status == "pending":
+        query["reviewStatus"] = {"$exists": False}
+    elif review_status:
+        query["reviewStatus"] = review_status
     return query

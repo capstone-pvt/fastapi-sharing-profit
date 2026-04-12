@@ -50,3 +50,83 @@ async def delete_sample(sample_id: str) -> bool:
         {"_id": to_object_id(sample_id)}
     )
     return result.deleted_count > 0
+
+
+async def update_sample(
+    sample_id: str, update_fields: dict[str, Any]
+) -> dict[str, Any] | None:
+    db = get_db()
+    from datetime import datetime, timezone
+
+    update_fields["updatedAt"] = datetime.now(timezone.utc)
+    await db["fish_training_samples"].update_one(
+        {"_id": to_object_id(sample_id)}, {"$set": update_fields}
+    )
+    doc = await db["fish_training_samples"].find_one(
+        {"_id": to_object_id(sample_id)}
+    )
+    return serialize_doc(doc) if doc else None
+
+
+async def get_correction_stats() -> dict[str, Any]:
+    db = get_db()
+    col = db["fish_training_samples"]
+
+    total_samples = await col.count_documents({})
+    total_corrections = await col.count_documents({"source": "scanner_correction"})
+    pending_review = await col.count_documents(
+        {"source": "scanner_correction", "reviewStatus": {"$exists": False}}
+    )
+    approved = await col.count_documents(
+        {"source": "scanner_correction", "reviewStatus": "approved"}
+    )
+    rejected = await col.count_documents(
+        {"source": "scanner_correction", "reviewStatus": "rejected"}
+    )
+
+    # Aggregate corrections by species (what AI got wrong → what user corrected to)
+    pipeline = [
+        {"$match": {"source": "scanner_correction"}},
+        {
+            "$group": {
+                "_id": {
+                    "correctedTo": "$species",
+                    "originalSpecies": "$originalSpecies",
+                },
+                "count": {"$sum": 1},
+            }
+        },
+        {"$sort": {"count": -1}},
+        {"$limit": 20},
+    ]
+    by_species = []
+    async for doc in col.aggregate(pipeline):
+        by_species.append(
+            {
+                "correctedTo": doc["_id"].get("correctedTo"),
+                "originalSpecies": doc["_id"].get("originalSpecies"),
+                "count": doc["count"],
+            }
+        )
+
+    # Last correction timestamp
+    last_cursor = (
+        col.find({"source": "scanner_correction"}, {"createdAt": 1})
+        .sort("createdAt", -1)
+        .limit(1)
+    )
+    last_correction_at = None
+    async for doc in last_cursor:
+        last_correction_at = doc.get("createdAt")
+
+    return {
+        "totalSamples": total_samples,
+        "totalCorrections": total_corrections,
+        "pendingReview": pending_review,
+        "approved": approved,
+        "rejected": rejected,
+        "correctionsBySpecies": by_species,
+        "lastCorrectionAt": (
+            last_correction_at.isoformat() if last_correction_at else None
+        ),
+    }

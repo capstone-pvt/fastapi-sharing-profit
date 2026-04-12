@@ -24,10 +24,12 @@ from app.infrastructure.fish_training_samples import exporter as training_export
 from app.infrastructure.fish_training_samples.repository import (
     create_sample as repo_create_sample,
     delete_sample as repo_delete_sample,
+    get_correction_stats as repo_get_correction_stats,
     list_active_species as repo_list_active_species,
     list_all_samples as repo_list_all_samples,
     list_samples as repo_list_samples,
     list_user_samples as repo_list_user_samples,
+    update_sample as repo_update_sample,
 )
 from app.infrastructure.fish_training_samples.storage import save_training_upload
 
@@ -125,13 +127,21 @@ async def create_sample(
     return await repo_create_sample(doc)
 
 
+@router.get("/stats", dependencies=[Depends(require_permissions("training-samples:read"))])
+async def correction_stats():
+    """Get correction collection statistics."""
+    return await repo_get_correction_stats()
+
+
 @router.get("", dependencies=[Depends(require_permissions("training-samples:read"))])
 async def list_samples(
     limit: int = Query(50, ge=1, le=500),
     offset: int = Query(0, ge=0),
     species: str | None = Query(None),
+    source: str | None = Query(None),
+    reviewStatus: str | None = Query(None),
 ):
-    query = build_samples_query(species)
+    query = build_samples_query(species=species, source=source, review_status=reviewStatus)
     results, total = await repo_list_samples(query, limit=limit, offset=offset)
     return {"results": results, "total": total, "limit": limit, "offset": offset}
 
@@ -169,3 +179,34 @@ async def delete_sample(sample_id: str):
     if not deleted:
         raise HTTPException(status_code=404, detail="Sample not found")
     return {"status": "deleted"}
+
+
+@router.patch(
+    "/{sample_id}/review",
+    dependencies=[Depends(require_roles("admin"))],
+)
+async def review_sample(
+    sample_id: str,
+    user: dict[str, Any] = Depends(get_current_user),
+    status: str = Query(..., regex="^(approved|rejected)$"),
+    reviewNote: str | None = Query(None),
+):
+    """Approve or reject a scanner correction before it enters the training pipeline."""
+    from datetime import datetime, timezone
+
+    full_name = " ".join(
+        part for part in [user.get("firstName"), user.get("lastName")] if part
+    ).strip()
+    reviewed_by = full_name if full_name else user.get("email")
+    updated = await repo_update_sample(
+        sample_id,
+        {
+            "reviewStatus": status,
+            "reviewedBy": reviewed_by,
+            "reviewedAt": datetime.now(timezone.utc),
+            "reviewNote": reviewNote,
+        },
+    )
+    if not updated:
+        raise HTTPException(status_code=404, detail="Sample not found")
+    return updated
