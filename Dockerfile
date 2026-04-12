@@ -1,4 +1,5 @@
 # Optimized build — targets < 4GB for Railway free tier
+# Build: 2026-04-13 — force cache bust for multi-role + companyId fix
 
 # Stage 1: Builder
 FROM python:3.11-slim AS builder
