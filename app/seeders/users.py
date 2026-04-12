@@ -24,8 +24,11 @@ async def backfill_default_user_role() -> int:
         return 0
     role_id = role["_id"]
     result = await db["users"].update_many(
-        {"$or": [{"role": {"$exists": False}}, {"role": None}]},
-        {"$set": {"role": role_id}},
+        {"$and": [
+            {"roles": {"$exists": False}},
+            {"$or": [{"role": {"$exists": False}}, {"role": None}]},
+        ]},
+        {"$set": {"roles": [role_id]}},
     )
     return result.modified_count
 
@@ -101,12 +104,16 @@ async def seed_default_role_users(
         hashed = hash_password(default_password)
         existing = await get_user_by_email(user["email"])
         if existing:
+            # Don't overwrite roles if user already has multi-role array
+            existing_roles = existing.get("roles")
+            has_multi_roles = isinstance(existing_roles, list) and len(existing_roles) > 1
             update_fields = {
                 "password": hashed,
-                "role": role["_id"],
                 "updatedAt": datetime.now(timezone.utc),
                 "companyApproved": True,
             }
+            if not has_multi_roles:
+                update_fields["roles"] = [role["_id"]]
             unset_fields: dict[str, str] = {
                 "companyName": "",
                 "companyCode": "",
