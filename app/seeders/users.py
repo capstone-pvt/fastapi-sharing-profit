@@ -121,10 +121,10 @@ async def seed_default_role_users(
                 "companyPhone": "",
                 "companyTaxId": "",
             }
-            if company_doc:
+            # Only set companyId if user doesn't already have one
+            existing_company = existing.get("companyId")
+            if not existing_company and company_doc:
                 update_fields["companyId"] = company_doc["_id"]
-            else:
-                unset_fields["companyId"] = ""
             await db["users"].update_one(
                 {"_id": existing["_id"]},
                 {
