@@ -371,12 +371,36 @@ async def forgot_password(payload: dict[str, Any] = Body(...)):
     if not stored_birthday or stored_birthday != birthday:
         raise HTTPException(status_code=403, detail="Verification failed. Please check your details.")
 
-    # 4. All verified — update password
+    # 4. All verified — update password + set pending approval
     from app.infrastructure.auth.repository import update_user_password
     hashed = hash_password(new_password)
     await update_user_password(str(user["_id"]), hashed)
 
-    return {"status": "ok", "message": "Password reset successfully. You can now login with your new password."}
+    # Set account to pending approval
+    db = get_db()
+    await db["users"].update_one(
+        {"_id": user["_id"]},
+        {"$set": {"companyApproved": False, "passwordResetPending": True}},
+    )
+
+    # Notify admin(s) about the password reset request
+    try:
+        from app.api.v1.notifications.routes import send_notification_to_company_role
+        user_name = f"{user.get('firstName', '')} {user.get('lastName', '')}".strip()
+        await send_notification_to_company_role(
+            company_id=str(company_id),
+            role_name="admin",
+            title="Password Reset Request",
+            body=f"{user_name or email} has reset their password and needs re-approval.",
+            category="password_reset",
+        )
+    except Exception:
+        pass  # notification is best-effort
+
+    return {
+        "status": "ok",
+        "message": "Password reset successfully. Your account is now pending admin approval before you can login.",
+    }
 
 
 @router.post("/logout")
