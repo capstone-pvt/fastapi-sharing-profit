@@ -37,6 +37,7 @@ def validate_register_payload(payload: dict[str, Any]) -> dict[str, str | None]:
         "roleIds": normalised_role_ids,
         "companyCode": (company_code or "").strip() or None,
         "companyName": (company_name or "").strip() or None,
+        "birthday": (payload.get("birthday") or "").strip() or None,
     }
 
 
@@ -65,6 +66,7 @@ def build_user_doc(
     session_id: str | None = None,
     company_id: str | None = None,
     company_approved: bool | None = None,
+    birthday: str | None = None,
 ) -> dict[str, Any]:
     now = datetime.now(timezone.utc)
     # Normalise to roleIds list
@@ -80,6 +82,7 @@ def build_user_doc(
         "firstName": first_name,
         "lastName": last_name,
         "roleIds": final_role_ids,
+        "birthday": birthday,
         "createdAt": now,
         "updatedAt": now,
     }

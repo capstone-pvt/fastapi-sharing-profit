@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any
 
 from app.db import get_db
@@ -95,6 +95,14 @@ async def update_session(
 
 async def revoke_refresh_token(user_id: str) -> None:
     await update_session(user_id, None, None, None)
+
+
+async def update_user_password(user_id: str, hashed_password: str) -> None:
+    db = get_db()
+    await db["users"].update_one(
+        {"_id": to_object_id(user_id)},
+        {"$set": {"password": hashed_password, "updatedAt": datetime.now(timezone.utc)}},
+    )
 
 
 async def serialize_user(user: dict[str, Any]) -> dict[str, Any]:

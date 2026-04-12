@@ -156,6 +156,7 @@ async def register(payload: dict[str, Any] = Body(...)):
     hashed = hash_password(password)
     session_id = uuid4().hex
     is_company_creator = bool(company_name)
+    birthday = fields.get("birthday")
     user_doc = build_user_doc(
         email=email,
         hashed_password=hashed,
@@ -165,6 +166,7 @@ async def register(payload: dict[str, Any] = Body(...)):
         session_id=session_id,
         company_id=company_id,
         company_approved=True if is_company_creator else None,
+        birthday=birthday,
     )
     user_id = await create_user(user_doc)
 
@@ -333,6 +335,48 @@ async def refresh(payload: dict[str, Any] = Body(...)):
         access_token=access_token,
         refresh_token=new_refresh_token,
     )
+
+
+@router.post("/forgot-password")
+async def forgot_password(payload: dict[str, Any] = Body(...)):
+    """Self-service password reset using email + company code + birthday."""
+    email = (payload.get("email") or "").strip().lower()
+    company_code = (payload.get("companyCode") or "").strip()
+    birthday = (payload.get("birthday") or "").strip()
+    new_password = (payload.get("newPassword") or "").strip()
+
+    if not email or not company_code or not birthday:
+        raise HTTPException(status_code=400, detail="Email, company code, and birthday are required")
+    if not new_password or len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+
+    # 1. Find user by email
+    user = await get_user_by_email(email)
+    if not user:
+        raise HTTPException(status_code=404, detail="Verification failed. Please check your details.")
+
+    # 2. Verify company code
+    company_id = user.get("companyId")
+    if not company_id:
+        raise HTTPException(status_code=404, detail="Verification failed. Please check your details.")
+    company = await get_company_by_id(str(company_id))
+    if not company:
+        raise HTTPException(status_code=404, detail="Verification failed. Please check your details.")
+    stored_code = (company.get("companyCode") or "").strip()
+    if stored_code.lower() != company_code.lower():
+        raise HTTPException(status_code=403, detail="Verification failed. Please check your details.")
+
+    # 3. Verify birthday
+    stored_birthday = (user.get("birthday") or "").strip()
+    if not stored_birthday or stored_birthday != birthday:
+        raise HTTPException(status_code=403, detail="Verification failed. Please check your details.")
+
+    # 4. All verified — update password
+    from app.infrastructure.auth.repository import update_user_password
+    hashed = hash_password(new_password)
+    await update_user_password(str(user["_id"]), hashed)
+
+    return {"status": "ok", "message": "Password reset successfully. You can now login with your new password."}
 
 
 @router.post("/logout")
