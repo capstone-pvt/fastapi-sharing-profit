@@ -73,6 +73,109 @@ async def register_device(
     return {"status": "registered"}
 
 
+# ── In-app notification storage ────────────────────────────────────
+
+NOTIF_COLLECTION = "notifications"
+
+
+@router.get("")
+async def list_notifications(
+    user: dict[str, Any] = Depends(get_current_user),
+    limit: int = 50,
+    offset: int = 0,
+) -> dict[str, Any]:
+    """List in-app notifications for the current user (newest first)."""
+    db = get_db()
+    user_id = str(user.get("_id") or user.get("id") or "")
+    query = {"userId": user_id}
+    cursor = (
+        db[NOTIF_COLLECTION]
+        .find(query)
+        .sort("createdAt", -1)
+        .skip(offset)
+        .limit(limit)
+    )
+    results = [serialize_doc(doc) async for doc in cursor]
+    total = await db[NOTIF_COLLECTION].count_documents(query)
+    unread = await db[NOTIF_COLLECTION].count_documents(
+        {**query, "isRead": False}
+    )
+    return {
+        "results": results,
+        "total": total,
+        "unread": unread,
+        "limit": limit,
+        "offset": offset,
+    }
+
+
+@router.get("/unread-count")
+async def unread_count(
+    user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, int]:
+    """Get the unread notification count for the current user."""
+    db = get_db()
+    user_id = str(user.get("_id") or user.get("id") or "")
+    count = await db[NOTIF_COLLECTION].count_documents(
+        {"userId": user_id, "isRead": False}
+    )
+    return {"unread": count}
+
+
+@router.patch("/{notification_id}/read")
+async def mark_as_read(
+    notification_id: str,
+    user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Mark a single notification as read."""
+    db = get_db()
+    user_id = str(user.get("_id") or user.get("id") or "")
+    result = await db[NOTIF_COLLECTION].update_one(
+        {"_id": to_object_id(notification_id), "userId": user_id},
+        {"$set": {"isRead": True, "readAt": datetime.now(timezone.utc)}},
+    )
+    if result.matched_count == 0:
+        return {"status": "not_found"}
+    return {"status": "read"}
+
+
+@router.patch("/read-all")
+async def mark_all_read(
+    user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    """Mark all notifications as read for the current user."""
+    db = get_db()
+    user_id = str(user.get("_id") or user.get("id") or "")
+    result = await db[NOTIF_COLLECTION].update_many(
+        {"userId": user_id, "isRead": False},
+        {"$set": {"isRead": True, "readAt": datetime.now(timezone.utc)}},
+    )
+    return {"status": "ok", "marked": result.modified_count}
+
+
+async def store_notification(
+    user_id: str,
+    title: str,
+    body: str,
+    category: str = "general",
+    data: dict[str, str] | None = None,
+) -> str:
+    """Store an in-app notification and return its ID."""
+    db = get_db()
+    now = datetime.now(timezone.utc)
+    doc = {
+        "userId": user_id,
+        "title": title,
+        "body": body,
+        "category": category,
+        "data": data or {},
+        "isRead": False,
+        "createdAt": now,
+    }
+    result = await db[NOTIF_COLLECTION].insert_one(doc)
+    return str(result.inserted_id)
+
+
 # ── Send notification helper (used by other modules) ────────────────
 
 async def send_notification_to_user(
@@ -80,11 +183,18 @@ async def send_notification_to_user(
     title: str,
     body: str,
     data: dict[str, str] | None = None,
+    category: str = "general",
 ) -> int:
-    """Send a push notification to all devices registered to a user.
+    """Send a push notification and store in-app notification.
 
     Returns the number of devices notified.
     """
+    # Always store in-app notification (even if no FCM tokens)
+    try:
+        await store_notification(user_id, title, body, category, data)
+    except Exception as e:
+        logger.warning("Failed to store in-app notification: %s", e)
+
     db = get_db()
     tokens_cursor = db[COLLECTION].find({"userId": user_id})
     tokens = [doc.get("fcmToken") async for doc in tokens_cursor if doc.get("fcmToken")]
