@@ -18,6 +18,7 @@ async def seed_broker_role_with_permissions() -> None:
         # Vessel management — create + read (broker registers vessels for owners)
         permission_ids.get("vessels:create"),
         permission_ids.get("vessels:read"),
+        permission_ids.get("vessel-owners:create"),
         permission_ids.get("vessel-owners:read"),
         permission_ids.get("boats:create"),
         permission_ids.get("boats:read"),
