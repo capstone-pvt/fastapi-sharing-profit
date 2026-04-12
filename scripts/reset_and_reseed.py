@@ -64,6 +64,9 @@ COLLECTIONS_TO_DROP = [
     # Licenses
     "licenses",
     "app_licenses",
+    # Notifications
+    "notifications",
+    "device_tokens",
 ]
 
 
@@ -133,23 +136,19 @@ async def reset_and_reseed() -> None:
     await seed_fish_models()
     print("  Done")
 
-    print()
-    print("=" * 50)
-    print("  RESET COMPLETE")
-    print("=" * 50)
-    print()
-    print("Default users:")
-    print("  super@demo.com    / P@ssw0rd123  (Super Admin)")
-    print("  admin@demo.com    / P@ssw0rd123  (Admin - Demo Fishing Co)")
-    print("  broker@demo.com   / P@ssw0rd123  (Broker - Demo Fishing Co)")
-    print("  owner@demo.com    / P@ssw0rd123  (Owner - Demo Fishing Co)")
-    print("  crew@demo.com     / P@ssw0rd123  (Crew - Demo Fishing Co)")
-    print()
-    print("Pre-activated licenses:")
-    print("  Demo Fishing Co   -> DEMO-FISH-CO00-0001  (premium, 365 days)")
-    print()
-
+    # 9. Seed demo transactional data
+    print("\n[8/8] Seeding demo transactions (vessels, trips, sales, etc.)...")
     await disconnect_db()
+
+    # Import and run the full transaction seeder
+    from scripts.seed_demo_transactions import seed as seed_transactions
+    await seed_transactions()
+
+    print()
+    print("=" * 50)
+    print("  FULL RESET + DEMO DATA COMPLETE")
+    print("=" * 50)
+    print()
 
 
 if __name__ == "__main__":
