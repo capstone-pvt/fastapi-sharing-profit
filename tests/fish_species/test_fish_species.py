@@ -29,8 +29,15 @@ class TestCreateFishSpecies:
         })
         assert resp.status_code in (200, 201)
 
-    def test_non_admin_cannot_create(self, client, broker_headers):
+    def test_broker_can_create(self, client, broker_headers):
+        """Broker is allowed to create species per current route permissions."""
         resp = client.post("/api/fish/species", headers=broker_headers, json={
+            "name": "Broker Added Fish",
+        })
+        assert resp.status_code in (200, 201)
+
+    def test_crew_cannot_create(self, client, crew_headers):
+        resp = client.post("/api/fish/species", headers=crew_headers, json={
             "name": "Unauthorized Fish",
         })
         assert resp.status_code == 403

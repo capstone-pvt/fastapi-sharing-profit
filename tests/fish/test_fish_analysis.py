@@ -60,14 +60,15 @@ class TestAnalyzeFish:
         )
         assert resp.status_code == 401
 
-    def test_crew_can_analyze(self, client, crew_headers):
+    def test_crew_cannot_analyze(self, client, crew_headers):
+        """Crew role does not have fish:analyze permission per RBAC spec."""
         image_bytes = _create_test_image()
         resp = client.post(
             "/api/fish/analyze",
             headers=crew_headers,
             files={"image": ("crew_fish.jpg", image_bytes, "image/jpeg")},
         )
-        assert resp.status_code in (200, 400, 500), resp.text
+        assert resp.status_code == 403
 
 
 class TestFishDiagnostic:

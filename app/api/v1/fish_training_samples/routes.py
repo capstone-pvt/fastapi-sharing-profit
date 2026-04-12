@@ -188,7 +188,7 @@ async def delete_sample(sample_id: str):
 async def review_sample(
     sample_id: str,
     user: dict[str, Any] = Depends(get_current_user),
-    status: str = Query(..., regex="^(approved|rejected)$"),
+    status: str = Query(..., pattern="^(approved|rejected)$"),
     reviewNote: str | None = Query(None),
 ):
     """Approve or reject a scanner correction before it enters the training pipeline."""
