@@ -344,6 +344,242 @@ async def seed():
 
     print(f"  Created {len(trip_ids)} trips with fish sales and expenses")
 
+    # ── 6b. Catches (per crew fish attribution) ─────────────────
+    print("\n[6b/12] Seeding catches per crew...")
+
+    catch_count = 0
+    for t_idx, tc in enumerate(trip_configs):
+        is_completed = tc["approved"] or tc["days_ago"] > 2
+        if not is_completed:
+            continue
+        trip_id = trip_ids[t_idx]
+        departure = NOW - timedelta(days=tc["days_ago"])
+        return_date = departure + timedelta(days=2)
+
+        for crew_idx in tc["crew"]:
+            num_catches = random.randint(2, 5)
+            for _ in range(num_catches):
+                sp_name, sp_price = random.choice(species_list)
+                weight = round(random.uniform(0.5, 15.0), 2)
+                catch_doc = {
+                    "tripId": str(trip_id),
+                    "crewMemberId": str(crew_member_ids[crew_idx]),
+                    "crewMemberName": f"{fisher_data[crew_idx][0]} {fisher_data[crew_idx][1]}",
+                    "species": sp_name,
+                    "weight": weight,
+                    "pricePerKg": sp_price + random.randint(-15, 25),
+                    "category": "big_fish" if weight > 8 else "small_fish",
+                    "caughtAt": (return_date - timedelta(hours=random.randint(1, 36))).isoformat(),
+                    "companyId": company_id, "demoTag": DEMO_TAG,
+                    "createdAt": return_date, "updatedAt": NOW,
+                }
+                await db["catches"].insert_one(catch_doc)
+                catch_count += 1
+
+    print(f"  Created {catch_count} catches across completed trips")
+
+    # ── 6c. Profit Shares (for approved trips) ──────────────────
+    print("\n[6c/12] Seeding profit shares for approved trips...")
+
+    ps_count = 0
+    for t_idx, tc in enumerate(trip_configs):
+        if not tc["approved"]:
+            continue
+        trip_id = trip_ids[t_idx]
+        departure = NOW - timedelta(days=tc["days_ago"])
+        return_date = departure + timedelta(days=2)
+
+        # Get the fish sale for this trip
+        sale = await db["fish_sales"].find_one({"tripId": str(trip_id)})
+        if not sale:
+            continue
+
+        line_items = sale.get("lineItems", [])
+        total_price = sale.get("totalPrice", 0)
+        total_weight = sale.get("totalWeight", 0)
+
+        # Compute small/big fish totals
+        small_total = sum(
+            li["kilos"] * li["pricePerKg"]
+            for li in line_items if "big" not in (li.get("category") or "")
+        )
+        big_total = sum(
+            li["kilos"] * li["pricePerKg"]
+            for li in line_items if "big" in (li.get("category") or "")
+        )
+        gross_revenue = round(small_total + big_total, 2)
+
+        # Get expenses
+        trip_expenses = await db["expenses"].find({"tripId": str(trip_id)}).to_list(100)
+        total_expenses = round(sum(float(e.get("amount", 0)) for e in trip_expenses), 2)
+
+        # Get cash advances for this trip
+        trip_cas = await db["cash_advances"].find(
+            {"tripId": str(trip_id), "status": "approved"}
+        ).to_list(100)
+        ca_per_crew = {}
+        for ca in trip_cas:
+            rid = ca.get("requestedBy", "")
+            ca_per_crew[rid] = ca_per_crew.get(rid, 0) + float(ca.get("amount", 0))
+        total_cash_advances = sum(ca_per_crew.values())
+
+        # Compute using policy
+        broker_pct = 0.10
+        small_bangka_pct = 0.20
+        big_bangka_pct = 0.10
+        divisor = 3 if tc["type"] == "pakura" else 2
+
+        broker_share = round(gross_revenue * broker_pct, 2)
+        small_bangka = round(small_total * small_bangka_pct, 2)
+        big_bangka = round(big_total * big_bangka_pct, 2)
+        total_bangka = small_bangka + big_bangka
+
+        small_crew_pool = round((small_total - small_bangka) / divisor, 2)
+        big_crew_pool = round((big_total - big_bangka) / divisor, 2)
+        total_crew_pool = small_crew_pool + big_crew_pool
+
+        crew_in_trip = tc["crew"]
+        crew_count = len(crew_in_trip)
+        crew_share_each = round(total_crew_pool / crew_count, 2) if crew_count > 0 else 0
+
+        captain_owner_net = round(gross_revenue - broker_share - total_crew_pool - total_expenses, 2)
+        per_member = captain_owner_net / 4 if captain_owner_net > 0 else 0
+        captain_share = round(per_member, 2)
+        owner_share_val = round(captain_owner_net - captain_share, 2)
+
+        # Big fish per crew
+        big_per_crew = {}
+        for li in line_items:
+            if "big" in (li.get("category") or ""):
+                cid = li.get("caughtById") or ""
+                big_per_crew[cid] = big_per_crew.get(cid, 0) + li["kilos"] * li["pricePerKg"]
+
+        # Build crew breakdown
+        crew_breakdown = []
+        fisherman_shares = {}
+        sinakahan = 100.0
+        kusinero = 50.0
+        custom_deductions = 200.0  # motorman
+
+        for ci in crew_in_trip:
+            cid = str(crew_member_ids[ci])
+            ca_deduction = ca_per_crew.get(cid, 0)
+            total_deductions = ca_deduction + sinakahan + kusinero + custom_deductions
+            net_payout = round(crew_share_each - total_deductions, 2)
+            big_fish_direct = round(big_per_crew.get(cid, 0), 2)
+
+            fisherman_shares[cid] = net_payout
+            crew_breakdown.append({
+                "crewId": cid,
+                "crewName": f"{fisher_data[ci][0]} {fisher_data[ci][1]}",
+                "grossShare": crew_share_each,
+                "smallFishEarnings": round(crew_share_each * 0.7, 2),
+                "bigFishEarnings": big_fish_direct,
+                "bigFishDirectAttribution": big_fish_direct,
+                "cashAdvanceDeduction": ca_deduction,
+                "sinakahan": sinakahan,
+                "kusinero": kusinero,
+                "customDeductions": custom_deductions,
+                "totalDeductions": total_deductions,
+                "netPayout": net_payout,
+            })
+
+        # Determine status: Trip #1 = paid, Trip #2 = finalized, Trip #3 = draft
+        statuses = ["paid", "finalized", "draft"]
+        ps_status = statuses[t_idx] if t_idx < len(statuses) else "draft"
+
+        ps_doc = {
+            "tripId": str(trip_id),
+            "tripName": f"Trip #{t_idx + 1}",
+            "vesselName": vessels[tc["vessel_idx"]]["name"],
+            "crewType": tc["type"],
+            "status": ps_status,
+            "generatedBy": str(owner_id),
+            "generatedAt": return_date.isoformat(),
+
+            # Revenue
+            "grossRevenue": gross_revenue,
+            "smallFishTotal": round(small_total, 2),
+            "bigFishTotal": round(big_total, 2),
+            "totalSmallWeight": round(sum(
+                li["kilos"] for li in line_items if "big" not in (li.get("category") or "")
+            ), 2),
+            "totalRevenue": gross_revenue,
+            "netProfit": round(gross_revenue - total_expenses, 2),
+
+            # Shares
+            "brokerShare": broker_share,
+            "brokerPercentage": 10,
+            "bangkaShare": total_bangka,
+            "smallBangka": small_bangka,
+            "bigBangka": big_bangka,
+            "smallBangkaPercentage": 20,
+            "bigBangkaPercentage": 10,
+            "crewPool": total_crew_pool,
+            "smallCrewPool": small_crew_pool,
+            "bigCrewPool": big_crew_pool,
+            "divisor": divisor,
+
+            # Captain/Owner
+            "captainOwnerNet": captain_owner_net,
+            "captainShare": captain_share,
+            "ownerShare": owner_share_val,
+            "captainId": str(crew_member_ids[crew_in_trip[0]]),
+            "captainIsOwner": False,
+            "boatOwnerPercentage": 60,
+            "fishermanPercentage": 30,
+
+            # Deductions
+            "totalExpenses": total_expenses,
+            "totalCashAdvances": total_cash_advances,
+            "sinakahan": sinakahan,
+            "kusineroAmount": kusinero,
+
+            # Nilicoman
+            "nilicomanEnabled": True,
+            "nilicomanTotal": captain_owner_net if captain_owner_net > 0 else 0,
+            "nilicomanOwner": round(captain_owner_net * 0.6, 2) if captain_owner_net > 0 else 0,
+            "nilicomanCrewEach": round(
+                (captain_owner_net * 0.4 / crew_count) if captain_owner_net > 0 and crew_count > 0 else 0, 2
+            ),
+
+            # Crew breakdown
+            "crewCount": crew_count,
+            "fishermanShares": fisherman_shares,
+            "crewBreakdown": crew_breakdown,
+
+            "policyId": None,
+            "companyId": company_id, "demoTag": DEMO_TAG,
+            "createdAt": return_date, "updatedAt": NOW,
+        }
+
+        # Add finalized/paid metadata
+        if ps_status in ("finalized", "paid"):
+            ps_doc["finalizedBy"] = "Oscar Reyes"
+            ps_doc["finalizedAt"] = (return_date + timedelta(days=1)).isoformat()
+        if ps_status == "paid":
+            ps_doc["paidBy"] = "Oscar Reyes"
+            ps_doc["paidAt"] = (return_date + timedelta(days=2)).isoformat()
+
+        await db["profit_shares"].insert_one(ps_doc)
+        ps_count += 1
+
+    print(f"  Created {ps_count} profit shares (1 paid, 1 finalized, 1 draft)")
+
+    # Add profit share notifications for crew
+    ps_notifs = []
+    for ci in [0, 1, 2]:  # Trip #1 crew — paid
+        ps_notifs.append({
+            "userId": str(fisher_ids[ci]),
+            "title": "Profit Share Paid",
+            "body": f"Your earnings for Trip #1 on FB Maria Clara have been paid.",
+            "category": "profit_share", "isRead": ci == 0,
+            "createdAt": NOW - timedelta(days=26),
+        })
+    if ps_notifs:
+        await db["notifications"].insert_many(ps_notifs)
+        print(f"  Created {len(ps_notifs)} profit share notifications")
+
     # ── 7. Cash Advances ────────────────────────────────────────
     print("\n[7/9] Seeding cash advances...")
 
@@ -428,8 +664,11 @@ async def seed():
     print()
     print("Vessels: FB Maria Clara, FB San Pedro, FB Estrella")
     print("Trips: 5 (3 completed+approved, 1 completed+pending, 1 in-progress)")
+    print("Catches: Per crew with species, weight, category")
+    print("Profit Shares: 3 (Trip#1=Paid, Trip#2=Finalized, Trip#3=Draft)")
+    print("  - Full crew breakdown with deductions per member")
     print("Cash Advances: 3 (2 approved, 1 pending)")
-    print("Notifications: 5 (2 unread)")
+    print("Notifications: 8+ (profit share + cash advance + sales)")
     print()
 
     await disconnect_db()
