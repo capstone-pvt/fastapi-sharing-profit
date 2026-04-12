@@ -2,10 +2,10 @@ from typing import Any, Callable
 
 from fastapi import Depends, HTTPException, Request, status
 from jose import JWTError, jwt
-from bson import ObjectId
 
 from app.core.config import get_settings
 from app.db import get_db
+from app.role_utils import get_user_role_ids, get_user_role_names, get_merged_permissions
 from app.utils import serialize_doc, to_object_id
 
 
@@ -33,7 +33,18 @@ async def get_current_user(request: Request) -> dict[str, Any]:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     user_data = serialize_doc(user)
-    user_data["roleId"] = payload.get("roleId")
+    # Multi-role: prefer roleIds (list) from JWT, fallback to roleId (single)
+    jwt_role_ids = payload.get("roleIds")
+    if isinstance(jwt_role_ids, list) and jwt_role_ids:
+        user_data["roleIds"] = jwt_role_ids
+    else:
+        single = payload.get("roleId")
+        if single:
+            user_data["roleIds"] = [single]
+        else:
+            user_data["roleIds"] = get_user_role_ids(user_data)
+    # Keep backward compat
+    user_data["roleId"] = user_data["roleIds"][0] if user_data["roleIds"] else None
     return user_data
 
 
@@ -41,18 +52,11 @@ def require_roles(*roles: str) -> Callable:
     async def _guard(user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
         if not roles:
             return user
-        role_name = None
-        role_value = user.get("role")
-        if isinstance(role_value, dict):
-            role_name = role_value.get("name")
-        if not role_name and user.get("roleId"):
-            db = get_db()
-            role = await db["roles"].find_one({"_id": to_object_id(user["roleId"])})
-            role_name = role.get("name") if role else None
+        user_roles = await get_user_role_names(user)
         # Super always passes any role guard.
-        if role_name == "super":
+        if "super" in user_roles:
             return user
-        if role_name not in roles:
+        if not user_roles.intersection(set(roles)):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         return user
 
@@ -64,38 +68,15 @@ def require_permissions(*permissions: str) -> Callable:
         if not permissions:
             return user
         # Super always has every permission.
-        role_value = user.get("role")
-        if isinstance(role_value, dict) and role_value.get("name") == "super":
+        user_roles = await get_user_role_names(user)
+        if "super" in user_roles:
             return user
-        db = get_db()
-        role_id = user.get("roleId") or user.get("role", {}).get("id")
-        if not role_id:
+        role_ids = get_user_role_ids(user)
+        if not role_ids:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
-        role = await db["roles"].find_one({"_id": to_object_id(role_id)})
-        role_perms = role.get("permissions", []) if role else []
-
-        permission_names: set[str] = set()
-        if role_perms:
-            if isinstance(role_perms[0], dict) and "name" in role_perms[0]:
-                permission_names = {perm.get("name") for perm in role_perms}
-            else:
-                has_object_ids = any(
-                    isinstance(perm, ObjectId) or ObjectId.is_valid(str(perm))
-                    for perm in role_perms
-                )
-                if has_object_ids:
-                    ids = [
-                        perm if isinstance(perm, ObjectId) else to_object_id(str(perm))
-                        for perm in role_perms
-                    ]
-                    cursor = db["permissions"].find({"_id": {"$in": ids}})
-                    permission_names = {
-                        perm.get("name") async for perm in cursor if perm.get("name")
-                    }
-                else:
-                    permission_names = {str(perm) for perm in role_perms}
-
-        if not set(permissions).issubset(permission_names):
+        # Merge permissions from ALL roles
+        perm_names = set(await get_merged_permissions(role_ids))
+        if not set(permissions).issubset(perm_names):
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN)
         return user
 

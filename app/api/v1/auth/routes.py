@@ -37,7 +37,7 @@ from app.infrastructure.auth.repository import (
     update_session,
     update_refresh_token,
 )
-from app.infrastructure.roles.repository import get_role_permissions_names
+from app.role_utils import get_user_role_ids, get_merged_permissions
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -47,6 +47,16 @@ def _generate_company_code() -> str:
     """Generate a short alphanumeric company code like ``AB12CD``."""
     chars = string.ascii_uppercase + string.digits
     return "".join(secrets.choice(chars) for _ in range(6))
+
+
+async def _resolve_roles(role_ids: list[str]) -> tuple[list[str], list[str], list[str]]:
+    """Resolve role IDs to (ids, names, merged_permissions)."""
+    names = []
+    for rid in role_ids:
+        role = await get_role_by_id(rid) if rid else None
+        names.append(role.get("name") if role else None)
+    permissions = await get_merged_permissions(role_ids)
+    return role_ids, names, permissions
 
 
 @router.post("/register")
@@ -60,7 +70,8 @@ async def register(payload: dict[str, Any] = Body(...)):
     password = fields["password"]
     first_name = fields["firstName"]
     last_name = fields["lastName"]
-    role_id = fields["roleId"]
+    role_ids = fields.get("roleIds") or []
+    role_id = fields.get("roleId")
     company_code = fields.get("companyCode")
     company_name = fields.get("companyName")
 
@@ -78,7 +89,7 @@ async def register(payload: dict[str, Any] = Body(...)):
             raise HTTPException(
                 status_code=404, detail='Role "admin" not found'
             )
-        role_id = str(admin_role["_id"])
+        role_ids = [str(admin_role["_id"])]
 
         # Generate a unique company code
         new_code = _generate_company_code()
@@ -108,7 +119,7 @@ async def register(payload: dict[str, Any] = Body(...)):
             )
         company_id = str(company["_id"])
 
-        # Enforce max 20 users per company (license may override with a lower limit)
+        # Enforce max 20 users per company
         max_users = 20
         license_doc = await db["app_licenses"].find_one(
             {"companyId": company["_id"], "status": "active"},
@@ -128,24 +139,27 @@ async def register(payload: dict[str, Any] = Body(...)):
                 detail=f"Company has reached the maximum number of users ({max_users})",
             )
 
-    if not role_id:
-        default_role = await get_role_by_name("user")
-        if not default_role:
-            raise HTTPException(
-                status_code=404, detail='Default role "user" not found'
-            )
-        role_id = str(default_role["_id"])
+    # Normalise role_ids
+    if not role_ids:
+        if role_id:
+            role_ids = [role_id]
+        else:
+            default_role = await get_role_by_name("user")
+            if not default_role:
+                raise HTTPException(
+                    status_code=404, detail='Default role "user" not found'
+                )
+            role_ids = [str(default_role["_id"])]
 
     hashed = hash_password(password)
     session_id = uuid4().hex
-    # Admin who creates company is auto-approved; users joining are pending
     is_company_creator = bool(company_name)
     user_doc = build_user_doc(
         email=email,
         hashed_password=hashed,
         first_name=first_name,
         last_name=last_name,
-        role_id=role_id,
+        role_ids=role_ids,
         session_id=session_id,
         company_id=company_id,
         company_approved=True if is_company_creator else None,
@@ -153,7 +167,7 @@ async def register(payload: dict[str, Any] = Body(...)):
     user_id = await create_user(user_doc)
 
     access_token = create_access_token(
-        {"sub": user_id, "email": email, "roleId": role_id, "sid": session_id}
+        {"sub": user_id, "email": email, "roleIds": role_ids, "sid": session_id}
     )
     refresh_token = create_refresh_token(
         {"sub": user_id, "email": email, "sid": session_id}
@@ -166,8 +180,7 @@ async def register(payload: dict[str, Any] = Body(...)):
         session_id,
     )
 
-    role = await get_role_by_id(role_id)
-    permissions = await get_role_permissions_names(role_id)
+    r_ids, r_names, permissions = await _resolve_roles(role_ids)
     company = await get_company_by_id(company_id) if company_id else None
     company_approved = True if is_company_creator else (False if company_id else True)
     return build_auth_response(
@@ -175,8 +188,8 @@ async def register(payload: dict[str, Any] = Body(...)):
         email=email,
         first_name=first_name,
         last_name=last_name,
-        role_id=role_id,
-        role_name=role.get("name") if role else None,
+        role_ids=r_ids,
+        role_names=r_names,
         company_id=company_id,
         company_approved=company_approved,
         company_name=company.get("companyName") if company else None,
@@ -203,11 +216,11 @@ async def login(payload: dict[str, Any] = Body(...)):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     user_id = str(user["_id"])
-    _role_val = user.get("role") or user.get("roleId")
-    role_id = str(_role_val) if _role_val else ""
+    # Multi-role: extract role IDs from user doc
+    role_ids = get_user_role_ids(user)
     session_id = uuid4().hex
     access_token = create_access_token(
-        {"sub": user_id, "email": email, "roleId": role_id, "sid": session_id}
+        {"sub": user_id, "email": email, "roleIds": role_ids, "sid": session_id}
     )
     refresh_token = create_refresh_token(
         {"sub": user_id, "email": email, "sid": session_id}
@@ -220,8 +233,7 @@ async def login(payload: dict[str, Any] = Body(...)):
         session_id,
     )
 
-    role = await get_role_by_id(role_id) if role_id else None
-    permissions = await get_role_permissions_names(role_id) if role_id else []
+    r_ids, r_names, permissions = await _resolve_roles(role_ids)
     company_id = str(user["companyId"]) if user.get("companyId") else None
     company = (
         await get_company_by_id(company_id) if company_id else None
@@ -232,8 +244,8 @@ async def login(payload: dict[str, Any] = Body(...)):
         email=email,
         first_name=user.get("firstName"),
         last_name=user.get("lastName"),
-        role_id=role_id,
-        role_name=role.get("name") if role else None,
+        role_ids=r_ids,
+        role_names=r_names,
         company_id=company_id,
         company_approved=company_approved,
         company_name=company.get("companyName") if company else user.get("companyName"),
@@ -275,11 +287,13 @@ async def refresh(payload: dict[str, Any] = Body(...)):
     if not session_id or refresh_payload.get("sid") != session_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
+    # Multi-role
+    role_ids = get_user_role_ids(user)
     access_token = create_access_token(
         {
             "sub": user_id,
             "email": user.get("email"),
-            "roleId": str(user.get("role")),
+            "roleIds": role_ids,
             "sid": session_id,
         }
     )
@@ -292,10 +306,7 @@ async def refresh(payload: dict[str, Any] = Body(...)):
         refresh_expiry_date(settings.jwt_refresh_expiration_days),
     )
 
-    _role_val = user.get("role") or user.get("roleId")
-    role_id = str(_role_val) if _role_val else ""
-    role = await get_role_by_id(role_id) if role_id else None
-    permissions = await get_role_permissions_names(role_id) if role_id else []
+    r_ids, r_names, permissions = await _resolve_roles(role_ids)
     company_id = str(user["companyId"]) if user.get("companyId") else None
     company = (
         await get_company_by_id(company_id) if company_id else None
@@ -306,8 +317,8 @@ async def refresh(payload: dict[str, Any] = Body(...)):
         email=user.get("email"),
         first_name=user.get("firstName"),
         last_name=user.get("lastName"),
-        role_id=role_id,
-        role_name=role.get("name") if role else None,
+        role_ids=r_ids,
+        role_names=r_names,
         company_id=company_id,
         company_approved=company_approved,
         company_name=company.get("companyName") if company else user.get("companyName"),

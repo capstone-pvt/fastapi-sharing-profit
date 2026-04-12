@@ -32,9 +32,15 @@ async def get_role_by_name(name: str) -> dict[str, Any] | None:
 
 async def create_user(user_doc: dict[str, Any]) -> str:
     db = get_db()
+    # Multi-role: prefer roleIds (list), fallback to roleId (single)
+    role_ids = user_doc.pop("roleIds", None)
     role_id = user_doc.pop("roleId", None)
-    if role_id:
-        user_doc["role"] = to_object_id(role_id)
+    if role_ids and isinstance(role_ids, list):
+        user_doc["roles"] = [to_object_id(r) for r in role_ids if r]
+    elif role_id:
+        user_doc["roles"] = [to_object_id(role_id)]
+    else:
+        user_doc["roles"] = []
     company_id = user_doc.pop("companyId", None)
     if company_id:
         user_doc["companyId"] = to_object_id(company_id)

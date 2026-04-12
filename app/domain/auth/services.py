@@ -16,16 +16,25 @@ def validate_register_payload(payload: dict[str, Any]) -> dict[str, str | None]:
     first_name = payload.get("firstName")
     last_name = payload.get("lastName")
     role_id = payload.get("roleId")
+    role_ids = payload.get("roleIds")
     company_code = payload.get("companyCode")
     company_name = payload.get("companyName")
     if not email or not password or not first_name or not last_name:
         raise ValueError("Missing required fields")
+    # Normalise to roleIds list
+    if role_ids and isinstance(role_ids, list):
+        normalised_role_ids = role_ids
+    elif role_id:
+        normalised_role_ids = [role_id]
+    else:
+        normalised_role_ids = None
     return {
         "email": email,
         "password": password,
         "firstName": first_name,
         "lastName": last_name,
-        "roleId": role_id,
+        "roleId": role_id,  # backward compat
+        "roleIds": normalised_role_ids,
         "companyCode": (company_code or "").strip() or None,
         "companyName": (company_name or "").strip() or None,
     }
@@ -51,18 +60,26 @@ def build_user_doc(
     hashed_password: str,
     first_name: str,
     last_name: str,
-    role_id: str,
+    role_ids: list[str] | None = None,
+    role_id: str | None = None,
     session_id: str | None = None,
     company_id: str | None = None,
     company_approved: bool | None = None,
 ) -> dict[str, Any]:
     now = datetime.now(timezone.utc)
+    # Normalise to roleIds list
+    if role_ids:
+        final_role_ids = role_ids
+    elif role_id:
+        final_role_ids = [role_id]
+    else:
+        final_role_ids = []
     user_doc = {
         "email": email,
         "password": hashed_password,
         "firstName": first_name,
         "lastName": last_name,
-        "roleId": role_id,
+        "roleIds": final_role_ids,
         "createdAt": now,
         "updatedAt": now,
     }
@@ -80,8 +97,10 @@ def build_auth_response(
     email: str,
     first_name: str | None,
     last_name: str | None,
-    role_id: str,
-    role_name: str | None,
+    role_ids: list[str] | None = None,
+    role_names: list[str] | None = None,
+    role_id: str | None = None,
+    role_name: str | None = None,
     company_id: str | None = None,
     company_approved: bool = True,
     company_name: str | None = None,
@@ -94,12 +113,23 @@ def build_auth_response(
     access_token: str = "",
     refresh_token: str = "",
 ) -> dict[str, Any]:
+    # Build roles array
+    r_ids = role_ids or ([role_id] if role_id else [])
+    r_names = role_names or ([role_name] if role_name else [])
+    roles_array = []
+    for i, rid in enumerate(r_ids):
+        name = r_names[i] if i < len(r_names) else None
+        roles_array.append({"id": rid, "name": name})
+
     user_obj: dict[str, Any] = {
         "id": user_id,
         "email": email,
         "firstName": first_name,
         "lastName": last_name,
-        "role": {"id": role_id, "name": role_name},
+        # Multi-role
+        "roles": roles_array,
+        # Backward compat — first role
+        "role": roles_array[0] if roles_array else {"id": None, "name": None},
         "companyApproved": company_approved,
         "companyName": company_name,
         "companyAddress": company_address,
