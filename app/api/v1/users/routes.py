@@ -197,9 +197,10 @@ async def update_user(
         payload.pop("companyTaxId", None)
         payload.pop("companyApproved", None)  # Only admins can approve registration
     if is_admin and payload.get("companyApproved") is True:
+        # When approving a registration, upgrade role from "user" to "crew"
         crew_role = await get_role_by_name("crew")
         if crew_role:
-            payload["roleId"] = str(crew_role["_id"])
+            payload["roleIds"] = [str(crew_role["_id"])]
     if is_admin and payload.get("companyName"):
         db = get_db()
         name = payload.get("companyName", "").strip()

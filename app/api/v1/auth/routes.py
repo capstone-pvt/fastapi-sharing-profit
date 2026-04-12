@@ -144,15 +144,12 @@ async def register(payload: dict[str, Any] = Body(...)):
         if role_id:
             role_ids = [role_id]
         else:
-            # Default role: "crew" when joining a company, "user" otherwise
-            default_role_name = "crew" if company_code else "user"
-            default_role = await get_role_by_name(default_role_name)
-            if not default_role:
-                # Fallback to "user" if "crew" doesn't exist
-                default_role = await get_role_by_name("user")
+            # Join Company: default role is "user" (pending approval)
+            # Once admin approves, role is upgraded to "crew"
+            default_role = await get_role_by_name("user")
             if not default_role:
                 raise HTTPException(
-                    status_code=404, detail=f'Default role "{default_role_name}" not found'
+                    status_code=404, detail='Default role "user" not found'
                 )
             role_ids = [str(default_role["_id"])]
 
