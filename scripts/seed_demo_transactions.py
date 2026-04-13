@@ -191,10 +191,10 @@ async def seed():
         })
     crew_member_ids = []
     for cd in crew_docs:
-        await db["fishermen"].update_one(
+        await db["crew"].update_one(
             {"email": cd["email"]}, {"$set": cd}, upsert=True
         )
-        doc = await db["fishermen"].find_one({"email": cd["email"]})
+        doc = await db["crew"].find_one({"email": cd["email"]})
         crew_member_ids.append(doc["_id"])
     print(f"  Created 5 crew members (1 captain, 4 crew)")
 
