@@ -3,6 +3,8 @@ from __future__ import annotations
 import re
 from typing import Any
 
+from bson import ObjectId
+
 from app.db import get_db
 from app.utils import serialize_doc
 
@@ -95,3 +97,26 @@ async def list_active_species_name_map() -> dict[str, str]:
         async for doc in cursor
         if doc.get("name")
     }
+
+
+async def get_analysis(analysis_id: str) -> dict[str, Any] | None:
+    db = get_db()
+    try:
+        oid = ObjectId(analysis_id)
+    except Exception:
+        return None
+    doc = await db["fish_analyses"].find_one({"_id": oid})
+    return serialize_doc(doc) if doc else None
+
+
+async def update_analysis(
+    analysis_id: str, update: dict[str, Any]
+) -> dict[str, Any] | None:
+    db = get_db()
+    try:
+        oid = ObjectId(analysis_id)
+    except Exception:
+        return None
+    await db["fish_analyses"].update_one({"_id": oid}, {"$set": update})
+    doc = await db["fish_analyses"].find_one({"_id": oid})
+    return serialize_doc(doc) if doc else None

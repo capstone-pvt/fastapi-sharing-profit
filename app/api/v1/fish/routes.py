@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from datetime import datetime, timezone
@@ -23,6 +24,10 @@ from app.infrastructure.fish.inference import (
     estimate_weight,
     preprocess_image,
     verify_detections_with_classifier,
+    detect_reference_object,
+    build_bulk_summary,
+    ReferenceType,
+    ReferenceBoundingBox,
 )
 from app.core.config import get_settings
 from app.infrastructure.fish.repository import (
@@ -148,6 +153,9 @@ async def analyze_fish(
     iou: float | None = None,
     caughtBy: str | None = None,
     caughtByName: str | None = None,
+    mode: str = "single",
+    referenceType: str = "manual",
+    referenceBoundingBox: str | None = None,
 ):
     try:
         settings = get_settings()
@@ -198,6 +206,34 @@ async def analyze_fish(
         except Exception as e:
             print(f"ERROR processing image: {str(e)}")
             raise HTTPException(status_code=400, detail="Invalid image format")
+
+        try:
+            ref_type_enum = ReferenceType(referenceType)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid referenceType")
+
+        supplied_bbox = None
+        if referenceBoundingBox:
+            try:
+                b = json.loads(referenceBoundingBox)
+                supplied_bbox = ReferenceBoundingBox(
+                    x=float(b["x"]), y=float(b["y"]),
+                    width=float(b["width"]), height=float(b["height"]),
+                )
+            except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+                raise HTTPException(
+                    status_code=400,
+                    detail="referenceBoundingBox must be JSON {x,y,width,height}",
+                )
+
+        ref_result = detect_reference_object(
+            pil_image, ref_type_enum, supplied_bbox=supplied_bbox
+        )
+        ref_pix_per_cm = ref_result.pixels_per_cm
+        logger.info(
+            " Reference detection: status=%s type=%s pixels_per_cm=%s",
+            ref_result.status, ref_result.type.value, ref_pix_per_cm,
+        )
 
         # Get active species (case-insensitive map: lowercase -> canonical name)
         species_map: dict[str, str] = {}
@@ -267,16 +303,24 @@ async def analyze_fish(
                 confidence_score = 0.0
                 top_predictions = []
 
-            # If no species detected, create a low-confidence generic detection
-            # so the user can still see the image and manually correct the species.
-            # The low confidence (0.1) signals to the UI that this is unreliable.
-            if species == "Unknown" or confidence_score == 0.0:
-                logger.warning(" No ML detection/classification. Using fallback: Unidentified Fish")
-                species = "Unidentified Fish"
-                confidence_score = 0.1
+            # Reject the image if classifier confidence is too low — this is the
+            # primary guard against non-fish images (flowers, objects, etc.).
+            # The classifier is trained only on fish, so a low max-confidence
+            # means none of the fish classes fit well, i.e. it is probably not a fish.
+            min_conf = settings.classifier_min_confidence
+            if confidence_score < min_conf or species == "Unknown":
+                logger.warning(
+                    " Classifier confidence %.2f below threshold %.2f — likely not a fish image",
+                    confidence_score,
+                    min_conf,
+                )
+                raise HTTPException(
+                    status_code=400,
+                    detail="No fish detected in the image.",
+                )
 
             canonical_names = set(species_map.values()) if species_map else set()
-            if canonical_names and species not in canonical_names and species != "Unidentified Fish":
+            if canonical_names and species not in canonical_names:
                 raise HTTPException(
                     status_code=400,
                     detail="No fish detected in the image.",
@@ -302,6 +346,7 @@ async def analyze_fish(
             detections = await apply_estimates_to_detections(
                 detections,
                 scale_reference_cm=scaleReferenceCm,
+                pixels_per_cm=ref_pix_per_cm,
                 get_species_index=get_species_index,
                 get_species_info=get_species_info,
                 estimate_weight=estimate_weight,
@@ -349,6 +394,11 @@ async def analyze_fish(
         except Exception as e:
             print(f"ERROR building analysis: {str(e)}")
             raise HTTPException(status_code=500, detail="Failed to process analysis data")
+
+        analysis["mode"] = mode
+        analysis["referenceDetection"] = ref_result.as_dict()
+        if mode == "bulk":
+            analysis["bulkSummary"] = build_bulk_summary(detections)
 
         try:
             result = await save_analysis(analysis)

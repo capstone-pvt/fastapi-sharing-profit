@@ -16,4 +16,17 @@ __all__ = [
     "verify_detections_with_classifier",
     "estimate_weight",
     "estimate_price",
+    "detect_reference_object",
+    "build_bulk_summary",
+    "ReferenceType",
+    "ReferenceBoundingBox",
+    "ReferenceDetectionResult",
 ]
+
+from app.infrastructure.fish.reference_detector import (
+    BoundingBox as ReferenceBoundingBox,
+    ReferenceDetectionResult,
+    detect_reference_object,
+)
+from app.domain.fish.bulk import build_bulk_summary
+from app.domain.fish.reference_types import ReferenceType

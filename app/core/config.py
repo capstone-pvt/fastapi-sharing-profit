@@ -66,6 +66,10 @@ class Settings:
     detector_model_path = _resolve_path("DETECTOR_MODEL_PATH", "app/models/detector/best.pt")
     detector_confidence = float(os.getenv("DETECTOR_CONFIDENCE", "0.25"))
     detector_iou = float(os.getenv("DETECTOR_IOU", "0.45"))
+    # Minimum classifier confidence to accept a species prediction.
+    # Below this threshold the image is rejected as "no fish detected".
+    # Raise this value (e.g. 0.5) to be stricter; lower it to be more permissive.
+    classifier_min_confidence = float(os.getenv("CLASSIFIER_MIN_CONFIDENCE", "0.40"))
     size_small_max_kg = float(os.getenv("SIZE_SMALL_MAX_KG", "0.5"))
     size_medium_max_kg = float(os.getenv("SIZE_MEDIUM_MAX_KG", "1.5"))
     openweather_api_key = os.getenv("OPENWEATHER_API_KEY", "")

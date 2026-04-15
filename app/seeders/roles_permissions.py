@@ -8,38 +8,55 @@ async def seed_broker_role_with_permissions() -> None:
     """Broker (Financer & Encoder) — per strict RBAC spec.
 
     CAN: encode fish sales, record expenses, manage cash advances (as
-    financer), view vessels/trips/crew (read only), AI analysis, forecasts.
+    financer), register vessels, create/manage trips and crew assignments,
+    record catches, AI analysis, forecasts.
 
-    CANNOT: create/modify vessels, vessel-owners, boats, trips, fishermen,
-    profit-sharing policies, generate profit shares, delete sales/expenses.
+    CANNOT: modify profit-sharing policies, generate/finalize profit shares,
+    delete sales/expenses, manage users/companies (admin job).
     """
     permission_ids = await ensure_default_permissions()
     broker_permissions = [
         # Vessel management — create + read (broker registers vessels for owners)
         permission_ids.get("vessels:create"),
         permission_ids.get("vessels:read"),
+        permission_ids.get("vessels:update"),
         permission_ids.get("vessel-owners:create"),
         permission_ids.get("vessel-owners:read"),
+        permission_ids.get("vessel-owners:update"),
         permission_ids.get("boats:create"),
         permission_ids.get("boats:read"),
+        permission_ids.get("boats:update"),
+        # Trip management — full CRUD (broker creates & manages trips)
+        permission_ids.get("trips:create"),
         permission_ids.get("trips:read"),
+        permission_ids.get("trips:update"),
+        permission_ids.get("trips:delete"),
+        # Crew management — create + read + update (broker assigns crew to trips)
+        permission_ids.get("fishermen:create"),
         permission_ids.get("fishermen:read"),
+        permission_ids.get("fishermen:update"),
+        # Catches — create + read + update (broker records catches)
+        permission_ids.get("catches:create"),
         permission_ids.get("catches:read"),
+        permission_ids.get("catches:update"),
         # Fish sales — encode (create + update), no delete (correction workflow)
         permission_ids.get("fish-sales:create"),
         permission_ids.get("fish-sales:read"),
         permission_ids.get("fish-sales:update"),
-        # Expenses — encode (create + update), no delete
+        # Expenses — full CRUD (broker manages trip expenses)
         permission_ids.get("expenses:create"),
         permission_ids.get("expenses:read"),
         permission_ids.get("expenses:update"),
+        permission_ids.get("expenses:delete"),
         # Cash advances — full management (broker is financer)
         permission_ids.get("cash-advances:create"),
         permission_ids.get("cash-advances:read"),
         permission_ids.get("cash-advances:update"),
+        permission_ids.get("cash-advances:delete"),
         permission_ids.get("cash-advances:approve"),
         permission_ids.get("cash-advances:decline"),
-        # Profit shares — view only (cannot generate/finalize)
+        # Profit shares — generate + view (broker triggers computation)
+        permission_ids.get("profit-shares:generate"),
         permission_ids.get("profit-shares:read"),
         # Policies — view only (cannot modify)
         permission_ids.get("profit-sharing-policies:read"),

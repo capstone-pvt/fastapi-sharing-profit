@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from app.api.v1.auth.routes import router as auth_router
 from app.api.v1.fish.routes import router as fish_router
+from app.api.v1.fish.patch_detections import router as fish_patch_router
 from app.api.v1.fish_models.routes import router as fish_models_router
 from app.api.v1.fish_species.routes import router as fish_species_router
 from app.api.v1.fish_training_samples.routes import (
@@ -31,6 +32,7 @@ api_router.include_router(users_router)
 api_router.include_router(roles_router)
 api_router.include_router(permissions_router)
 api_router.include_router(fish_router)
+api_router.include_router(fish_patch_router)
 api_router.include_router(fish_models_router)
 api_router.include_router(fish_species_router)
 api_router.include_router(fish_training_router)
