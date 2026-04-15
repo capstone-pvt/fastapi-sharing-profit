@@ -76,8 +76,10 @@ async def compute_profit_share(
     crew_name_map: dict[str, str] = {}
 
     # Build crew roster — try crewDetails first (richer), fallback to crewMembers
+    # IMPORTANT: Prefer userId (links to users collection) over _id (crew doc ID)
+    # so that Flutter crew pages can match via AuthProvider.user.id
     for cd in crew_details:
-        cid = str(cd.get("_id") or cd.get("id") or cd.get("crewMemberId") or "")
+        cid = str(cd.get("userId") or cd.get("_id") or cd.get("id") or cd.get("crewMemberId") or "")
         name = cd.get("name") or cd.get("fullName") or ""
         if cid:
             crew_ids.append(cid)
@@ -87,7 +89,7 @@ async def compute_profit_share(
             if isinstance(cm, str):
                 crew_ids.append(cm)
             elif isinstance(cm, dict):
-                cid = str(cm.get("_id") or cm.get("id") or "")
+                cid = str(cm.get("userId") or cm.get("_id") or cm.get("id") or "")
                 if cid:
                     crew_ids.append(cid)
                     crew_name_map[cid] = cm.get("name") or cm.get("fullName") or ""

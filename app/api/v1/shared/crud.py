@@ -148,6 +148,11 @@ def build_crud_router(
             company_name = user.get("companyName")
             if company_name and not is_super:
                 payload["companyName"] = company_name
+            # Auto-set requesterRole for cash_advances if not already set
+            if collection_name == "cash_advances" and not payload.get("requesterRole"):
+                role_name = await _get_role_name(user)
+                if role_name:
+                    payload["requesterRole"] = role_name
             result = await db[collection_name].insert_one(payload)
             doc = await db[collection_name].find_one({"_id": result.inserted_id})
             return serialize_doc(doc)

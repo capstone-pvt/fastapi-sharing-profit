@@ -81,6 +81,7 @@ async def apply_estimates_to_detections(
     detections: list[dict[str, Any]],
     *,
     scale_reference_cm: float | None,
+    pixels_per_cm: float | None = None,
     get_species_index: Callable[[str | None], Awaitable[int]],
     get_species_info: Callable[[str | None], Awaitable[dict[str, Any] | None]] | None = None,
     estimate_weight: Callable[
@@ -98,9 +99,22 @@ async def apply_estimates_to_detections(
         bbox_y = float(bbox.get("y") or 0.0)
         species = detection.get("species")
         species_index = await get_species_index(species)
-        length_cm, width_cm = estimate_cm_from_scale(
-            int(bbox_width), int(bbox_height), scale_reference_cm
-        )
+        if pixels_per_cm is not None and pixels_per_cm > 0:
+            from app.infrastructure.fish.calibration import bbox_to_cm
+            length_cm, width_cm = bbox_to_cm(
+                bbox_width_px=bbox_width,
+                bbox_height_px=bbox_height,
+                pixels_per_cm=pixels_per_cm,
+            )
+            calibration_source = "reference"
+        elif scale_reference_cm:
+            length_cm, width_cm = estimate_cm_from_scale(
+                int(bbox_width), int(bbox_height), scale_reference_cm
+            )
+            calibration_source = "scaleReferenceCm"
+        else:
+            length_cm, width_cm = None, None
+            calibration_source = "none"
         if bbox_width >= bbox_height:
             mouth = {"x": bbox_x, "y": bbox_y + (bbox_height / 2)}
             tail = {"x": bbox_x + bbox_width, "y": bbox_y + (bbox_height / 2)}
@@ -135,6 +149,7 @@ async def apply_estimates_to_detections(
             "lengthCm": length_cm,
             "widthCm": width_cm,
             "pixelLength": pixel_length,
+            "calibrationSource": calibration_source,
             "keypoints": {
                 "mouth": mouth,
                 "tail": tail,
