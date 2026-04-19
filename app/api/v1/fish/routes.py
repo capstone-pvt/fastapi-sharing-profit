@@ -285,6 +285,24 @@ async def analyze_fish(
             ]
             logger.info(f" After filtering by active species: {len(detections)} detection(s)")
 
+        # Drop detections whose confidence is below the classifier threshold.
+        # Without this, the YOLO detector can draw boxes on non-fish objects
+        # (flowers, hands, plastic) at low confidence and skip the classifier
+        # rejection below — letting non-fish images through as valid scans.
+        min_det_conf = settings.classifier_min_confidence
+        before_count = len(detections)
+        detections = [
+            d for d in detections
+            if float(d.get("confidence", 0)) >= min_det_conf
+        ]
+        if before_count != len(detections):
+            logger.info(
+                " Dropped %d low-confidence detection(s) (< %.2f); %d remain",
+                before_count - len(detections),
+                min_det_conf,
+                len(detections),
+            )
+
         # --- Step 3: Fallback to full-image classifier if no detections ---
         if not detections:
             try:

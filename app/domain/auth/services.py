@@ -115,6 +115,13 @@ def build_auth_response(
     permissions: list[str] | None = None,
     access_token: str = "",
     refresh_token: str = "",
+    kyc_completed: bool = False,
+    street: str | None = None,
+    house_number: str | None = None,
+    barangay: str | None = None,
+    city: str | None = None,
+    province: str | None = None,
+    zip_code: str | None = None,
 ) -> dict[str, Any]:
     # Build roles array
     r_ids = role_ids or ([role_id] if role_id else [])
@@ -141,6 +148,13 @@ def build_auth_response(
         "companyThemeColor": company_theme_color,
         "companyCode": company_code,
         "permissions": permissions or [],
+        "kycCompleted": kyc_completed,
+        "street": street,
+        "houseNumber": house_number,
+        "barangay": barangay,
+        "city": city,
+        "province": province,
+        "zipCode": zip_code,
     }
     if company_id:
         user_obj["companyId"] = company_id

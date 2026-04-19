@@ -17,11 +17,13 @@ from app.api.v1.shared.crud import build_crud_router
 from app.api.v1.users.routes import router as users_router
 from app.api.v1.audit.routes import router as audit_router
 from app.api.v1.weather.routes import router as weather_router
+from app.api.v1.psgc.routes import router as psgc_router
 from app.api.v1.licenses.routes import router as licenses_router
 from app.api.v1.forecast.routes import router as forecast_router
 from app.api.v1.trips.routes import router as trips_router
 from app.api.v1.notifications.routes import router as notifications_router
 from app.api.v1.profit_shares.routes import router as profit_shares_custom_router
+from app.api.v1.role_requests.routes import router as role_requests_router
 from app.deps import require_roles
 
 
@@ -41,6 +43,7 @@ api_router.include_router(companies_router)
 api_router.include_router(cash_advances_router)
 api_router.include_router(audit_router)
 api_router.include_router(weather_router)
+api_router.include_router(psgc_router)
 api_router.include_router(licenses_router)
 api_router.include_router(forecast_router)
 
@@ -167,6 +170,7 @@ api_router.include_router(
 )
 
 api_router.include_router(notifications_router)
+api_router.include_router(role_requests_router)
 
 # Custom profit-shares routes (/compute, /generate, /status) — must be
 # included BEFORE the generic CRUD so the custom paths take priority.
