@@ -342,15 +342,60 @@ async def seed_full_demo(reset: bool = False):
             )
 
         total_expenses = round(sum(amt for _, _, amt in expense_rows), 2)
-        broker_pct = 10
-        owner_pct = 60
-        fisher_pct = 30
-        broker_share = round(total_value * broker_pct / 100, 2)
-        net_after_broker = round(total_value - broker_share, 2)
-        net_profit = round(net_after_broker - total_expenses, 2)
-        owner_share = round(net_profit * owner_pct / (owner_pct + fisher_pct), 2)
-        crew_pool = round(net_profit - owner_share, 2)
-        per_crew = round(crew_pool / max(1, len(crew_ids)), 2)
+
+        # Realistic Pakura-style profit computation
+        broker_pct = 10.0
+        small_bangka_pct = 20.0
+        big_bangka_pct = 10.0
+        divisor = 3  # Pakura
+
+        gross_revenue = total_value
+        # Split small/big fish randomly (~60% small, ~40% big)
+        small_fish_total = round(gross_revenue * 0.6, 2)
+        big_fish_total = round(gross_revenue - small_fish_total, 2)
+        total_small_weight = round(total_weight * 0.7, 2)
+
+        broker_share = round(gross_revenue * broker_pct / 100, 2)
+        small_bangka = round(small_fish_total * small_bangka_pct / 100, 2)
+        big_bangka = round(big_fish_total * big_bangka_pct / 100, 2)
+        bangka_share = round(small_bangka + big_bangka, 2)
+
+        small_crew_pool = round(small_fish_total - small_bangka, 2)
+        big_crew_pool = round(big_fish_total - big_bangka, 2)
+        crew_pool = round((small_crew_pool + big_crew_pool) / divisor, 2)
+
+        captain_owner_net = round(
+            gross_revenue - broker_share - bangka_share - crew_pool, 2
+        )
+        captain_share = round(captain_owner_net * 0.25, 2)
+        owner_share_val = round(captain_owner_net - captain_share, 2)
+
+        net_profit = round(gross_revenue - broker_share - total_expenses, 2)
+
+        per_crew_gross = round(crew_pool / max(1, len(crew_ids)), 2)
+
+        # Build crewBreakdown with realistic deductions
+        cash_advances = [500.0, 300.0, 0.0]
+        crew_breakdown = []
+        fisherman_shares = {}
+        for idx, (c_id, c_uid) in enumerate(zip(crew_ids, crew_user_ids)):
+            ca = cash_advances[idx] if idx < len(cash_advances) else 0.0
+            net_payout = round(per_crew_gross - ca, 2)
+            crew_breakdown.append({
+                "crewId": str(c_id),
+                "crewName": crew_data[idx]["first"] + " " + crew_data[idx]["last"],
+                "grossShare": per_crew_gross,
+                "smallFishEarnings": round(per_crew_gross * 0.5, 2),
+                "bigFishEarnings": round(per_crew_gross * 0.5, 2) if idx == 0 else 0,
+                "bigFishDirectAttribution": round(big_fish_total, 2) if idx == 0 else 0,
+                "cashAdvanceDeduction": ca,
+                "sinakahan": 0,
+                "kusinero": 0,
+                "customDeductions": 0,
+                "totalDeductions": ca,
+                "netPayout": net_payout,
+            })
+            fisherman_shares[str(c_uid)] = net_payout
 
         # ── Profit share ──
         await db["profit_shares"].insert_one(
@@ -359,20 +404,39 @@ async def seed_full_demo(reset: bool = False):
                 "boatOwnerId": str(owner_id),
                 "generatedBy": str(broker_id),
                 "calculationDate": end,
-                "totalRevenue": total_value,
-                "totalExpenses": total_expenses,
-                "totalCashAdvances": 0,
-                "netProfit": net_profit,
-                "boatOwnerShare": owner_share,
+                "crewType": "pakura",
+                "grossRevenue": gross_revenue,
+                "smallFishTotal": small_fish_total,
+                "bigFishTotal": big_fish_total,
+                "totalSmallWeight": total_small_weight,
                 "brokerShare": broker_share,
                 "brokerPercentage": broker_pct,
-                "boatOwnerPercentage": owner_pct,
-                "fishermanPercentage": fisher_pct,
-                # Keyed by user id so the fisherman pages (which filter by
-                # the logged-in user's id) can find their share.
-                "fishermanShares": {
-                    str(uid): per_crew for uid in crew_user_ids
-                },
+                "bangkaShare": bangka_share,
+                "smallBangka": small_bangka,
+                "bigBangka": big_bangka,
+                "smallBangkaPercentage": small_bangka_pct,
+                "bigBangkaPercentage": big_bangka_pct,
+                "crewPool": crew_pool,
+                "smallCrewPool": small_crew_pool,
+                "bigCrewPool": big_crew_pool,
+                "divisor": divisor,
+                "captainOwnerNet": captain_owner_net,
+                "captainShare": captain_share,
+                "ownerShare": owner_share_val,
+                "captainId": str(crew_ids[0]),
+                "captainIsOwner": False,
+                "totalExpenses": total_expenses,
+                "totalCashAdvances": sum(cash_advances[:len(crew_ids)]),
+                "sinakahan": 0.0,
+                "kusineroAmount": 0.0,
+                "nilicomanEnabled": False,
+                "nilicomanTotal": 0.0,
+                "nilicomanOwner": 0.0,
+                "nilicomanCrewEach": 0.0,
+                "netProfit": net_profit,
+                "totalRevenue": gross_revenue,
+                "fishermanShares": fisherman_shares,
+                "crewBreakdown": crew_breakdown,
                 "status": "approved",
                 "notes": "Auto-generated demo share",
                 "companyId": company_id,

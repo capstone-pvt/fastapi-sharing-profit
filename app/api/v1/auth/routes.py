@@ -261,6 +261,13 @@ async def login(payload: dict[str, Any] = Body(...)):
         permissions=permissions,
         access_token=access_token,
         refresh_token=refresh_token,
+        kyc_completed=user.get("kycCompleted", False),
+        street=user.get("street"),
+        house_number=user.get("houseNumber"),
+        barangay=user.get("barangay"),
+        city=user.get("city"),
+        province=user.get("province"),
+        zip_code=user.get("zipCode"),
     )
 
 
@@ -334,6 +341,13 @@ async def refresh(payload: dict[str, Any] = Body(...)):
         permissions=permissions,
         access_token=access_token,
         refresh_token=new_refresh_token,
+        kyc_completed=user.get("kycCompleted", False),
+        street=user.get("street"),
+        house_number=user.get("houseNumber"),
+        barangay=user.get("barangay"),
+        city=user.get("city"),
+        province=user.get("province"),
+        zip_code=user.get("zipCode"),
     )
 
 

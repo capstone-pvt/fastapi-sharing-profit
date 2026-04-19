@@ -72,6 +72,7 @@ async def patch_profile(
     payload: dict[str, Any] = Body(...),
     user: dict[str, Any] = Depends(get_current_user),
 ):
+    print(f"[PATCH /profile] payload keys: {list(payload.keys())}, payload: {payload}")
     try:
         validate_profile_update(payload)
     except ValueError as exc:

@@ -15,6 +15,13 @@ def validate_profile_update(payload: dict[str, Any]) -> None:
         "companyAddress",
         "companyPhone",
         "companyTaxId",
+        "street",
+        "houseNumber",
+        "barangay",
+        "city",
+        "province",
+        "zipCode",
+        "kycCompleted",
     }
     if not any(field in payload for field in allowed):
         raise ValueError("No updatable fields provided")
@@ -30,6 +37,13 @@ def build_profile_update_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "companyAddress",
         "companyPhone",
         "companyTaxId",
+        "street",
+        "houseNumber",
+        "barangay",
+        "city",
+        "province",
+        "zipCode",
+        "kycCompleted",
     ):
         if field in payload and payload[field] is not None:
             update_payload[field] = payload[field]
