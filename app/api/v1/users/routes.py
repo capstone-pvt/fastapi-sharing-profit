@@ -89,6 +89,48 @@ async def list_users(
     return {"results": results, "total": total, "limit": limit, "offset": offset}
 
 
+@router.get("/pending-approvals")
+async def list_pending_approvals(
+    limit: int = Query(100, ge=1, le=500),
+    offset: int = Query(0, ge=0),
+    user: dict[str, Any] = Depends(get_current_user),
+):
+    """Return the pending users the caller can actually approve.
+
+    Auth-only (no user:read permission required) so that delegates can hit it.
+    Scope:
+      - super admin: all pending users everywhere
+      - company admin: all pending users in their company
+      - delegate: pending users in their company whose ``requestedRole`` is in
+        the caller's ``approvalDelegates``
+      - anyone else: empty list
+    """
+    _, is_super, is_company_admin = await _get_role_flags(user)
+    is_admin = is_super or is_company_admin
+    delegates_current = [
+        r.strip().lower()
+        for r in (user.get("approvalDelegates") or [])
+        if isinstance(r, str) and r.strip()
+    ]
+
+    if not is_admin and not delegates_current:
+        return {"results": [], "total": 0, "limit": limit, "offset": offset}
+
+    query: dict[str, Any] = {"companyApproved": False}
+    if not is_super:
+        company_id = _company_id_value(user)
+        object_id = _company_object_id(company_id)
+        if not object_id:
+            return {"results": [], "total": 0, "limit": limit, "offset": offset}
+        query["companyId"] = {"$in": [object_id, str(object_id)]}
+    if not is_admin:
+        # Delegate scope: only matching requested roles.
+        query["requestedRole"] = {"$in": delegates_current}
+
+    results, total = await repo_list_users(query, limit=limit, offset=offset)
+    return {"results": results, "total": total, "limit": limit, "offset": offset}
+
+
 @router.get("/{user_id}", dependencies=[Depends(require_permissions("user:read"))])
 async def get_user(
     user_id: str, user: dict[str, Any] = Depends(get_current_user)
@@ -177,6 +219,23 @@ async def update_user(
     _, is_super, is_company_admin = await _get_role_flags(user)
     is_admin = is_super or is_company_admin
 
+    # Is the caller a delegate who can approve *this* pending registration?
+    delegates_current = [
+        r.strip().lower()
+        for r in (user.get("approvalDelegates") or [])
+        if isinstance(r, str) and r.strip()
+    ]
+    target_requested_role = (
+        str(target_user.get("requestedRole") or "").strip().lower() or None
+    )
+    is_delegate_for_target = (
+        not is_admin
+        and bool(target_requested_role)
+        and target_requested_role in delegates_current
+        and _company_id_value(user) is not None
+        and _company_id_value(user) == _company_id_value(target_user)
+    )
+
     # Prevent super users from editing their own account
     current_user_id = str(user.get("id") or user.get("_id"))
     if is_super and user_id == current_user_id:
@@ -190,17 +249,42 @@ async def update_user(
         if not company_id or company_id != target_company_id:
             raise HTTPException(status_code=403, detail="Forbidden")
         payload.pop("companyId", None)
+
+    # `approvalDelegates` is admin-only — strip for everyone else.
+    if not is_admin and "approvalDelegates" in payload:
+        payload.pop("approvalDelegates", None)
+    # Validate + normalise when admin sets it.
+    if is_admin and "approvalDelegates" in payload:
+        raw = payload.get("approvalDelegates") or []
+        if not isinstance(raw, list):
+            raise HTTPException(
+                status_code=400, detail="approvalDelegates must be a list of role names"
+            )
+        payload["approvalDelegates"] = [
+            r.strip().lower()
+            for r in raw
+            if isinstance(r, str) and r.strip()
+        ]
+
     if not is_admin:
         payload.pop("companyName", None)
         payload.pop("companyAddress", None)
         payload.pop("companyPhone", None)
         payload.pop("companyTaxId", None)
-        payload.pop("companyApproved", None)  # Only admins can approve registration
-    if is_admin and payload.get("companyApproved") is True:
-        # When approving a registration, upgrade role from "user" to "crew"
-        crew_role = await get_role_by_name("crew")
-        if crew_role:
-            payload["roleIds"] = [str(crew_role["_id"])]
+        # Delegates can approve for their authorised role; strip otherwise.
+        if not is_delegate_for_target:
+            payload.pop("companyApproved", None)
+
+    if (is_admin or is_delegate_for_target) and payload.get("companyApproved") is True:
+        # Promote the approved user to their requested role (e.g. broker/owner).
+        # Fall back to "crew" when no explicit request was captured.
+        desired_role_name = target_requested_role or "crew"
+        desired_role = await get_role_by_name(desired_role_name)
+        if not desired_role and desired_role_name != "crew":
+            # Unknown role → fall back to crew so the approval still succeeds.
+            desired_role = await get_role_by_name("crew")
+        if desired_role:
+            payload["roleIds"] = [str(desired_role["_id"])]
     if is_admin and payload.get("companyName"):
         db = get_db()
         name = payload.get("companyName", "").strip()
@@ -228,6 +312,117 @@ async def update_user(
     if not doc:
         raise HTTPException(status_code=404, detail="User not found")
     return doc
+
+
+@router.post("/{user_id}/approve")
+async def approve_user(
+    user_id: str,
+    user: dict[str, Any] = Depends(get_current_user),
+):
+    """Approve a pending user.
+
+    Caller may be: super admin, company admin, or a company member whose
+    ``approvalDelegates`` array contains the target's ``requestedRole``.
+
+    On success the target's ``companyApproved`` flips to ``True`` and their
+    role is promoted from the default "user" placeholder to the role they
+    requested during signup (falling back to "crew" if unknown).
+    """
+    target_user = await repo_get_user(user_id)
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    _, is_super, is_company_admin = await _get_role_flags(user)
+    is_admin = is_super or is_company_admin
+
+    target_requested_role = (
+        str(target_user.get("requestedRole") or "").strip().lower() or None
+    )
+    delegates_current = [
+        r.strip().lower()
+        for r in (user.get("approvalDelegates") or [])
+        if isinstance(r, str) and r.strip()
+    ]
+    is_delegate_for_target = (
+        not is_admin
+        and bool(target_requested_role)
+        and target_requested_role in delegates_current
+    )
+
+    # Scope check: everyone (admin or delegate) must share the company with the target.
+    if not is_super:
+        caller_company = _company_id_value(user)
+        target_company = _company_id_value(target_user)
+        if not caller_company or caller_company != target_company:
+            raise HTTPException(status_code=403, detail="Forbidden")
+
+    if not (is_admin or is_delegate_for_target):
+        raise HTTPException(
+            status_code=403,
+            detail="You don't have permission to approve this registration",
+        )
+
+    update_payload: dict[str, Any] = {"companyApproved": True}
+    desired_role_name = target_requested_role or "crew"
+    desired_role = await get_role_by_name(desired_role_name)
+    if not desired_role and desired_role_name != "crew":
+        desired_role = await get_role_by_name("crew")
+    if desired_role:
+        update_payload["roleIds"] = [str(desired_role["_id"])]
+
+    payload = build_update_user_payload(update_payload, hash_password=hash_password)
+    doc = await repo_update_user(user_id, payload)
+    if not doc:
+        raise HTTPException(status_code=404, detail="User not found")
+    return doc
+
+
+@router.post("/{user_id}/reject")
+async def reject_user(
+    user_id: str,
+    user: dict[str, Any] = Depends(get_current_user),
+):
+    """Reject a pending registration.
+
+    Same authorisation surface as approve. Deletes the pending user record.
+    """
+    target_user = await repo_get_user(user_id)
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    _, is_super, is_company_admin = await _get_role_flags(user)
+    is_admin = is_super or is_company_admin
+
+    target_requested_role = (
+        str(target_user.get("requestedRole") or "").strip().lower() or None
+    )
+    delegates_current = [
+        r.strip().lower()
+        for r in (user.get("approvalDelegates") or [])
+        if isinstance(r, str) and r.strip()
+    ]
+    is_delegate_for_target = (
+        not is_admin
+        and bool(target_requested_role)
+        and target_requested_role in delegates_current
+    )
+
+    if not is_super:
+        caller_company = _company_id_value(user)
+        target_company = _company_id_value(target_user)
+        if not caller_company or caller_company != target_company:
+            raise HTTPException(status_code=403, detail="Forbidden")
+
+    if not (is_admin or is_delegate_for_target):
+        raise HTTPException(
+            status_code=403,
+            detail="You don't have permission to reject this registration",
+        )
+
+    deleted = await repo_delete_user(user_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"status": "rejected"}
 
 
 @router.delete("/{user_id}", dependencies=[Depends(require_permissions("user:delete"))])

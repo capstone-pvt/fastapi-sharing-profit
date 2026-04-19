@@ -13,6 +13,25 @@ async def get_user_by_email(email: str) -> dict[str, Any] | None:
     return await db["users"].find_one({"email": email})
 
 
+async def get_user_by_username(username: str) -> dict[str, Any] | None:
+    db = get_db()
+    return await db["users"].find_one(
+        {"username": {"$regex": f"^{re.escape(username)}$", "$options": "i"}}
+    )
+
+
+async def get_user_by_identifier(identifier: str) -> dict[str, Any] | None:
+    """Look up a user by email, then fall back to username."""
+    ident = (identifier or "").strip()
+    if not ident:
+        return None
+    if "@" in ident:
+        user = await get_user_by_email(ident.lower())
+        if user:
+            return user
+    return await get_user_by_username(ident)
+
+
 async def get_user_by_id(user_id: str) -> dict[str, Any] | None:
     db = get_db()
     return await db["users"].find_one({"_id": to_object_id(user_id)})

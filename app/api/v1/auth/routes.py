@@ -1,6 +1,10 @@
+import base64
+import re
 import secrets
 import string
+import uuid
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
@@ -8,6 +12,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException, status
 from jose import JWTError, jwt
 
 from app.db import get_db
+from app.utils import to_object_id
 
 from app.core.config import get_settings
 from app.core.security import (
@@ -33,6 +38,8 @@ from app.infrastructure.auth.repository import (
     get_role_by_name,
     get_user_by_email,
     get_user_by_id,
+    get_user_by_identifier,
+    get_user_by_username,
     revoke_refresh_token,
     update_session,
     update_refresh_token,
@@ -41,6 +48,54 @@ from app.role_utils import get_user_role_ids, get_merged_permissions
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+_DATA_URL_RE = re.compile(r"^data:(?P<mime>[\w./+-]+);base64,(?P<data>.+)$", re.DOTALL)
+_MIME_EXT = {
+    "image/jpeg": ".jpg",
+    "image/jpg": ".jpg",
+    "image/png": ".png",
+    "image/webp": ".webp",
+    "application/pdf": ".pdf",
+}
+_MAX_ASSET_BYTES = 6 * 1024 * 1024  # 6 MB
+
+
+def _save_base64_asset(data_url: str | None, subdir: str) -> str | None:
+    """Decode a data URL and persist bytes under uploads/<subdir>/<uuid><ext>.
+
+    Returns the public URL path (``/uploads/...``) or ``None`` if input is falsy.
+    Raises HTTPException on invalid shape / oversized payload / unsupported mime.
+    """
+    if not data_url:
+        return None
+    match = _DATA_URL_RE.match(data_url)
+    if not match:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{subdir}: must be a data: URL (e.g. data:image/jpeg;base64,...)",
+        )
+    mime = match.group("mime").lower()
+    ext = _MIME_EXT.get(mime)
+    if not ext:
+        raise HTTPException(
+            status_code=400,
+            detail=f"{subdir}: unsupported type {mime}. Allowed: jpeg/png/webp/pdf.",
+        )
+    try:
+        raw = base64.b64decode(match.group("data"), validate=True)
+    except (ValueError, base64.binascii.Error) as exc:
+        raise HTTPException(status_code=400, detail=f"{subdir}: invalid base64") from exc
+    if len(raw) > _MAX_ASSET_BYTES:
+        raise HTTPException(status_code=413, detail=f"{subdir}: file larger than 6 MB")
+
+    settings = get_settings()
+    root = Path(settings.upload_root) / subdir
+    root.mkdir(parents=True, exist_ok=True)
+    safe_name = f"{uuid.uuid4().hex}{ext}"
+    target = root / safe_name
+    target.write_bytes(raw)
+    return f"/uploads/{subdir}/{safe_name}"
 
 
 def _generate_company_code() -> str:
@@ -59,6 +114,47 @@ async def _resolve_roles(role_ids: list[str]) -> tuple[list[str], list[str], lis
     return role_ids, names, permissions
 
 
+async def _admin_and_delegate_user_ids(
+    company_id: str, requested_role: str | None
+) -> list[str]:
+    """Return distinct user ids that should be notified about a pending signup.
+
+    Includes: all admins of the company, plus any company member whose
+    ``approvalDelegates`` array contains the requested role name (if any).
+    """
+    db = get_db()
+    try:
+        oid = to_object_id(str(company_id))
+    except Exception:
+        return []
+
+    admin_role = await get_role_by_name("admin")
+    admin_id = admin_role["_id"] if admin_role else None
+
+    or_clauses: list[dict[str, Any]] = []
+    if admin_id is not None:
+        or_clauses.append({"roles": admin_id})
+    if requested_role:
+        or_clauses.append({"approvalDelegates": requested_role.lower()})
+
+    if not or_clauses:
+        return []
+
+    query: dict[str, Any] = {
+        "companyId": {"$in": [oid, str(oid)]},
+        "$or": or_clauses,
+    }
+    cursor = db["users"].find(query, {"_id": 1})
+    seen: set[str] = set()
+    result: list[str] = []
+    async for doc in cursor:
+        uid = str(doc["_id"])
+        if uid not in seen:
+            seen.add(uid)
+            result.append(uid)
+    return result
+
+
 @router.post("/register")
 async def register(payload: dict[str, Any] = Body(...)):
     try:
@@ -67,17 +163,24 @@ async def register(payload: dict[str, Any] = Body(...)):
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     email = fields["email"]
+    username = fields.get("username")
     password = fields["password"]
     first_name = fields["firstName"]
     last_name = fields["lastName"]
     role_ids = fields.get("roleIds") or []
     role_id = fields.get("roleId")
+    role_name_requested = fields.get("roleName")
     company_code = fields.get("companyCode")
     company_name = fields.get("companyName")
 
-    existing = await get_user_by_email(email)
-    if existing:
-        raise HTTPException(status_code=409, detail="Email already registered")
+    if email:
+        existing = await get_user_by_email(email)
+        if existing:
+            raise HTTPException(status_code=409, detail="Email already registered")
+    if username:
+        existing_uname = await get_user_by_username(username)
+        if existing_uname:
+            raise HTTPException(status_code=409, detail="Username already taken")
 
     db = get_db()
     company_id: str | None = None
@@ -139,19 +242,25 @@ async def register(payload: dict[str, Any] = Body(...)):
                 detail=f"Company has reached the maximum number of users ({max_users})",
             )
 
-    # Normalise role_ids
+    # Normalise role_ids — for non-admin flows we keep the user on the default
+    # "user" role (pending approval). ``requestedRole`` is surfaced on the user
+    # doc so admins can see which role the member asked for during approval.
     if not role_ids:
         if role_id:
             role_ids = [role_id]
         else:
-            # Join Company: default role is "user" (pending approval)
-            # Once admin approves, role is upgraded to "crew"
             default_role = await get_role_by_name("user")
             if not default_role:
                 raise HTTPException(
                     status_code=404, detail='Default role "user" not found'
                 )
             role_ids = [str(default_role["_id"])]
+
+    # Persist base64 attachments (if any) to /uploads/{valid-ids,profile-photos}
+    valid_id_url = _save_base64_asset(fields.get("validIdBase64"), "valid-ids")
+    profile_photo_url = _save_base64_asset(
+        fields.get("profilePhotoBase64"), "profile-photos"
+    )
 
     hashed = hash_password(password)
     session_id = uuid4().hex
@@ -167,8 +276,47 @@ async def register(payload: dict[str, Any] = Body(...)):
         company_id=company_id,
         company_approved=True if is_company_creator else None,
         birthday=birthday,
+        username=username,
+        mobile_number=fields.get("mobileNumber"),
+        address=fields.get("address"),
+        valid_id_url=valid_id_url,
+        profile_photo_url=profile_photo_url,
+        requested_role=role_name_requested,
     )
     user_id = await create_user(user_doc)
+
+    # Notify admins (and delegates for the requested role) when a member
+    # joins an existing company. Best-effort — failures should not block
+    # registration itself.
+    if company_id and not is_company_creator:
+        try:
+            from app.api.v1.notifications.routes import send_notification_to_user
+
+            full_name = f"{first_name} {last_name}".strip()
+            role_label = (role_name_requested or "member").title()
+            title = "New registration pending approval"
+            body = (
+                f"{full_name or email or username} registered as {role_label}. "
+                "Review them in Pending approvals."
+            )
+            data = {
+                "category": "registration",
+                "userId": user_id,
+                "requestedRole": role_name_requested or "",
+            }
+
+            notifiable_ids = await _admin_and_delegate_user_ids(
+                company_id, role_name_requested
+            )
+            for uid in notifiable_ids:
+                try:
+                    await send_notification_to_user(uid, title, body, data, category="registration")
+                except Exception:
+                    # one recipient failing shouldn't block others
+                    pass
+        except Exception:
+            # notifications are best-effort
+            pass
 
     access_token = create_access_token(
         {"sub": user_id, "email": email, "roleIds": role_ids, "sid": session_id}
@@ -205,21 +353,25 @@ async def register(payload: dict[str, Any] = Body(...)):
         permissions=permissions,
         access_token=access_token,
         refresh_token=refresh_token,
+        approval_delegates=[],
+        requested_role=role_name_requested,
+        username=username,
     )
 
 
 @router.post("/login")
 async def login(payload: dict[str, Any] = Body(...)):
     try:
-        email, password = validate_login_payload(payload)
+        identifier, password = validate_login_payload(payload)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
-    user = await get_user_by_email(email)
+    user = await get_user_by_identifier(identifier)
     if not user or not verify_password(password, user.get("password", "")):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     user_id = str(user["_id"])
+    email = user.get("email")
     # Multi-role: extract role IDs from user doc
     role_ids = get_user_role_ids(user)
     session_id = uuid4().hex
@@ -268,6 +420,9 @@ async def login(payload: dict[str, Any] = Body(...)):
         city=user.get("city"),
         province=user.get("province"),
         zip_code=user.get("zipCode"),
+        approval_delegates=user.get("approvalDelegates") or [],
+        requested_role=user.get("requestedRole"),
+        username=user.get("username"),
     )
 
 
@@ -348,6 +503,9 @@ async def refresh(payload: dict[str, Any] = Body(...)):
         city=user.get("city"),
         province=user.get("province"),
         zip_code=user.get("zipCode"),
+        approval_delegates=user.get("approvalDelegates") or [],
+        requested_role=user.get("requestedRole"),
+        username=user.get("username"),
     )
 
 
