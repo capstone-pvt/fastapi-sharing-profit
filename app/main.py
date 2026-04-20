@@ -49,6 +49,8 @@ async def lifespan(app: FastAPI):
     """Application lifespan: startup and shutdown logic."""
     # Startup — DB + seeders first (fast)
     await connect_db()
+    # Ensure indexes for query-critical fields
+    await get_db()["trips"].create_index("crewIds")
     await seed_broker_role_with_permissions()
     await seed_boat_owner_role_with_permissions()
     await seed_fisherman_role_with_permissions()

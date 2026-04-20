@@ -26,7 +26,7 @@ router = APIRouter(prefix="/trips", tags=["trips"])
 
 COLLECTION = "trips"
 
-_FILTER_FIELDS = frozenset({"status", "tripId", "boatId", "vesselId", "ownerId"})
+_FILTER_FIELDS = frozenset({"status", "tripId", "boatId", "vesselId", "ownerId", "crewId"})
 
 
 # ── helpers ──────────────────────────────────────────────────────────
@@ -100,6 +100,10 @@ async def list_trips(
     query: dict[str, Any] = {}
     for key, value in request.query_params.items():
         if key in {"limit", "offset"}:
+            continue
+        if key == "crewId":
+            # crewIds is an array; match membership
+            query["crewIds"] = value
             continue
         if key in _FILTER_FIELDS:
             query[key] = value
