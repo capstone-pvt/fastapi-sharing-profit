@@ -13,7 +13,7 @@ auto-assigning the broker as ``financerId`` and ``encoderId``.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Mapping
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query, Request
 
@@ -26,10 +26,30 @@ router = APIRouter(prefix="/trips", tags=["trips"])
 
 COLLECTION = "trips"
 
-_FILTER_FIELDS = frozenset({"status", "tripId", "boatId", "vesselId", "ownerId", "crewId"})
+_FILTER_FIELDS = frozenset({"status", "tripId", "boatId", "vesselId", "ownerId"})
+
+# Maps an incoming singular query param to the plural array field stored on
+# the trip document. Membership against the array is matched by supplying
+# the scalar value (Mongo treats it as "any element equals").
+_ARRAY_FIELD_FILTERS: dict[str, str] = {"crewId": "crewIds"}
 
 
 # ── helpers ──────────────────────────────────────────────────────────
+
+
+def _build_query_from_params(params: Mapping[str, str]) -> dict[str, Any]:
+    query: dict[str, Any] = {}
+    for key, value in params.items():
+        if key in {"limit", "offset"}:
+            continue
+        array_field = _ARRAY_FIELD_FILTERS.get(key)
+        if array_field is not None:
+            query[array_field] = value
+            continue
+        if key in _FILTER_FIELDS:
+            query[key] = value
+    return query
+
 
 async def _get_role_name(user: dict[str, Any]) -> str:
     role_value = user.get("role")
@@ -97,16 +117,7 @@ async def list_trips(
     user: dict[str, Any] = Depends(get_current_user),
 ):
     db = get_db()
-    query: dict[str, Any] = {}
-    for key, value in request.query_params.items():
-        if key in {"limit", "offset"}:
-            continue
-        if key == "crewId":
-            # crewIds is an array; match membership
-            query["crewIds"] = value
-            continue
-        if key in _FILTER_FIELDS:
-            query[key] = value
+    query = _build_query_from_params(request.query_params)
     if not await _is_super_user(user):
         company_id = _company_id_value(user)
         object_id = _company_object_id(company_id)

@@ -3,22 +3,24 @@
 
 class TestCrewIdFilter:
     def test_crew_id_filter_is_accepted(self, client, super_headers):
-        # Known crewId — the filter simply has to be accepted server-side
-        # and translate into an array-membership query. If the filter is not
-        # recognised, the backend would ignore it and return all trips; we
-        # assert the endpoint handles the param without error.
+        target_crew_id = "000000000000000000000001"
+        create_resp = client.post(
+            "/api/trips",
+            headers=super_headers,
+            json={"crewIds": [target_crew_id], "name": "filter-test-trip"},
+        )
+        assert create_resp.status_code in (200, 201)
+
         resp = client.get(
             "/api/trips",
             headers=super_headers,
-            params={"crewId": "000000000000000000000001"},
+            params={"crewId": target_crew_id},
         )
         assert resp.status_code == 200
         body = resp.json()
-        assert "results" in body
-        assert "total" in body
-        # When no trips match, total must be 0 (not the whole collection)
+        assert body["total"] >= 1
         for trip in body["results"]:
-            assert "000000000000000000000001" in (trip.get("crewIds") or [])
+            assert target_crew_id in (trip.get("crewIds") or [])
 
     def test_unknown_filter_keys_are_ignored(self, client, super_headers):
         resp = client.get(

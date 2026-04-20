@@ -49,8 +49,6 @@ async def lifespan(app: FastAPI):
     """Application lifespan: startup and shutdown logic."""
     # Startup — DB + seeders first (fast)
     await connect_db()
-    # Ensure indexes for query-critical fields
-    await get_db()["trips"].create_index("crewIds")
     await seed_broker_role_with_permissions()
     await seed_boat_owner_role_with_permissions()
     await seed_fisherman_role_with_permissions()
@@ -77,6 +75,13 @@ async def lifespan(app: FastAPI):
             logger.info(f"Skipping demo seed — {_trip_count} trips already exist")
     except Exception as e:
         logger.warning(f"Demo seed skipped: {e}")
+    # Ensure indexes for query-critical fields — must run AFTER the demo-seed
+    # disconnect/reconnect cycle so the index lands on the connection the app
+    # will actually serve requests on.
+    try:
+        await get_db()["trips"].create_index("crewIds")
+    except Exception as e:
+        logger.warning(f"trips.crewIds index creation skipped: {e}")
     logger.info("Application startup complete — models loading in background")
     # Preload models in background thread (non-blocking)
     import threading
