@@ -79,7 +79,7 @@ async def lifespan(app: FastAPI):
     # disconnect/reconnect cycle so the index lands on the connection the app
     # will actually serve requests on.
     try:
-        await get_db()["trips"].create_index("crewIds")
+        await get_db()["trips"].create_index("crewIds", background=True)
     except Exception as e:
         logger.warning(f"trips.crewIds index creation skipped: {e}")
     logger.info("Application startup complete — models loading in background")
