@@ -89,6 +89,109 @@ async def list_users(
     return {"results": results, "total": total, "limit": limit, "offset": offset}
 
 
+# ─── Role-profile verification queue ──────────────────────────────────────
+# Endpoints below must be declared BEFORE the generic `/{user_id}` routes or
+# FastAPI will route `/pending-approvals` into the path-param handler.
+
+
+@router.get(
+    "/pending-approvals",
+    dependencies=[Depends(require_permissions("user:read"))],
+)
+async def list_pending_approvals(
+    limit: int = Query(100, ge=1, le=200),
+    user: dict[str, Any] = Depends(get_current_user),
+):
+    """Users awaiting admin verification (within the caller's company unless super)."""
+    from app.infrastructure.role_profiles.repository import list_pending_verification
+
+    _, is_super, _ = await _get_role_flags(user)
+    company_object_id: Any | None = None
+    if not is_super:
+        company_id = _company_id_value(user)
+        company_object_id = _company_object_id(company_id)
+        if not company_object_id:
+            return {"results": [], "total": 0}
+    results = await list_pending_verification(
+        company_object_id=company_object_id, limit=limit
+    )
+    return {"results": results, "total": len(results)}
+
+
+async def _assert_can_approve(
+    admin_user: dict[str, Any], target_user_id: str
+) -> dict[str, Any]:
+    """Resolve target user and confirm the admin may act on them."""
+    target = await repo_get_user(target_user_id)
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+    _, is_super, is_company_admin = await _get_role_flags(admin_user)
+    if not (is_super or is_company_admin):
+        raise HTTPException(status_code=403, detail="Forbidden")
+    if is_company_admin and not is_super:
+        admin_company_id = _company_id_value(admin_user)
+        target_company_id = _company_id_value(target)
+        if not admin_company_id or admin_company_id != target_company_id:
+            raise HTTPException(status_code=403, detail="Forbidden")
+    return target
+
+
+@router.post(
+    "/{user_id}/approve",
+    dependencies=[Depends(require_permissions("user:update"))],
+)
+async def approve_user(
+    user_id: str,
+    user: dict[str, Any] = Depends(get_current_user),
+):
+    """Mark a user as verified + company-approved (single approval action)."""
+    from app.domain.role_profiles.services import build_verify_payload
+
+    await _assert_can_approve(user, user_id)
+    update = build_verify_payload(admin_user_id=user["id"])
+    doc = await repo_update_user(user_id, update)
+    if not doc:
+        raise HTTPException(status_code=500, detail="Failed to approve user")
+    return doc
+
+
+# Alias for clients that prefer the semantically-specific name.
+@router.post(
+    "/{user_id}/verify",
+    dependencies=[Depends(require_permissions("user:update"))],
+)
+async def verify_user(
+    user_id: str,
+    user: dict[str, Any] = Depends(get_current_user),
+):
+    return await approve_user(user_id, user)  # type: ignore[call-arg]
+
+
+@router.post(
+    "/{user_id}/reject",
+    dependencies=[Depends(require_permissions("user:update"))],
+)
+async def reject_user(
+    user_id: str,
+    payload: dict[str, Any] = Body(default_factory=dict),
+    user: dict[str, Any] = Depends(get_current_user),
+):
+    """Reject a user's verification. Payload: {"reason": "..."} (optional)."""
+    from app.domain.role_profiles.services import build_reject_payload
+
+    await _assert_can_approve(user, user_id)
+    reason = payload.get("reason")
+    if reason is not None and not isinstance(reason, str):
+        raise HTTPException(status_code=400, detail="reason must be a string")
+    update = build_reject_payload(
+        admin_user_id=user["id"], reason=reason.strip() if reason else None
+    )
+    doc = await repo_update_user(user_id, update)
+    if not doc:
+        raise HTTPException(status_code=500, detail="Failed to reject user")
+    return doc
+
+
 @router.get("/{user_id}", dependencies=[Depends(require_permissions("user:read"))])
 async def get_user(
     user_id: str, user: dict[str, Any] = Depends(get_current_user)

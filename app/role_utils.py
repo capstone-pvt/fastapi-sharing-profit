@@ -13,8 +13,14 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.core.cache import AsyncTtlCache
 from app.db import get_db
 from app.utils import to_object_id
+
+
+# Roles and permissions change rarely; cache for 2 minutes per role_id.
+_role_name_cache = AsyncTtlCache(ttl_seconds=120.0)
+_role_perms_cache = AsyncTtlCache(ttl_seconds=120.0)
 
 
 def get_user_role_ids(user: dict[str, Any]) -> list[str]:
@@ -45,22 +51,49 @@ def get_user_role_ids(user: dict[str, Any]) -> list[str]:
     return []
 
 
+async def _load_role_name(rid: str) -> str | None:
+    db = get_db()
+    try:
+        role = await db["roles"].find_one({"_id": to_object_id(rid)})
+    except Exception:
+        return None
+    if role and role.get("name"):
+        return role["name"]
+    return None
+
+
 async def get_user_role_names(user: dict[str, Any]) -> set[str]:
     """Resolve all role names for a user dict from the DB."""
     role_ids = get_user_role_ids(user)
     if not role_ids:
         return set()
 
-    db = get_db()
     names: set[str] = set()
     for rid in role_ids:
-        try:
-            role = await db["roles"].find_one({"_id": to_object_id(rid)})
-            if role and role.get("name"):
-                names.add(role["name"])
-        except Exception:
-            continue
+        name = await _role_name_cache.get_or_set(rid, lambda r=rid: _load_role_name(r))
+        if name:
+            names.add(name)
     return names
+
+
+async def _load_role_permissions(rid: str) -> list[str]:
+    db = get_db()
+    try:
+        role = await db["roles"].find_one({"_id": to_object_id(rid)})
+        if not role:
+            return []
+        perm_ids = role.get("permissions", [])
+        if not perm_ids:
+            return []
+        perm_oids = [to_object_id(str(p)) for p in perm_ids]
+        names: list[str] = []
+        async for perm in db["permissions"].find({"_id": {"$in": perm_oids}}):
+            name = perm.get("name")
+            if name:
+                names.append(name)
+        return names
+    except Exception:
+        return []
 
 
 async def get_merged_permissions(role_ids: list[str]) -> list[str]:
@@ -68,25 +101,10 @@ async def get_merged_permissions(role_ids: list[str]) -> list[str]:
     if not role_ids:
         return []
 
-    db = get_db()
     all_perms: set[str] = set()
-
     for rid in role_ids:
-        try:
-            role = await db["roles"].find_one({"_id": to_object_id(rid)})
-            if not role:
-                continue
-            perm_ids = role.get("permissions", [])
-            if not perm_ids:
-                continue
-            perm_oids = [to_object_id(str(p)) for p in perm_ids]
-            async for perm in db["permissions"].find(
-                {"_id": {"$in": perm_oids}}
-            ):
-                name = perm.get("name")
-                if name:
-                    all_perms.add(name)
-        except Exception:
-            continue
-
+        perms = await _role_perms_cache.get_or_set(
+            rid, lambda r=rid: _load_role_permissions(r)
+        )
+        all_perms.update(perms)
     return sorted(all_perms)

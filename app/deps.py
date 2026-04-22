@@ -3,10 +3,17 @@ from typing import Any, Callable
 from fastapi import Depends, HTTPException, Request, status
 from jose import JWTError, jwt
 
+from app.core.cache import AsyncTtlCache
 from app.core.config import get_settings
 from app.db import get_db
 from app.role_utils import get_user_role_ids, get_user_role_names, get_merged_permissions
 from app.utils import serialize_doc, to_object_id
+
+
+# Cache authenticated user lookups for 30s keyed by (user_id, session_id).
+# Session rotation on login/logout invalidates stale entries naturally — a
+# stolen/rotated session will miss the cache key after the next login.
+_user_cache = AsyncTtlCache(ttl_seconds=30.0)
 
 
 async def get_current_user(request: Request) -> dict[str, Any]:
@@ -24,12 +31,18 @@ async def get_current_user(request: Request) -> dict[str, Any]:
     if not user_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
     session_id = payload.get("sid")
-
-    db = get_db()
-    user = await db["users"].find_one({"_id": to_object_id(user_id)})
-    if not user:
+    if not session_id:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
-    if not session_id or user.get("sessionId") != session_id:
+
+    async def _load_user() -> dict[str, Any] | None:
+        db = get_db()
+        doc = await db["users"].find_one({"_id": to_object_id(user_id)})
+        if not doc or doc.get("sessionId") != session_id:
+            return None
+        return doc
+
+    user = await _user_cache.get_or_set((user_id, session_id), _load_user)
+    if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
     user_data = serialize_doc(user)

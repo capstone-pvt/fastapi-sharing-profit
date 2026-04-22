@@ -9,6 +9,7 @@ from app.api.v1.fish_training_samples.routes import (
     router as fish_training_router,
 )
 from app.api.v1.profile.routes import router as profile_router
+from app.api.v1.role_profiles.routes import router as role_profiles_router
 from app.api.v1.companies.routes import router as companies_router
 from app.api.v1.cash_advances.routes import router as cash_advances_router
 from app.api.v1.permissions.routes import router as permissions_router
@@ -39,6 +40,7 @@ api_router.include_router(fish_models_router)
 api_router.include_router(fish_species_router)
 api_router.include_router(fish_training_router)
 api_router.include_router(profile_router)
+api_router.include_router(role_profiles_router)
 api_router.include_router(companies_router)
 api_router.include_router(cash_advances_router)
 api_router.include_router(audit_router)

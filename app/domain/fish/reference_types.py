@@ -8,6 +8,7 @@ class ReferenceType(str, Enum):
     COIN_PHP_1 = "coin_php_1"
     COIN_PHP_5 = "coin_php_5"
     COIN_PHP_10 = "coin_php_10"
+    COIN_PHP_20 = "coin_php_20"
     ID_CARD = "id_card"
     BILL_PHP = "bill_php"
     ARUCO_4CM = "aruco_4cm"
@@ -20,6 +21,7 @@ _KNOWN_DIMENSION_MM: dict[ReferenceType, float] = {
     ReferenceType.COIN_PHP_1: 20.0,
     ReferenceType.COIN_PHP_5: 25.0,
     ReferenceType.COIN_PHP_10: 26.5,
+    ReferenceType.COIN_PHP_20: 30.0,
     ReferenceType.ID_CARD: 85.6,
     ReferenceType.BILL_PHP: 160.0,
     ReferenceType.ARUCO_4CM: 40.0,
@@ -37,6 +39,7 @@ _CIRCULAR_TYPES = {
     ReferenceType.COIN_PHP_1,
     ReferenceType.COIN_PHP_5,
     ReferenceType.COIN_PHP_10,
+    ReferenceType.COIN_PHP_20,
 }
 
 

@@ -1,8 +1,10 @@
 # Virtual environment
 .venv
+.venv-linux/
 venv/
 env/
 
+docs
 # Environment files (NEVER commit secrets)
 .env
 .env.*
