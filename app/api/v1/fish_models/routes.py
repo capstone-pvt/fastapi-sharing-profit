@@ -1,3 +1,8 @@
+import os
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, File, HTTPException, Query, UploadFile
@@ -19,6 +24,21 @@ from app.infrastructure.fish_models.storage import save_model_zip
 
 
 router = APIRouter(prefix="/fish/models", tags=["fish-models"])
+
+
+# In-memory tracker for the most recent regression retrain job. Resets on
+# server restart, which is fine: after a restart the admin just reloads the
+# page and can kick off a new job or trust the weight_model.joblib mtime.
+_retrain_state: dict[str, Any] = {"status": "idle"}
+
+
+def _weight_model_mtime(project_root: Path) -> str | None:
+    weight_path = project_root / "app" / "models" / "weight" / "weight_model.joblib"
+    if not weight_path.exists():
+        return None
+    return datetime.fromtimestamp(
+        weight_path.stat().st_mtime, tz=timezone.utc
+    ).isoformat()
 
 
 @router.get("", dependencies=[Depends(require_roles("admin"))])
@@ -74,6 +94,91 @@ async def activate_model(model_id: str):
     if not doc:
         raise HTTPException(status_code=404, detail="Model not found")
     return doc
+
+
+@router.post("/retrain-regression", dependencies=[Depends(require_roles("admin"))])
+async def retrain_regression():
+    """Kick off weight + price regression retraining from approved training samples.
+
+    Fires the full export + `train_regression_models.py` pipeline as a background
+    subprocess (YOLO retraining is skipped). Returns immediately. Poll
+    ``GET /fish/models/retrain-regression/status`` for progress.
+    """
+    global _retrain_state
+    existing_proc = _retrain_state.get("_proc")
+    if existing_proc is not None and existing_proc.poll() is None:
+        raise HTTPException(
+            status_code=409,
+            detail="A retrain job is already running. Wait for it to finish or check the status endpoint.",
+        )
+
+    project_root = Path(__file__).resolve().parents[4]
+    cmd = [
+        sys.executable,
+        "scripts/auto_train.py",
+        "--skip-detect",
+        "--skip-classify",
+    ]
+    env = dict(os.environ)
+    # scripts/auto_train.py imports `app.db` etc., which requires the project
+    # root on PYTHONPATH when invoked as a plain subprocess.
+    existing_pp = env.get("PYTHONPATH", "")
+    env["PYTHONPATH"] = (
+        str(project_root) + (os.pathsep + existing_pp if existing_pp else "")
+    )
+    try:
+        proc = subprocess.Popen(cmd, cwd=str(project_root), env=env)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to start retrain job: {exc}"
+        )
+    _retrain_state = {
+        "status": "running",
+        "startedAt": datetime.now(timezone.utc).isoformat(),
+        "pid": proc.pid,
+        "weightModelMTimeAtStart": _weight_model_mtime(project_root),
+        "_proc": proc,
+    }
+    return {
+        "status": "started",
+        "pid": proc.pid,
+        "startedAt": _retrain_state["startedAt"],
+    }
+
+
+@router.get(
+    "/retrain-regression/status",
+    dependencies=[Depends(require_roles("admin"))],
+)
+async def retrain_regression_status():
+    """Return the current/last regression retrain job state.
+
+    States: idle | running | completed | failed.
+    """
+    global _retrain_state
+    project_root = Path(__file__).resolve().parents[4]
+    status = _retrain_state.get("status", "idle")
+
+    proc = _retrain_state.get("_proc")
+    if status == "running" and proc is not None:
+        rc = proc.poll()
+        if rc is not None:
+            _retrain_state["status"] = "completed" if rc == 0 else "failed"
+            _retrain_state["finishedAt"] = datetime.now(timezone.utc).isoformat()
+            _retrain_state["exitCode"] = rc
+            _retrain_state["weightModelMTime"] = _weight_model_mtime(project_root)
+            _retrain_state.pop("_proc", None)
+            status = _retrain_state["status"]
+
+    return {
+        "status": status,
+        "startedAt": _retrain_state.get("startedAt"),
+        "finishedAt": _retrain_state.get("finishedAt"),
+        "pid": _retrain_state.get("pid"),
+        "exitCode": _retrain_state.get("exitCode"),
+        "weightModelMTimeAtStart": _retrain_state.get("weightModelMTimeAtStart"),
+        "weightModelMTime": _weight_model_mtime(project_root),
+    }
 
 
 @router.delete("/{model_id}", dependencies=[Depends(require_roles("admin"))])
