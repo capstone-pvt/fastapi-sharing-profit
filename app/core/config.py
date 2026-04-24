@@ -75,6 +75,12 @@ class Settings:
     openweather_api_key = os.getenv("OPENWEATHER_API_KEY", "")
     storage_backend = os.getenv("STORAGE_BACKEND", "local")
     cloudinary_url = os.getenv("CLOUDINARY_URL", "")
+    # When false, skip seeding fish species, fish models, and demo transactions
+    # at startup. Auth data (roles, permissions, users, companies, licenses)
+    # still seeds so the app remains usable.
+    seed_on_startup = os.getenv("SEED_ON_STARTUP", "true").lower() in (
+        "1", "true", "yes", "on",
+    )
 
 
 def _validate_settings(s: Settings) -> None:

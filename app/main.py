@@ -57,24 +57,27 @@ async def lifespan(app: FastAPI):
     _, companies_by_key = await seed_default_companies()
     await seed_default_licenses(companies_by_key)
     await seed_default_role_users()
-    await seed_fish_species()
-    await seed_fish_models()
-    # Seed demo transactional data if no trips exist yet
-    try:
-        from app.db import get_db as _get_db
-        _db = _get_db()
-        _trip_count = await _db["trips"].count_documents({})
-        if _trip_count == 0:
-            logger.info("No trips found — seeding demo transactions...")
-            await disconnect_db()
-            from scripts.seed_demo_transactions import seed as _seed_demo
-            await _seed_demo()
-            await connect_db()
-            logger.info("Demo transactions seeded")
-        else:
-            logger.info(f"Skipping demo seed — {_trip_count} trips already exist")
-    except Exception as e:
-        logger.warning(f"Demo seed skipped: {e}")
+    if settings.seed_on_startup:
+        await seed_fish_species()
+        await seed_fish_models()
+        # Seed demo transactional data if no trips exist yet
+        try:
+            from app.db import get_db as _get_db
+            _db = _get_db()
+            _trip_count = await _db["trips"].count_documents({})
+            if _trip_count == 0:
+                logger.info("No trips found — seeding demo transactions...")
+                await disconnect_db()
+                from scripts.seed_demo_transactions import seed as _seed_demo
+                await _seed_demo()
+                await connect_db()
+                logger.info("Demo transactions seeded")
+            else:
+                logger.info(f"Skipping demo seed — {_trip_count} trips already exist")
+        except Exception as e:
+            logger.warning(f"Demo seed skipped: {e}")
+    else:
+        logger.info("SEED_ON_STARTUP=false — skipping fish species, fish models, and demo transactions")
     logger.info("Application startup complete — models loading in background")
     # Preload models in background thread (non-blocking)
     import threading
