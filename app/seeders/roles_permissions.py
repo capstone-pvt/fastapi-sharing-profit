@@ -203,3 +203,50 @@ async def seed_admin_role_with_all_permissions() -> None:
             RoleNames.SUPER: all_permissions,
         }
     )
+
+
+async def seed_government_role_with_permissions() -> None:
+    """Government / Port Management Unit (PMU / BFAR / LGU) — cross-company
+    regulator with read-only access plus verification and flagging powers.
+
+    CAN: read every operational resource across all companies (trips,
+    catches, fish sales, vessels, vessel-owners, crew, expenses, cash
+    advances, profit shares, profit-sharing policies, fish species,
+    forecasts, AI analytics/history), approve/reject pending users,
+    flag suspicious transactions, view audit logs.
+
+    CANNOT: create/update/delete operational records (those stay with the
+    broker/owner workflow), generate profit shares, manage company users,
+    change roles or permissions.
+    """
+    permission_ids = await ensure_default_permissions()
+    government_permissions = [
+        # Operational data — read-only across companies
+        permission_ids.get("trips:read"),
+        permission_ids.get("catches:read"),
+        permission_ids.get("fish-sales:read"),
+        permission_ids.get("expenses:read"),
+        permission_ids.get("cash-advances:read"),
+        permission_ids.get("profit-shares:read"),
+        permission_ids.get("profit-sharing-policies:read"),
+        permission_ids.get("vessels:read"),
+        permission_ids.get("vessel-owners:read"),
+        permission_ids.get("boats:read"),
+        permission_ids.get("fishermen:read"),
+        permission_ids.get("forecasts:read"),
+        # AI monitoring
+        permission_ids.get("fish:diagnostic"),
+        permission_ids.get("fish:analytics"),
+        permission_ids.get("fish:history"),
+        permission_ids.get("training-samples:read"),
+        # Compliance — read users (broker + vessel verification queues
+        # are layered on top in Phase 3); no create/update/delete here.
+        permission_ids.get("user:read"),
+        # Audit trail visibility
+        permission_ids.get("audit:read"),
+    ]
+    await ensure_default_roles(
+        {
+            RoleNames.GOVERNMENT: [pid for pid in government_permissions if pid],
+        }
+    )

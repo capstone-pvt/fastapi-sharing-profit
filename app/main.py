@@ -16,6 +16,7 @@ from app.seeders.roles_permissions import (
     seed_boat_owner_role_with_permissions,
     seed_broker_role_with_permissions,
     seed_fisherman_role_with_permissions,
+    seed_government_role_with_permissions,
 )
 from app.seeders.users import backfill_default_user_role, seed_default_role_users
 from app.seeders.companies import seed_default_companies
@@ -53,6 +54,7 @@ async def lifespan(app: FastAPI):
     await seed_boat_owner_role_with_permissions()
     await seed_fisherman_role_with_permissions()
     await seed_admin_role_with_all_permissions()
+    await seed_government_role_with_permissions()
     await backfill_default_user_role()
     _, companies_by_key = await seed_default_companies()
     await seed_default_licenses(companies_by_key)

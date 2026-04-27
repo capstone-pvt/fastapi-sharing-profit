@@ -54,6 +54,27 @@ async def _is_role(user: dict[str, Any], role: str) -> bool:
     return (await _get_role_name(user)).strip().lower() == role
 
 
+async def _has_role_named(user: dict[str, Any], target: str) -> bool:
+    target_lower = target.strip().lower()
+    if (await _get_role_name(user)).strip().lower() == target_lower:
+        return True
+    for rid in user.get("roleIds") or []:
+        if not rid:
+            continue
+        role = await get_role(str(rid))
+        if role and (role.get("name") or "").strip().lower() == target_lower:
+            return True
+    return False
+
+
+async def _is_cross_company_reader(user: dict[str, Any]) -> bool:
+    """Super-admins and government regulators can read trips across every
+    company. Used only on read paths."""
+    if await _is_super_user(user):
+        return True
+    return await _has_role_named(user, RoleNames.GOVERNMENT)
+
+
 def _company_id_value(data: dict[str, Any]) -> str | None:
     cid = data.get("companyId")
     return str(cid) if cid else None
@@ -103,7 +124,7 @@ async def list_trips(
             continue
         if key in _FILTER_FIELDS:
             query[key] = value
-    if not await _is_super_user(user):
+    if not await _is_cross_company_reader(user):
         company_id = _company_id_value(user)
         object_id = _company_object_id(company_id)
         if not object_id:
@@ -128,7 +149,7 @@ async def get_trip(
     doc = await db[COLLECTION].find_one({"_id": to_object_id(item_id)})
     if not doc:
         raise HTTPException(status_code=404, detail="Not found")
-    if not await _is_super_user(user):
+    if not await _is_cross_company_reader(user):
         company_id = _company_id_value(user)
         target_company_id = _company_id_value(doc)
         if not company_id or company_id != target_company_id:

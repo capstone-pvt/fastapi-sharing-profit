@@ -68,6 +68,15 @@ DEFAULT_ROLE_USERS = [
         "last_name": "Demo",
         "company_key": "company_a",
     },
+    {
+        # Government regulator (Port Management Unit / BFAR / LGU). No
+        # company_key — government users are cross-company readers and
+        # don't belong to any single company.
+        "role_names": [RoleNames.GOVERNMENT],
+        "email": "gov@demo.com",
+        "first_name": "Government",
+        "last_name": "Admin",
+    },
 ]
 
 

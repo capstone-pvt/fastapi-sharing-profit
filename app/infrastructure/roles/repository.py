@@ -25,6 +25,9 @@ class RoleNames:
     CREW = "crew"
     ADMIN = "admin"
     SUPER = "super"
+    # Port Management Unit / BFAR / LGU regulator: read-only across companies,
+    # write only on verifications + change requests + flags.
+    GOVERNMENT = "government"
 
 
 async def list_roles() -> list[dict[str, Any]]:
@@ -188,6 +191,14 @@ async def ensure_default_roles(
         {
             "name": RoleNames.SUPER,
             "description": "Super administrator role with all permissions",
+            "permissions": [],
+            "isActive": True,
+            "createdAt": now,
+            "updatedAt": now,
+        },
+        {
+            "name": RoleNames.GOVERNMENT,
+            "description": "Government regulator (PMU / BFAR / LGU) — cross-company read-only",
             "permissions": [],
             "isActive": True,
             "createdAt": now,

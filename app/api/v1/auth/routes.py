@@ -59,6 +59,79 @@ async def _resolve_roles(role_ids: list[str]) -> tuple[list[str], list[str], lis
     return role_ids, names, permissions
 
 
+@router.post("/register-government")
+async def register_government(payload: dict[str, Any] = Body(...)):
+    """Public registration for government regulators (BFAR / LGU / PMU).
+
+    Unlike :func:`register` this path does not require (or allow) a company
+    association. The user lands with the default ``user`` role and is parked
+    in the pending-approval queue with ``requestedRole='government'`` so a
+    super-admin can review the agency credentials before assigning the
+    cross-company ``government`` role.
+    """
+    email = (payload.get("email") or "").strip().lower()
+    password = payload.get("password") or ""
+    first_name = (payload.get("firstName") or "").strip()
+    last_name = (payload.get("lastName") or "").strip()
+    agency = (payload.get("agency") or "").strip() or None
+    position = (payload.get("position") or "").strip() or None
+    if not email or not password or not first_name or not last_name:
+        raise HTTPException(status_code=400, detail="Missing required fields")
+    if len(password) < 8:
+        raise HTTPException(
+            status_code=400, detail="Password must be at least 8 characters"
+        )
+
+    if await get_user_by_email(email):
+        raise HTTPException(status_code=409, detail="Email already registered")
+
+    db = get_db()
+    default_role = await get_role_by_name("user")
+    if not default_role:
+        raise HTTPException(
+            status_code=500, detail='Default role "user" not found'
+        )
+    role_ids = [str(default_role["_id"])]
+
+    hashed = hash_password(password)
+    session_id = uuid4().hex
+    user_doc = build_user_doc(
+        email=email,
+        hashed_password=hashed,
+        first_name=first_name,
+        last_name=last_name,
+        role_ids=role_ids,
+        session_id=session_id,
+        company_id=None,
+    )
+    # Government-specific metadata — picked up by the pending-approvals UI.
+    user_doc["requestedRole"] = "government"
+    if agency:
+        user_doc["agency"] = agency
+    if position:
+        user_doc["position"] = position
+
+    user_id = await create_user(user_doc)
+
+    access_token = create_access_token(
+        {"sub": user_id, "email": email, "roleIds": role_ids, "sid": session_id}
+    )
+    refresh_token = create_refresh_token(
+        {"sub": user_id, "email": email, "sid": session_id}
+    )
+    return build_auth_response(
+        user_id=user_id,
+        email=email,
+        first_name=first_name,
+        last_name=last_name,
+        role_ids=role_ids,
+        role_names=["user"],
+        access_token=access_token,
+        refresh_token=refresh_token,
+        company_approved=False,
+    )
+
+
 @router.post("/register")
 async def register(payload: dict[str, Any] = Body(...)):
     try:

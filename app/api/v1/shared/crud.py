@@ -47,6 +47,30 @@ def build_crud_router(
         role_name = (await _get_role_name(user)).strip().lower()
         return role_name == "super"
 
+    async def _has_role_named(user: dict[str, Any], target: str) -> bool:
+        """True if any of the user's roles matches ``target`` (case-insensitive).
+        Handles both single-role (``roleId``) and multi-role (``roleIds``)
+        users without depending on which role happens to be primary."""
+        target_lower = target.strip().lower()
+        primary = (await _get_role_name(user)).strip().lower()
+        if primary == target_lower:
+            return True
+        for rid in user.get("roleIds") or []:
+            if not rid:
+                continue
+            role = await get_role(str(rid))
+            if role and (role.get("name") or "").strip().lower() == target_lower:
+                return True
+        return False
+
+    async def _is_cross_company_reader(user: dict[str, Any]) -> bool:
+        """Government regulators (PMU/BFAR/LGU) plus super-admins can read
+        records across every company. Used only on read paths — writes still
+        go through the regular per-company scoping."""
+        if await _is_super_user(user):
+            return True
+        return await _has_role_named(user, "government")
+
     def _company_id_value(data: dict[str, Any]) -> str | None:
         company_id = data.get("companyId")
         return str(company_id) if company_id else None
@@ -76,7 +100,7 @@ def build_crud_router(
                 # NoSQL injection via arbitrary query parameter keys.
                 if key in _allowed_filter_fields:
                     query[key] = value
-            if not await _is_super_user(user):
+            if not await _is_cross_company_reader(user):
                 company_id = _company_id_value(user)
                 object_id = _company_object_id(company_id)
                 if not object_id:
@@ -114,7 +138,7 @@ def build_crud_router(
             )
             if not doc:
                 raise HTTPException(status_code=404, detail="Not found")
-            if not await _is_super_user(user):
+            if not await _is_cross_company_reader(user):
                 company_id = _company_id_value(user)
                 target_company_id = _company_id_value(doc)
                 if not company_id or company_id != target_company_id:

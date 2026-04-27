@@ -148,20 +148,58 @@ async def seed():
     # ── 3. Vessels ──────────────────────────────────────────────
     print("\n[3/9] Seeding vessels...")
 
+    # Varied verification states so the regulator dashboards demo with
+    # something interesting on every tile: one cleanly verified, one
+    # expiring soon (within 30d), one expired, one pending, one rejected,
+    # and one without a registration number (Missing Documents tile).
+    expires_clean = NOW + timedelta(days=180)
+    expires_soon = NOW + timedelta(days=15)
+    expires_past = NOW - timedelta(days=45)
+
     vessels = [
         {"name": "FB Maria Clara", "registrationNumber": "REG-2024-001",
          "type": "Fishing Boat", "length": 12.5, "capacity": 5.0, "crewCapacity": 8,
          "vesselOwnerId": str(vo_ids[0]), "status": "active",
+         "verificationStatus": "verified",
+         "documentExpiresAt": expires_clean.isoformat(),
+         "verifiedByName": "BFAR Inspector",
+         "verifiedAt": NOW.isoformat(),
          "notes": "Documents attached: Fishing Permit, BFAR Registration",
          "companyId": company_id, "demoTag": DEMO_TAG, "createdAt": NOW, "updatedAt": NOW},
         {"name": "FB San Pedro", "registrationNumber": "REG-2024-002",
          "type": "Trawler", "length": 15.0, "capacity": 8.0, "crewCapacity": 12,
          "vesselOwnerId": str(vo_ids[0]), "status": "active",
+         "verificationStatus": "verified",
+         "documentExpiresAt": expires_soon.isoformat(),
+         "verifiedByName": "BFAR Inspector",
+         "verifiedAt": NOW.isoformat(),
          "notes": "Documents attached: Fishing Permit, Coast Guard Clearance",
          "companyId": company_id, "demoTag": DEMO_TAG, "createdAt": NOW, "updatedAt": NOW},
         {"name": "FB Estrella", "registrationNumber": "REG-2024-003",
          "type": "Fishing Boat", "length": 10.0, "capacity": 3.5, "crewCapacity": 6,
          "vesselOwnerId": str(vo_ids[1]), "status": "active",
+         "verificationStatus": "pending",
+         "companyId": company_id, "demoTag": DEMO_TAG, "createdAt": NOW, "updatedAt": NOW},
+        {"name": "FB Bantay Dagat", "registrationNumber": "REG-2023-014",
+         "type": "Fishing Boat", "length": 11.0, "capacity": 4.0, "crewCapacity": 5,
+         "vesselOwnerId": str(vo_ids[1]), "status": "active",
+         "verificationStatus": "verified",
+         "documentExpiresAt": expires_past.isoformat(),
+         "verifiedByName": "BFAR Inspector",
+         "verifiedAt": (NOW - timedelta(days=400)).isoformat(),
+         "notes": "Permit lapsed — owner has not renewed.",
+         "companyId": company_id, "demoTag": DEMO_TAG, "createdAt": NOW, "updatedAt": NOW},
+        {"name": "FB Bagong Lipunan", "registrationNumber": "REG-2024-019",
+         "type": "Trawler", "length": 14.0, "capacity": 7.0, "crewCapacity": 9,
+         "vesselOwnerId": str(vo_ids[0]), "status": "inactive",
+         "verificationStatus": "rejected",
+         "verificationNotes": "Hull dimensions do not match registry filing.",
+         "companyId": company_id, "demoTag": DEMO_TAG, "createdAt": NOW, "updatedAt": NOW},
+        {"name": "FB Sirena", "type": "Fishing Boat",
+         "length": 9.5, "capacity": 3.0, "crewCapacity": 4,
+         "vesselOwnerId": str(vo_ids[1]), "status": "active",
+         "verificationStatus": "pending",
+         "notes": "Awaiting BFAR registration certificate from owner.",
          "companyId": company_id, "demoTag": DEMO_TAG, "createdAt": NOW, "updatedAt": NOW},
     ]
     vessel_ids = []
@@ -171,7 +209,7 @@ async def seed():
         )
         doc = await db["vessels"].find_one({"name": v["name"], "companyId": company_id})
         vessel_ids.append(doc["_id"])
-    print(f"  Created 3 vessels")
+    print(f"  Created {len(vessels)} vessels (mixed verification states)")
 
     # ── 4. Crew Members (fishermen) ─────────────────────────────
     print("\n[4/9] Seeding crew members...")
@@ -343,6 +381,40 @@ async def seed():
             await db["expenses"].insert_many(expenses)
 
     print(f"  Created {len(trip_ids)} trips with fish sales and expenses")
+
+    # ── 6a. Price-anomaly demo line items ───────────────────────
+    # Append two extra sales whose `pricePerKg` deviates ±50% from the species
+    # median so the regulator's "Suspicious Transactions" detector flags them.
+    # Tied to the most recent completed trip so they show up in current views.
+    last_completed_trip_id = None
+    for t_idx, tc in enumerate(trip_configs):
+        if tc["approved"] or tc["days_ago"] > 2:
+            last_completed_trip_id = trip_ids[t_idx]
+    if last_completed_trip_id is not None:
+        anomalies = [
+            # Lapu-Lapu normally ~₱450/kg → flag at ₱950/kg (over 2x).
+            {"speciesName": "Lapu-Lapu", "kilos": 6.0, "pricePerKg": 950,
+             "category": "big_fish"},
+            # Bangus normally ~₱160/kg → flag at ₱60/kg (under 50%).
+            {"speciesName": "Bangus", "kilos": 18.0, "pricePerKg": 60,
+             "category": "small_fish"},
+        ]
+        anomaly_total_weight = sum(li["kilos"] for li in anomalies)
+        anomaly_total_price = sum(li["kilos"] * li["pricePerKg"] for li in anomalies)
+        await db["fish_sales"].insert_one({
+            "tripId": str(last_completed_trip_id),
+            "recordedBy": str(broker_id),
+            "saleDate": NOW.isoformat(),
+            "buyerName": "Off-port buyer (suspicious)",
+            "totalWeight": round(anomaly_total_weight, 2),
+            "totalPrice": round(anomaly_total_price, 2),
+            "pricePerKg": round(anomaly_total_price / max(anomaly_total_weight, 0.01), 2),
+            "lineItems": anomalies,
+            "notes": "Demo: prices deviate from species median by >50%.",
+            "companyId": company_id, "demoTag": DEMO_TAG,
+            "createdAt": NOW, "updatedAt": NOW,
+        })
+        print("  Added 1 price-anomalous fish-sale for regulator demo")
 
     # ── 6b. Catches (per crew fish attribution) ─────────────────
     print("\n[6b/12] Seeding catches per crew...")

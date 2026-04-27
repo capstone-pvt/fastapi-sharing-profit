@@ -26,6 +26,10 @@ from app.api.v1.notifications.routes import router as notifications_router
 from app.api.v1.profit_shares.routes import router as profit_shares_custom_router
 from app.api.v1.role_requests.routes import router as role_requests_router
 from app.api.v1.events.routes import router as events_router
+from app.api.v1.change_requests.routes import router as change_requests_router
+from app.api.v1.vessel_verification.routes import (
+    router as vessel_verification_router,
+)
 from app.deps import require_roles
 
 
@@ -63,6 +67,7 @@ api_router.include_router(
     prefix="/boats",
     tags=["boats"],
 )
+api_router.include_router(vessel_verification_router)
 api_router.include_router(
     build_crud_router(
         "vessels",
@@ -175,6 +180,7 @@ api_router.include_router(
 api_router.include_router(notifications_router)
 api_router.include_router(role_requests_router)
 api_router.include_router(events_router)
+api_router.include_router(change_requests_router)
 
 # Custom profit-shares routes (/compute, /generate, /status) — must be
 # included BEFORE the generic CRUD so the custom paths take priority.
