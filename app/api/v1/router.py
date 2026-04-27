@@ -30,6 +30,10 @@ from app.api.v1.change_requests.routes import router as change_requests_router
 from app.api.v1.vessel_verification.routes import (
     router as vessel_verification_router,
 )
+from app.api.v1.vessel_join_requests.routes import (
+    router as vessel_join_requests_router,
+)
+from app.api.v1.buyers.routes import router as buyers_router
 from app.deps import require_roles
 
 
@@ -179,6 +183,8 @@ api_router.include_router(
 
 api_router.include_router(notifications_router)
 api_router.include_router(role_requests_router)
+api_router.include_router(vessel_join_requests_router)
+api_router.include_router(buyers_router)
 api_router.include_router(events_router)
 api_router.include_router(change_requests_router)
 
