@@ -13,9 +13,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # Build deps
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc g++ git git-lfs \
-    && rm -rf /var/lib/apt/lists/* \
-    && git lfs install
+    gcc g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 
@@ -68,12 +67,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     AUTO_TRAIN_ON_SAMPLE=false \
     OPENWEATHER_API_KEY=""
 
-# Runtime deps only (OpenCV needs libgl1 + glib + git-lfs for model files)
+# Runtime deps only (OpenCV needs libgl1 + glib)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 libglib2.0-0 libsm6 libxext6 libxrender1 \
     libgomp1 libgcc-s1 libstdc++6 \
-    curl ca-certificates git git-lfs \
-    && git lfs install \
+    curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy venv from builder
@@ -86,29 +84,17 @@ COPY --chown=appuser:appuser . .
 RUN mkdir -p uploads app/models/classifier app/models/detector app/models/weight app/models/price logs && \
     chown -R appuser:appuser /app
 
-# Resolve LFS pointers → actual model binaries
-# Shallow-clone repo with LFS, copy model files, then remove clone
-RUN git config --global --add safe.directory /tmp/repo && \
-    GIT_LFS_SKIP_SMUDGE=0 git clone --depth 1 --filter=blob:none \
-      https://github.com/capstone-pvt/fastapi-sharing-profit.git /tmp/repo && \
-    cd /tmp/repo && git lfs pull --include="app/models/**" && \
-    cp -f /tmp/repo/app/models/classifier/best.pt /app/app/models/classifier/best.pt 2>/dev/null || true && \
-    cp -f /tmp/repo/app/models/detector/best.pt /app/app/models/detector/best.pt 2>/dev/null || true && \
-    cp -f /tmp/repo/app/models/weight/weight_model.joblib /app/app/models/weight/weight_model.joblib 2>/dev/null || true && \
-    cp -f /tmp/repo/app/models/price/price_model.joblib /app/app/models/price/price_model.joblib 2>/dev/null || true && \
-    rm -rf /tmp/repo
-
-# Verify model files are real binaries (not LFS pointers)
+# Verify model files are real binaries
 RUN for f in app/models/classifier/best.pt app/models/detector/best.pt app/models/weight/weight_model.joblib app/models/price/price_model.joblib; do \
       if [ -f "$f" ]; then \
         SIZE=$(stat -c%s "$f" 2>/dev/null || stat -f%z "$f" 2>/dev/null); \
         if [ "$SIZE" -lt 1000 ]; then \
-          echo "FAIL: $f is only ${SIZE} bytes (likely LFS pointer)"; exit 1; \
+          echo "FAIL: $f is only ${SIZE} bytes"; exit 1; \
         else \
           echo "OK: $f (${SIZE} bytes)"; \
         fi; \
       else \
-        echo "WARN: $f not found"; \
+        echo "FAIL: $f not found"; exit 1; \
       fi; \
     done
 
