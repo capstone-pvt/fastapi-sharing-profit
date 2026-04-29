@@ -84,8 +84,10 @@ COPY --chown=appuser:appuser . .
 RUN mkdir -p uploads app/models/classifier app/models/detector app/models/weight app/models/price logs && \
     chown -R appuser:appuser /app
 
-# Verify model files are real binaries
-RUN for f in app/models/classifier/best.pt app/models/detector/best.pt app/models/weight/weight_model.joblib app/models/price/price_model.joblib; do \
+# Verify required model files are real binaries.
+# Price model is intentionally optional — when absent, estimator.py falls back
+# to a flat PHP 8.50/kg rate. See app/models/README.md.
+RUN for f in app/models/classifier/best.pt app/models/detector/best.pt app/models/weight/weight_model.joblib; do \
       if [ -f "$f" ]; then \
         SIZE=$(stat -c%s "$f" 2>/dev/null || stat -f%z "$f" 2>/dev/null); \
         if [ "$SIZE" -lt 1000 ]; then \
@@ -96,7 +98,12 @@ RUN for f in app/models/classifier/best.pt app/models/detector/best.pt app/model
       else \
         echo "FAIL: $f not found"; exit 1; \
       fi; \
-    done
+    done; \
+    if [ -f app/models/price/price_model.joblib ]; then \
+      echo "OK: app/models/price/price_model.joblib present"; \
+    else \
+      echo "INFO: price_model.joblib absent — using flat PHP 8.50/kg fallback"; \
+    fi
 
 USER appuser
 
