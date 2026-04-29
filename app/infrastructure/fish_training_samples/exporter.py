@@ -43,7 +43,8 @@ def export_dataset(
         if not image_path.exists():
             continue
         ext = image_path.suffix or ".jpg"
-        image_file = f"{sample['_id']}{ext}"
+        sample_id = sample.get("id") or sample.get("_id")
+        image_file = f"{sample_id}{ext}"
         dest_image = images_dir / image_file
 
         if include_images:
@@ -70,7 +71,7 @@ def export_dataset(
                             f"{class_index} {x_center:.6f} {y_center:.6f} "
                             f"{width_norm:.6f} {height_norm:.6f}"
                         )
-                        (labels_dir / f"{sample['_id']}.txt").write_text(
+                        (labels_dir / f"{sample_id}.txt").write_text(
                             label_line + "\n"
                         )
                         labels_count += 1
