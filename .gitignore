@@ -26,9 +26,13 @@ __pycache__/
 *.tflite
 yolov8*.pt
 
-# Ignore training runs and temp model artifacts
+# Ignore training runs, temp model artifacts, and timestamped model backups
 runs/
 *.pt.bak
+app/models/.backup_*/
+
+# Local Claude Code cache
+.claude/
 
 # Keep production model files (tracked by Git LFS)
 !app/models/classifier/best.pt
