@@ -8,6 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from pathlib import Path
 
+from app import build_info
 from app.db import connect_db, disconnect_db, get_db
 from app.api.v1 import api_router
 from app.core.config import get_settings
@@ -90,7 +91,12 @@ async def lifespan(app: FastAPI):
     logger.info("Application shutdown complete")
 
 
-app = FastAPI(title="Profit Sharing API (FastAPI)", lifespan=lifespan)
+_BUILD_INFO = build_info()
+app = FastAPI(
+    title="Profit Sharing API (FastAPI)",
+    version=_BUILD_INFO["version"],
+    lifespan=lifespan,
+)
 
 _origins = settings.allowed_origins
 _use_wildcard = _origins == ["*"]
@@ -105,7 +111,13 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"status": "ok", "service": "profit-sharing-api"}
+    return {"status": "ok", "service": "profit-sharing-api", "build": _BUILD_INFO}
+
+
+@app.get("/version")
+async def version():
+    """Return version + build metadata so clients can pin which build they hit."""
+    return _BUILD_INFO
 
 
 @app.get("/health")
@@ -114,6 +126,7 @@ async def health_check():
     health: dict = {
         "status": "ok",
         "timestamp": datetime.now(timezone.utc).isoformat(),
+        "build": _BUILD_INFO,
         "models": _models_loaded if _models_loaded else {"mode": "lazy-load", "note": "models load on first scan request"},
     }
     # Check MongoDB connectivity
