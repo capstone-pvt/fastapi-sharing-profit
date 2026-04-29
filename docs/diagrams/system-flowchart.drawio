@@ -1,0 +1,193 @@
+<mxfile host="app.diagrams.net" modified="2026-04-29T11:30:00.000Z" agent="claude" version="22.0.0" type="device">
+  <diagram name="System Flowchart" id="flow-1">
+    <mxGraphModel dx="1600" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="2200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TITLE -->
+        <mxCell id="title" value="Smart Catch — System Flowchart (post-rollout)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="5-species classifier · weight regressor · flat ₱8.50/kg price fallback" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2;fontColor=#666;" vertex="1" parent="1">
+          <mxGeometry x="450" y="55" width="800" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ── ENTRY ── -->
+        <mxCell id="start" value="User opens app" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="780" y="100" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="auth-decision" value="Logged in?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="780" y="180" width="140" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="login" value="POST /auth/login&#10;or /auth/register" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="540" y="260" width="180" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="role-check" value="Role?&#10;(super / admin / owner /&#10;broker / crew / government)" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="730" y="330" width="240" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- ── 3 PARALLEL FLOWS ── -->
+        <!-- A: AI Scan -->
+        <mxCell id="lane-a-title" value="A. AI Fish Scan" style="text;html=1;strokeColor=#5b8a3a;fillColor=#e2f0d9;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="450" width="500" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="a1" value="Capture image&#10;(camera or gallery)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="80" y="500" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a2" value="POST /fish/analyze&#10;multipart image" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="320" y="500" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a3" value="preprocess_image()&#10;(EXIF, sharpen, contrast)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="80" y="580" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a4" value="detector (YOLOv8)&#10;→ bounding boxes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="320" y="580" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a5" value="classifier (YOLOv8m-cls)&#10;→ 1 of 5 species&#10;Auxis rochei · Elagatis bipinnulata&#10;Euthynnus affinis · Katsuwonus pelamis&#10;Thunnus albacares" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="80" y="660" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="a6" value="estimate_weight()&#10;sklearn GBR&#10;features: idx, length, width&#10;+ engineered" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="320" y="660" width="200" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="a7" value="estimate_price()&#10;model present? predict.&#10;else weight × ₱8.50/kg" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="80" y="790" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="a8" value="save fish_analyses&#10;(image, detections, weights, prices)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="320" y="790" width="200" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="a9" value="user sees result&#10;(species + weight + size class)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="200" y="900" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a-correct" value="user corrects species?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="200" y="980" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="a10" value="POST /fish-training-samples&#10;source=&quot;scanner_correction&quot;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1080" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="a11" value="(later) admin retrains classifier&#10;auto_train.py + evaluate scripts" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="320" y="1080" width="220" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Edges A -->
+        <mxCell id="ea1" style="endArrow=classic;html=1;" edge="1" parent="1" source="a1" target="a2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea2" style="endArrow=classic;html=1;" edge="1" parent="1" source="a2" target="a3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea3" style="endArrow=classic;html=1;" edge="1" parent="1" source="a3" target="a4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea4" style="endArrow=classic;html=1;" edge="1" parent="1" source="a4" target="a5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea5" style="endArrow=classic;html=1;" edge="1" parent="1" source="a5" target="a6"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea6" style="endArrow=classic;html=1;" edge="1" parent="1" source="a6" target="a7"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea7" style="endArrow=classic;html=1;" edge="1" parent="1" source="a7" target="a8"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea8" style="endArrow=classic;html=1;" edge="1" parent="1" source="a8" target="a9"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea9" style="endArrow=classic;html=1;" edge="1" parent="1" source="a9" target="a-correct"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea10" value="yes" style="endArrow=classic;html=1;" edge="1" parent="1" source="a-correct" target="a10"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ea11" style="endArrow=classic;html=1;" edge="1" parent="1" source="a10" target="a11"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- B: Trip & Sales -->
+        <mxCell id="lane-b-title" value="B. Trip → Sales → Profit Share" style="text;html=1;strokeColor=#3a5b8a;fillColor=#dae8fc;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="450" width="500" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="b1" value="Owner: create vessel&#10;+ register crew" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="610" y="500" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b2" value="Owner: create trip&#10;crewType (Pakura / Tongko)&#10;assign captain + crew" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="860" y="500" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b3" value="Broker: record fish sales&#10;(small fish + big fish lineItems)&#10;may use AI scan to auto-fill species" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="610" y="590" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b4" value="Broker: record expenses&#10;(fuel, ice, food, supplies)&#10;cash advances → approval flow" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="860" y="590" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b5" value="Owner: PATCH /trips/{id}&#10;status: completed" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="610" y="680" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b6" value="Owner: PATCH /trips/{id}/approve-sales" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="860" y="680" width="220" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="b7" value="POST /profit-shares/compute&#10;preview: gross / broker / bangka /&#10;crewPool / per-crew / owner" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="610" y="760" width="220" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="b8" value="POST /profit-shares/generate&#10;persists, status=draft" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="860" y="760" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b9" value="PATCH /profit-shares/{id}/status&#10;draft → finalized" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="610" y="850" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b10" value="PATCH /profit-shares/{id}/status&#10;finalized → paid" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="860" y="850" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="b11" value="Each role views their share&#10;owner: full breakdown · broker: commission&#10;crew: net-of-deductions earnings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="730" y="940" width="280" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Edges B -->
+        <mxCell id="eb1" style="endArrow=classic;html=1;" edge="1" parent="1" source="b1" target="b2"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb2" style="endArrow=classic;html=1;" edge="1" parent="1" source="b2" target="b3"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb3" style="endArrow=classic;html=1;" edge="1" parent="1" source="b3" target="b4"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb4" style="endArrow=classic;html=1;" edge="1" parent="1" source="b4" target="b5"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb5" style="endArrow=classic;html=1;" edge="1" parent="1" source="b5" target="b6"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb6" style="endArrow=classic;html=1;" edge="1" parent="1" source="b6" target="b7"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb7" style="endArrow=classic;html=1;" edge="1" parent="1" source="b7" target="b8"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb8" style="endArrow=classic;html=1;" edge="1" parent="1" source="b8" target="b9"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb9" style="endArrow=classic;html=1;" edge="1" parent="1" source="b9" target="b10"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="eb10" style="endArrow=classic;html=1;" edge="1" parent="1" source="b10" target="b11"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- C: Admin / Misc -->
+        <mxCell id="lane-c-title" value="C. Admin · Forecasts · Audit" style="text;html=1;strokeColor=#a05a2c;fillColor=#ffe6cc;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="1140" y="450" width="500" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="c1" value="Admin: manage roles + permissions&#10;CRUD users · approve memberships" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="500" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c2" value="Forecasts:&#10;/forecasts/seasonal&#10;/forecasts/price-guide&#10;/forecasts/species-calendar" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="500" width="220" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="c3" value="Buyers + ledger&#10;(per-buyer balance,&#10;sales/payments timeline)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="590" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c4" value="Change requests&#10;(broker proposes edits to&#10;sales/expenses · owner approves)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1410" y="610" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c5" value="Audit logs&#10;every CUD operation traced&#10;(actor, action, target, before/after)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="690" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="c6" value="License gate&#10;company.licenseStatus = active&#10;else read-only" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="780" width="280" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ── BUILD / DEPLOY ── -->
+        <mxCell id="deploy-title" value="Build / deploy / observability" style="text;html=1;strokeColor=#666;fillColor=#f5f5f5;align=center;verticalAlign=middle;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1180" width="1580" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="d1" value="git push main → Railway redeploy&#10;Dockerfile bakes 3 model files (price optional)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1230" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d2" value="GET /version&#10;{ version, gitSha, builtAt }" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="400" y="1230" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d3" value="GET /health → ping mongo + models loaded&#10;(returns 503 if degraded)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="660" y="1230" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d4" value="Web bundle:&#10;version + sha shown in sidebar footer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="1230" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="d5" value="Flutter APK:&#10;version + sha shown in Settings footer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="1230" width="280" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- TOP-LEVEL EDGES -->
+        <mxCell id="es1" style="endArrow=classic;html=1;" edge="1" parent="1" source="start" target="auth-decision"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es2" value="no" style="endArrow=classic;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="auth-decision" target="login"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es3" value="yes" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="auth-decision" target="role-check"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es4" style="endArrow=classic;html=1;" edge="1" parent="1" source="login" target="role-check"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es5" value="all roles" style="endArrow=classic;html=1;" edge="1" parent="1" source="role-check" target="a1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es6" value="owner / broker" style="endArrow=classic;html=1;" edge="1" parent="1" source="role-check" target="b1"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="es7" value="admin" style="endArrow=classic;html=1;" edge="1" parent="1" source="role-check" target="c1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

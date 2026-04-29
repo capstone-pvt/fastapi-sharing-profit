@@ -5,6 +5,10 @@ venv/
 env/
 
 docs
+# Whitelist editable architecture diagrams (drawio source files)
+!docs/diagrams/
+!docs/diagrams/**
+
 # Environment files (NEVER commit secrets)
 .env
 .env.*

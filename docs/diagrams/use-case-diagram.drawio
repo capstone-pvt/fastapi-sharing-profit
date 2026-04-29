@@ -1,0 +1,296 @@
+<mxfile host="app.diagrams.net" modified="2026-04-29T11:30:00.000Z" agent="claude" version="22.0.0" type="device">
+  <diagram name="Use Case" id="uc-1">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1700" pageHeight="2200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Smart Catch — Use Case Diagram (post-rollout)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="900" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="6 actors · 1 system · &lt;&lt;include&gt;&gt; and &lt;&lt;extend&gt;&gt; relationships shown as dashed arrows" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontStyle=2;fontColor=#666;" vertex="1" parent="1">
+          <mxGeometry x="400" y="55" width="900" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ── ACTORS (LEFT) ── -->
+        <mxCell id="actor-super" value="Super Admin" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="160" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-admin" value="Admin&#10;(company)" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="320" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-owner" value="Boat Owner" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="500" width="40" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ── ACTORS (RIGHT) ── -->
+        <mxCell id="actor-broker" value="Broker" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="180" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-crew" value="Crew /&#10;Fisherman" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="370" width="40" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-gov" value="Government&#10;Inspector" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1560" y="540" width="40" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ── EXTERNAL ACTOR ── -->
+        <mxCell id="actor-ai" value="«system»&#10;AI Inference&#10;(YOLO + sklearn)" style="shape=umlActor;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;verticalAlign=top;html=1;outlineConnect=0;fontSize=11;fontStyle=2;fontColor=#666;" vertex="1" parent="1">
+          <mxGeometry x="780" y="1640" width="40" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ── SYSTEM BOUNDARY ── -->
+        <mxCell id="system" value="Smart Catch System (FastAPI · Web · Flutter)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333;dashed=0;verticalAlign=top;fontSize=13;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="100" width="1240" height="1500" as="geometry" />
+        </mxCell>
+
+        <!-- Group: Onboarding -->
+        <mxCell id="grp-onboard" value="Onboarding · Auth" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="140" width="540" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-register" value="Register account&#10;(Create company / Join company)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="300" y="180" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-login" value="Login / Refresh token" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="560" y="180" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-kyc" value="Complete KYC profile" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="300" y="270" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-rolereq" value="Request additional role&#10;(crew → broker / owner)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="560" y="270" width="220" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Group: Admin / Identity -->
+        <mxCell id="grp-admin" value="Admin · Identity Management" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="380" width="540" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-approveuser" value="Approve / reject user join request" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="300" y="420" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-rolemgmt" value="Manage roles &amp; permissions" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="560" y="420" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-userassign" value="Assign multiple roles&#10;(admin + broker + owner)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="300" y="510" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-license" value="Manage company license" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="560" y="510" width="220" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-companycfg" value="Configure company branding/settings" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="430" y="600" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Group: Vessel & Crew -->
+        <mxCell id="grp-vessel" value="Vessels &amp; Crew" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="140" width="620" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-crvessel" value="Register vessel + verify gov't info" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="870" y="180" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-crew" value="Add / edit crew members" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="180" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-vjr" value="Request to join a vessel" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="870" y="270" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-vjr-approve" value="Approve crew join request" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="270" width="260" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Group: Trip lifecycle -->
+        <mxCell id="grp-trip" value="Trips &amp; Sales" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="400" width="620" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-crtrip" value="Create trip&#10;(crewType: pakura/tongko)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="870" y="440" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-recordsale" value="Record fish sale&#10;(small + big lineItems)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="440" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-recordexpense" value="Record expenses&#10;(fuel · ice · food · other)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="870" y="530" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-cashadv" value="Request / approve&#10;cash advance" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="530" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-completetrip" value="Mark trip completed" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="870" y="620" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-approvesale" value="Approve fish sales&#10;(unlocks profit-share compute)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="620" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-changereq" value="Propose / approve change request&#10;(fish_sales · expenses)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="710" width="280" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Group: Profit Sharing -->
+        <mxCell id="grp-ps" value="Profit Sharing" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="690" width="540" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-policy" value="Configure profit-sharing policy&#10;(divisor · percentages · deductions)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="300" y="730" width="500" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-compute" value="Preview profit-share computation&#10;(POST /profit-shares/compute)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="300" y="820" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-generate" value="Generate (Draft)&#10;Finalize → Paid" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="560" y="820" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-viewshare" value="View own profit share / earnings" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="430" y="900" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Group: AI Scanner -->
+        <mxCell id="grp-ai-scan" value="AI Fish Scanner" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4edda;strokeColor=#28a745;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="840" y="800" width="620" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-scan" value="Scan fish / capture image" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#28a745;" vertex="1" parent="1">
+          <mxGeometry x="870" y="840" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-classify" value="Classify species (5 classes)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#28a745;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="840" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-detect" value="Detect bounding boxes" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#28a745;" vertex="1" parent="1">
+          <mxGeometry x="870" y="930" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-weight" value="Estimate weight (kg)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#28a745;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="930" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-price" value="Estimate price&#10;(model present, else flat ₱8.50/kg)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#28a745;" vertex="1" parent="1">
+          <mxGeometry x="870" y="1020" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-savescan" value="Save analysis history" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#28a745;" vertex="1" parent="1">
+          <mxGeometry x="1170" y="1020" width="260" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-correct" value="Correct wrong species&#10;(feeds training samples)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#28a745;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="1110" width="280" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Group: Forecasts / Insights -->
+        <mxCell id="grp-forecast" value="Forecasts &amp; Insights" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="990" width="540" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-forecast" value="View seasonal forecast&#10;(species calendar)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="300" y="1030" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-priceguide" value="View market price guide" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="560" y="1030" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-buyers" value="Manage buyers + ledger" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="300" y="1120" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-weather" value="View weather + tide overlay" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="560" y="1120" width="240" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Group: Audit / Government -->
+        <mxCell id="grp-audit" value="Audit · Inspection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="1260" width="1190" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-audit" value="Review audit logs" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="300" y="1300" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-notif" value="Receive notifications&#10;(in-app + FCM push)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="560" y="1300" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-vesselverify" value="Verify vessel registration" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="820" y="1300" width="240" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-inspect" value="Inspect company catch records" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="1300" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-version" value="Read /version + /health&#10;(QA: pin which build)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#999;" vertex="1" parent="1">
+          <mxGeometry x="600" y="1390" width="240" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Group: AI training feedback loop -->
+        <mxCell id="grp-train" value="AI Training Feedback Loop" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;dashed=1;verticalAlign=top;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="1480" width="1190" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-trainadmin" value="Admin: review training samples&#10;+ trigger retrain (auto_train.py)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="300" y="1520" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-evaluate" value="Run accuracy evaluation&#10;(evaluate_dataset_accuracy.py)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="600" y="1520" width="280" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-deploy" value="Promote new model to prod&#10;(commit best.pt + redeploy)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="900" y="1520" width="280" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ── ASSOCIATIONS ── -->
+        <!-- Super Admin -->
+        <mxCell id="asoc-super-1" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-super" target="uc-rolemgmt"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-super-2" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-super" target="uc-license"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-super-3" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-super" target="uc-trainadmin"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-super-4" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-super" target="uc-evaluate"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-super-5" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-super" target="uc-deploy"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-super-6" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-super" target="uc-version"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Admin -->
+        <mxCell id="asoc-admin-1" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-admin" target="uc-register"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-admin-2" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-admin" target="uc-approveuser"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-admin-3" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-admin" target="uc-userassign"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-admin-4" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-admin" target="uc-companycfg"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-admin-5" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-admin" target="uc-audit"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-admin-6" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-admin" target="uc-trainadmin"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Boat Owner -->
+        <mxCell id="asoc-owner-1" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-owner" target="uc-crvessel"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-owner-2" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-owner" target="uc-crew"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-owner-3" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-owner" target="uc-vjr-approve"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-owner-4" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-owner" target="uc-crtrip"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-owner-5" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-owner" target="uc-completetrip"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-owner-6" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-owner" target="uc-approvesale"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-owner-7" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-owner" target="uc-policy"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-owner-8" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-owner" target="uc-compute"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-owner-9" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-owner" target="uc-generate"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Broker -->
+        <mxCell id="asoc-broker-1" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-broker" target="uc-recordsale"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-broker-2" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-broker" target="uc-recordexpense"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-broker-3" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-broker" target="uc-cashadv"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-broker-4" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-broker" target="uc-changereq"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-broker-5" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-broker" target="uc-buyers"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-broker-6" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-broker" target="uc-priceguide"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-broker-7" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-broker" target="uc-scan"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Crew / Fisherman -->
+        <mxCell id="asoc-crew-1" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-register"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-crew-2" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-kyc"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-crew-3" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-rolereq"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-crew-4" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-vjr"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-crew-5" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-cashadv"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-crew-6" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-viewshare"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-crew-7" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-scan"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-crew-8" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-correct"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-crew-9" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-weather"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-crew-10" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-crew" target="uc-notif"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- Government Inspector -->
+        <mxCell id="asoc-gov-1" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-gov" target="uc-vesselverify"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-gov-2" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-gov" target="uc-inspect"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-gov-3" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-gov" target="uc-audit"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- AI Inference (system actor) -->
+        <mxCell id="asoc-ai-1" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-ai" target="uc-classify"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-ai-2" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-ai" target="uc-detect"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-ai-3" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-ai" target="uc-weight"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="asoc-ai-4" style="endArrow=none;html=1;" edge="1" parent="1" source="actor-ai" target="uc-price"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+        <!-- ── INCLUDE / EXTEND ── -->
+        <mxCell id="inc1" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-scan" target="uc-classify"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc2" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-scan" target="uc-detect"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc3" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-scan" target="uc-weight"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc4" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-scan" target="uc-price"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc5" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-scan" target="uc-savescan"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ext1" value="«extend»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-correct" target="uc-savescan"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc6" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-recordsale" target="uc-scan"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc7" value="«include»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-generate" target="uc-compute"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="inc8" value="«precedes»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-approvesale" target="uc-compute"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="ext2" value="«extend»" style="endArrow=open;html=1;dashed=1;fontSize=10;fontStyle=2;" edge="1" parent="1" source="uc-correct" target="uc-trainadmin"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

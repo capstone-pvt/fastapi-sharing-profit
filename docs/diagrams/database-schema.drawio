@@ -1,0 +1,367 @@
+<mxfile host="app.diagrams.net" modified="2026-04-29T11:30:00.000Z" agent="claude" version="22.0.0" type="device">
+  <diagram name="Database Schema" id="db-1">
+    <mxGraphModel dx="1800" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="2400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Smart Catch — MongoDB Collections (post-rollout)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="20" width="1000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" value="Atlas/Railway database: smart_catch · embedded ObjectId references shown as solid edges; logical fk-by-string as dashed" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontStyle=2;fontColor=#666;" vertex="1" parent="1">
+          <mxGeometry x="400" y="55" width="1200" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ====================================================== -->
+        <!-- DOMAIN: AUTH & IDENTITY                                  -->
+        <!-- ====================================================== -->
+        <mxCell id="grp-auth" value="Auth &amp; Identity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="100" width="640" height="540" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t-users" value="users" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="140" width="280" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="t-users-r1" value="" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontSize=11;" vertex="1" parent="t-users">
+          <mxGeometry y="30" width="280" height="22" as="geometry" />
+        </mxCell>
+        <mxCell id="t-users-r1c1" value="PK _id : ObjectId" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" vertex="1" parent="t-users-r1"><mxGeometry width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-users-r2" value="email : string (unique)" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;fontSize=11;" vertex="1" parent="t-users"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-users-r3" value="password : string (hashed)" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;fontSize=11;" vertex="1" parent="t-users"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-users-r4" value="firstName · lastName" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;fontSize=11;" vertex="1" parent="t-users"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-users-r5" value="FK roleIds : ObjectId[]  → roles" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;fontSize=11;" vertex="1" parent="t-users"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-users-r6" value="FK companyId : ObjectId  → companies" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;fontSize=11;" vertex="1" parent="t-users"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-users-r7" value="companyApproved : bool" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;fontSize=11;" vertex="1" parent="t-users"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-users-r8" value="kycCompleted, isActive : bool" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;fontSize=11;" vertex="1" parent="t-users"><mxGeometry y="184" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-users-r9" value="address: street, barangay, city,&#10;province, zipCode" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;fontSize=10;" vertex="1" parent="t-users"><mxGeometry y="206" width="280" height="32" as="geometry" /></mxCell>
+        <mxCell id="t-users-r10" value="createdAt · updatedAt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;top=0;left=0;bottom=0;right=0;collapsible=0;dropTarget=0;fillColor=none;fontSize=11;" vertex="1" parent="t-users"><mxGeometry y="238" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-roles" value="roles" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="140" width="280" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="t-roles-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-roles"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-roles-r2" value="name : string  (super, admin, owner,&#10;broker, crew, government, user)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-roles"><mxGeometry y="52" width="280" height="32" as="geometry" /></mxCell>
+        <mxCell id="t-roles-r3" value="description : string" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-roles"><mxGeometry y="84" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-roles-r4" value="FK permissionIds : ObjectId[]  → permissions" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-roles"><mxGeometry y="106" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-roles-r5" value="createdAt · updatedAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-roles"><mxGeometry y="128" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-perms" value="permissions" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="340" width="280" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="t-perms-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-perms"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-perms-r2" value="name : string  (e.g. fish:analyze)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-perms"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-perms-r3" value="description : string" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-perms"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-rolereq" value="role_requests" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="450" width="280" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="t-rolereq-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-rolereq"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-rolereq-r2" value="FK userId  → users" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-rolereq"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-rolereq-r3" value="FK requestedRoleId  → roles" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-rolereq"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-rolereq-r4" value="status : pending|approved|rejected" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-rolereq"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-rolereq-r5" value="reason : string" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-rolereq"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-rolereq-r6" value="reviewedBy · reviewedAt · createdAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-rolereq"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+
+        <!-- ====================================================== -->
+        <!-- DOMAIN: COMPANY & LICENSING                              -->
+        <!-- ====================================================== -->
+        <mxCell id="grp-org" value="Company &amp; Licensing" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="700" y="100" width="640" height="320" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t-companies" value="companies" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="720" y="140" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="t-companies-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-companies"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-companies-r2" value="companyName · companyCode (unique)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-companies"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-companies-r3" value="companyAddress · phone · taxId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-companies"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-companies-r4" value="companyThemeColor : string?" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-companies"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-companies-r5" value="createdAt · updatedAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-companies"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-licenses" value="app_licenses" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#d6b656;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="140" width="280" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="t-licenses-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-licenses"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-licenses-r2" value="FK companyId  → companies" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-licenses"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-licenses-r3" value="plan : free|standard|premium" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-licenses"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-licenses-r4" value="status : active|expired|trial|revoked" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-licenses"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-licenses-r5" value="seatLimit : int" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-licenses"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-licenses-r6" value="activatedAt · expiresAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-licenses"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-licenses-r7" value="activationCode : string?" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-licenses"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+
+        <!-- ====================================================== -->
+        <!-- DOMAIN: VESSELS & CREW                                   -->
+        <!-- ====================================================== -->
+        <mxCell id="grp-vessel" value="Vessels &amp; Crew" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="100" width="640" height="540" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t-vo" value="vessel_owners" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#82b366;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="140" width="280" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="t-vo-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vo"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vo-r2" value="FK userId  → users" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vo"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vo-r3" value="FK companyId  → companies" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vo"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vo-r4" value="name · contactNumber · email" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vo"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vo-r5" value="address · status (active|suspended)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vo"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vo-r6" value="createdAt · updatedAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vo"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-vessels" value="vessels" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#82b366;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="140" width="280" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="t-vessels-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vessels"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vessels-r2" value="FK vesselOwnerId  → vessel_owners" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vessels"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vessels-r3" value="FK companyId  → companies" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vessels"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vessels-r4" value="name · registrationNumber" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vessels"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vessels-r5" value="type · length · capacity · crewCapacity" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vessels"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vessels-r6" value="status (active|maintenance|retired)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vessels"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vessels-r7" value="govRegistrationStatus" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vessels"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vessels-r8" value="notes · createdAt · updatedAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vessels"><mxGeometry y="184" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-crew" value="crew" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#82b366;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="400" width="280" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="t-crew-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-crew"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-crew-r2" value="FK userId  → users (optional)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-crew"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-crew-r3" value="FK vesselId  → vessels" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-crew"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-crew-r4" value="firstName · lastName · contactNumber" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-crew"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-crew-r5" value="role : captain|crew" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-crew"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-crew-r6" value="crewType : pakura|tongko" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-crew"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-crew-r7" value="status (active|inactive)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-crew"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-vjr" value="vessel_join_requests" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#82b366;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="400" width="280" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="t-vjr-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vjr"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vjr-r2" value="FK userId  → users (the fisherman)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vjr"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vjr-r3" value="FK vesselId  → vessels" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vjr"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vjr-r4" value="status : pending|approved|rejected" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vjr"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vjr-r5" value="message · reviewerNote" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vjr"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vjr-r6" value="reviewedBy · reviewedAt · createdAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-vjr"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-vjr-r7" value="on approve → inserts crew row" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;fontStyle=2;fontColor=#666;" vertex="1" parent="t-vjr"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+
+        <!-- ====================================================== -->
+        <!-- DOMAIN: TRIPS, SALES, EXPENSES                           -->
+        <!-- ====================================================== -->
+        <mxCell id="grp-ops" value="Trips, Sales, Expenses" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="660" width="1300" height="540" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t-trips" value="trips" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="700" width="300" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="t-trips-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="30" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r2" value="tripName · vesselName" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="52" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r3" value="FK vesselId  → vessels" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="74" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r4" value="FK ownerId · brokerId · encoderId  → users" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="96" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r5" value="FK captainId  → users · captainName" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="118" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r6" value="crewMembers : ObjectId[]  → users" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="140" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r7" value="crewType : pakura|tongko" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="162" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r8" value="departureDate · returnDate" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="184" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r9" value="location · notes" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="206" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r10" value="status : planned|ongoing|completed" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="228" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trips-r11" value="salesApprovedAt · salesApprovedBy" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trips"><mxGeometry y="250" width="300" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-fishsales" value="fish_sales" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="380" y="700" width="300" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="t-fishsales-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishsales"><mxGeometry y="30" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r2" value="FK tripId  → trips" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishsales"><mxGeometry y="52" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r3" value="FK buyerId  → buyers (optional)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishsales"><mxGeometry y="74" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r4" value="lineItems : embedded[ ]" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="t-fishsales"><mxGeometry y="96" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r5" value="  species · category : small|big" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-fishsales"><mxGeometry y="118" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r6" value="  weightKg · pricePerKg · totalKg · totalSales" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-fishsales"><mxGeometry y="140" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r7" value="  caughtBy : ObjectId? (big-fish only)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-fishsales"><mxGeometry y="162" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r8" value="  fromAnalysisId : ObjectId? → fish_analyses" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-fishsales"><mxGeometry y="184" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r9" value="totalSales · smallFishTotal · bigFishTotal" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishsales"><mxGeometry y="206" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r10" value="status (pending|approved)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishsales"><mxGeometry y="228" width="300" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishsales-r11" value="createdAt · updatedAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishsales"><mxGeometry y="250" width="300" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-expenses" value="expenses" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="700" y="700" width="280" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="t-expenses-r1" value="PK _id · FK tripId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-expenses"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-expenses-r2" value="category : fuel|ice|food|other" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-expenses"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-expenses-r3" value="amount : decimal · currency" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-expenses"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-expenses-r4" value="description · receiptUrl" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-expenses"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-expenses-r5" value="incurredAt · createdAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-expenses"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-cash" value="cash_advances" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="700" y="900" width="280" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="t-cash-r1" value="PK _id · FK tripId · FK crewId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-cash"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-cash-r2" value="amount : decimal" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-cash"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-cash-r3" value="status : pending|approved|declined" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-cash"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-cash-r4" value="approvedBy · approvedAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-cash"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-cash-r5" value="reason · createdAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-cash"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-buyers" value="buyers + buyer_balance_ledger" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="700" width="320" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="t-buyers-r1" value="buyers: PK _id · name · contact · balance" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-buyers"><mxGeometry y="30" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-buyers-r2" value="ledger: PK _id · FK buyerId · type" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-buyers"><mxGeometry y="52" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-buyers-r3" value="    (sale|payment|adjustment) · amount" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-buyers"><mxGeometry y="74" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-buyers-r4" value="    runningBalance · refDocId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-buyers"><mxGeometry y="96" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-buyers-r5" value="    notes · createdAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-buyers"><mxGeometry y="118" width="320" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-changereq" value="transaction_change_requests" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="900" width="320" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="t-changereq-r1" value="PK _id · proposedBy" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-changereq"><mxGeometry y="30" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-changereq-r2" value="targetCollection (fish_sales|expenses)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-changereq"><mxGeometry y="52" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-changereq-r3" value="targetDocId · before · after  (json diff)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-changereq"><mxGeometry y="74" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-changereq-r4" value="status : pending|approved|rejected" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-changereq"><mxGeometry y="96" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-changereq-r5" value="reviewedBy · reviewedAt · reason" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-changereq"><mxGeometry y="118" width="320" height="22" as="geometry" /></mxCell>
+
+        <!-- ====================================================== -->
+        <!-- DOMAIN: PROFIT SHARING                                   -->
+        <!-- ====================================================== -->
+        <mxCell id="grp-ps" value="Profit Sharing" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="660" width="640" height="540" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t-pspolicy" value="profit_sharing_policies" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="700" width="280" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="t-pspolicy-r1" value="PK _id · name · isActive" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r2" value="FK companyId  → companies" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r3" value="brokerPercentage · ownerPercentage" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r4" value="crewPercentage" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r5" value="smallBangkaPercentage" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r6" value="bigBangkaPercentage" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r7" value="pakuraDivisor (3) · tongkoDivisor (2)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r8" value="sinakahan · kusinero · customDeductions" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="184" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r9" value="nilicomanEnabled · nilicomanOwnerPct" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="206" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r10" value="captainOwnerSplit : members_split | flat" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="228" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pspolicy-r11" value="createdAt · updatedAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pspolicy"><mxGeometry y="250" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-pshare" value="profit_shares" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#b85450;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="700" width="280" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="t-pshare-r1" value="PK _id : ObjectId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pshare"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r2" value="FK tripId  → trips" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pshare"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r3" value="FK policyId  → profit_sharing_policies" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pshare"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r4" value="grossRevenue · netRevenue" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pshare"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r5" value="brokerShare · bangkaShare · crewPool" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pshare"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r6" value="ownerShare · captainShare" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pshare"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r7" value="crewBreakdown : embedded[ ]" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="t-pshare"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r8" value="  userId · grossShare · cashAdvance" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-pshare"><mxGeometry y="184" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r9" value="  sinakahan · netShare" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-pshare"><mxGeometry y="206" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r10" value="status : draft|finalized|paid" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="t-pshare"><mxGeometry y="228" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-pshare-r11" value="finalizedAt · paidAt · finalizedBy · paidBy" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-pshare"><mxGeometry y="250" width="280" height="22" as="geometry" /></mxCell>
+
+        <!-- ====================================================== -->
+        <!-- DOMAIN: AI / ML                                          -->
+        <!-- ====================================================== -->
+        <mxCell id="grp-ai" value="AI &amp; ML" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#2c8a3a;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1220" width="1300" height="380" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t-fishspecies" value="fish_species (post-rollout: 5 docs)" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#2c8a3a;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1260" width="320" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="t-fishspecies-r1" value="PK _id · classIndex (0..4)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishspecies"><mxGeometry y="30" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishspecies-r2" value="name : string  (= scientific name)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishspecies"><mxGeometry y="52" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishspecies-r3" value="scientificName · genus · family" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishspecies"><mxGeometry y="74" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishspecies-r4" value="englishName · localName" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishspecies"><mxGeometry y="96" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishspecies-r5" value="weightRange : [min, max] kg" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishspecies"><mxGeometry y="118" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishspecies-r6" value="pricePerKg : [min, max] PHP" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishspecies"><mxGeometry y="140" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishspecies-r7" value="peakMonths : int[]  · habitat" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishspecies"><mxGeometry y="162" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishspecies-r8" value="isActive · createdAt · updatedAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishspecies"><mxGeometry y="184" width="320" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-fishmodels" value="fish_models (registry)" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#2c8a3a;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="1260" width="280" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="t-fishmodels-r1" value="PK _id · modelType" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishmodels"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishmodels-r2" value="    (detector|classifier|weight)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishmodels"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishmodels-r3" value="version · description" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishmodels"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishmodels-r4" value="modelPath : string (disk path)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishmodels"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishmodels-r5" value="trainingMetrics : embedded" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishmodels"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishmodels-r6" value="datasetInfo : embedded" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishmodels"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishmodels-r7" value="isActive · status · trainedAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishmodels"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-trainsamples" value="fish_training_samples" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#2c8a3a;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1260" width="320" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="t-trainsamples-r1" value="PK _id · FK userId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trainsamples"><mxGeometry y="30" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trainsamples-r2" value="imageUrl · imagePath" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trainsamples"><mxGeometry y="52" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trainsamples-r3" value="species · scientificName · english · local" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trainsamples"><mxGeometry y="74" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trainsamples-r4" value="weightKg · pricePerKg · scaleReferenceCm" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trainsamples"><mxGeometry y="96" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trainsamples-r5" value="lengthCm · widthCm" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trainsamples"><mxGeometry y="118" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trainsamples-r6" value="bbox : { x, y, width, height }" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trainsamples"><mxGeometry y="140" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trainsamples-r7" value="source : dataset_import|excel_*|" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trainsamples"><mxGeometry y="162" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trainsamples-r8" value="     scanner_correction" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trainsamples"><mxGeometry y="184" width="320" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-trainsamples-r9" value="originalSpecies · originalConfidence" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-trainsamples"><mxGeometry y="206" width="320" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-fishanalyses" value="fish_analyses (per-scan record)" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#2c8a3a;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="1260" width="280" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="t-fishanalyses-r1" value="PK _id · FK userId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishanalyses"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishanalyses-r2" value="imageUrl" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishanalyses"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishanalyses-r3" value="detections : embedded[ ]" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;fontStyle=1;" vertex="1" parent="t-fishanalyses"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishanalyses-r4" value="  species · confidence · classIndex" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-fishanalyses"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishanalyses-r5" value="  boundingBox · estimatedWeight" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-fishanalyses"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishanalyses-r6" value="  sizeCategory · lengthCm · widthCm" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=10;" vertex="1" parent="t-fishanalyses"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishanalyses-r7" value="totalEstimatedWeight · predictedPrice" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishanalyses"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-fishanalyses-r8" value="caughtBy · caughtByName" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-fishanalyses"><mxGeometry y="184" width="280" height="22" as="geometry" /></mxCell>
+
+        <!-- ====================================================== -->
+        <!-- DOMAIN: AUDIT / NOTIFICATIONS                            -->
+        <!-- ====================================================== -->
+        <mxCell id="grp-audit" value="Audit · Notifications" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#999;fontSize=14;fontStyle=1;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="1360" y="1220" width="640" height="380" as="geometry" />
+        </mxCell>
+
+        <mxCell id="t-audit" value="audit_logs" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#999;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1380" y="1260" width="280" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="t-audit-r1" value="PK _id · FK actorId  → users" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-audit"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-audit-r2" value="actorEmail · actorRole" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-audit"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-audit-r3" value="action : create|update|delete|approve" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-audit"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-audit-r4" value="targetCollection · targetId" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-audit"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-audit-r5" value="before · after  (json snapshot)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-audit"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-audit-r6" value="ip · userAgent · timestamp" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-audit"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-audit-r7" value="FK companyId  → companies" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-audit"><mxGeometry y="162" width="280" height="22" as="geometry" /></mxCell>
+
+        <mxCell id="t-notif" value="notifications" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fillColor=#fff;strokeColor=#999;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="1260" width="280" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="t-notif-r1" value="PK _id · FK userId  → users" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-notif"><mxGeometry y="30" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-notif-r2" value="type · title · message" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-notif"><mxGeometry y="52" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-notif-r3" value="data : { refId, refKind, ... }" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-notif"><mxGeometry y="74" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-notif-r4" value="read : bool · readAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-notif"><mxGeometry y="96" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-notif-r5" value="createdAt" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;" vertex="1" parent="t-notif"><mxGeometry y="118" width="280" height="22" as="geometry" /></mxCell>
+        <mxCell id="t-notif-r6" value="(also FCM via firebase_messaging)" style="shape=tableRow;horizontal=0;startSize=0;strokeColor=inherit;fillColor=none;fontSize=11;fontStyle=2;fontColor=#666;" vertex="1" parent="t-notif"><mxGeometry y="140" width="280" height="22" as="geometry" /></mxCell>
+
+        <!-- ====================================================== -->
+        <!-- RELATIONSHIP EDGES                                       -->
+        <!-- ====================================================== -->
+        <mxCell id="r1" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-users" target="t-roles"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r2" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-users" target="t-companies"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r3" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-roles" target="t-perms"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r4" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-licenses" target="t-companies"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r5" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-vo" target="t-users"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r6" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-vessels" target="t-vo"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r7" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-crew" target="t-vessels"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r8" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;dashed=1;" edge="1" parent="1" source="t-crew" target="t-users"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r9" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-vjr" target="t-vessels"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r10" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-trips" target="t-vessels"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r11" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-fishsales" target="t-trips"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r12" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-expenses" target="t-trips"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r13" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-cash" target="t-trips"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r14" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-fishsales" target="t-buyers"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r15" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;dashed=1;" edge="1" parent="1" source="t-fishsales" target="t-fishanalyses"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r16" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-pshare" target="t-trips"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r17" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-pshare" target="t-pspolicy"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r18" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-pspolicy" target="t-companies"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r19" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;dashed=1;" edge="1" parent="1" source="t-fishanalyses" target="t-fishspecies"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r20" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;dashed=1;" edge="1" parent="1" source="t-trainsamples" target="t-fishspecies"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r21" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-audit" target="t-users"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r22" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-notif" target="t-users"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r23" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;" edge="1" parent="1" source="t-rolereq" target="t-users"><mxGeometry relative="1" as="geometry" /></mxCell>
+        <mxCell id="r24" style="endArrow=classic;html=1;startArrow=ERmany;endFill=0;startFill=0;dashed=1;" edge="1" parent="1" source="t-changereq" target="t-fishsales"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
