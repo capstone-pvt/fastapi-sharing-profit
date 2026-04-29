@@ -234,7 +234,13 @@ async def seed_full_demo(reset: bool = False):
 
     # ─── Trips + child docs ───
     print("Seeding trips, catches, sales, expenses, profit shares...")
-    species_pool = ["Tuna", "Mackerel", "Tilapia", "Lapu-Lapu", "Bangus"]
+    species_pool = [
+        "Auxis rochei",
+        "Elagatis bipinnulata",
+        "Euthynnus affinis",
+        "Katsuwonus pelamis",
+        "Thunnus albacares",
+    ]
 
     for trip_index in range(3):
         days_ago = (trip_index + 1) * 7

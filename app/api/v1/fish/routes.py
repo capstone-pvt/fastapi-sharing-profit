@@ -47,76 +47,45 @@ router = APIRouter(prefix="/fish", tags=["fish"])
 _ALLOWED_IMAGE_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
 _MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
 
-# Known typos / aliases in model class names -> canonical names
+# Aliases / common name variants -> canonical scientific names emitted by the
+# trained classifier. Matched case-insensitively against the model's class
+# label and against any user-provided species string.
 _SPECIES_ALIASES: dict[str, str] = {
-    # Tuna family
-    "tune": "Tuna",
-    "tunas": "Tuna",
-    "yellowfin tuna": "Tuna",
-    "yellowfin": "Tuna",
-    "skipjack": "Skipjack Tuna",
-    "gulyasan": "Skipjack Tuna",
-    "bigeye": "Bigeye Tuna",
-    "tulingan": "Eastern Little Tuna",
-    "frigate": "Frigate Tuna",
-    # Bangus
-    "milkfish": "Bangus",
-    "bangos": "Bangus",
-    # Tilapia
-    "tilapiia": "Tilapia",
-    # Galunggong / Roundscad
-    "galunggong": "Galunggong",
-    "round scad": "Galunggong",
-    "roundscad": "Galunggong",
-    "hourse mackerel": "Galunggong",
-    "horse mackerel": "Galunggong",
-    # Sardines
-    "sardinas": "Sardine",
-    "sardines": "Sardine",
-    "tamban": "Sardine",
-    "bali sardinella": "Sardine",
-    "tunsoy": "Fimbriated Sardine",
-    "tawilis": "Tawilis",
-    # Mackerel
-    "alumahan": "Indian Mackerel",
-    "indian mackerel": "Indian Mackerel",
-    "hasa hasa": "Indo-Pacific Mackerel",
-    "hasahasa": "Indo-Pacific Mackerel",
-    "hasa-hasa": "Indo-Pacific Mackerel",
-    "short mackerel": "Indo-Pacific Mackerel",
-    "tanigue": "Spanish Mackerel",
-    "tangigue": "Spanish Mackerel",
-    "spanish mackerel": "Spanish Mackerel",
-    # Other commercial
-    "matang-baka": "Big-eyed Scad",
-    "matangbaka": "Big-eyed Scad",
-    "big-eyed scad": "Big-eyed Scad",
-    "dilis": "Anchovy",
-    "anchovy": "Anchovy",
-    "anchovies": "Anchovy",
-    "pusit": "Squid",
-    "squid": "Squid",
-    "bisugo": "Threadfin Bream",
-    "threadfin bream": "Threadfin Bream",
-    "talakitok": "Crevalle Jack",
-    "crevalle": "Crevalle Jack",
-    "sapsap": "Slipmouth",
-    "slipmouth": "Slipmouth",
-    # Grouper / Lapu-lapu
-    "lapu lapu": "Grouper",
-    "lapulapu": "Grouper",
-    "lapu-lapu": "Grouper",
-    "grouper": "Grouper",
-    # Others
-    "malasugi": "Blue Marlin",
-    "blue marlin": "Blue Marlin",
-    "danggit": "Rabbitfish",
-    "samaral": "Rabbitfish",
-    "barracuda": "Barracuda",
-    "espada": "Barracuda",
-    "swordfish": "Barracuda",
-    "salay-salay": "Moonfish",
-    "chabita": "Moonfish",
+    # Auxis rochei (Bullet tuna)
+    "bullet tuna": "Auxis rochei",
+    "mangko": "Auxis rochei",
+    "pirit": "Auxis rochei",
+    "auxis": "Auxis rochei",
+    "auxis rochei": "Auxis rochei",
+    # Elagatis bipinnulata (Rainbow runner)
+    "rainbow runner": "Elagatis bipinnulata",
+    "salindatu": "Elagatis bipinnulata",
+    "salmon": "Elagatis bipinnulata",  # local PH usage; not actual salmon
+    "elagatis": "Elagatis bipinnulata",
+    "elagatis bipinnulata": "Elagatis bipinnulata",
+    # Euthynnus affinis (Eastern little tuna)
+    "eastern little tuna": "Euthynnus affinis",
+    "patikan": "Euthynnus affinis",
+    "tulingan": "Euthynnus affinis",
+    "euthynnus": "Euthynnus affinis",
+    "euthynnus affinis": "Euthynnus affinis",
+    # Katsuwonus pelamis (Skipjack tuna)
+    "skipjack": "Katsuwonus pelamis",
+    "skipjack tuna": "Katsuwonus pelamis",
+    "sambagon": "Katsuwonus pelamis",
+    "bulis": "Katsuwonus pelamis",
+    "gulyasan": "Katsuwonus pelamis",
+    "katsuwonus": "Katsuwonus pelamis",
+    "katsuwonus pelamis": "Katsuwonus pelamis",
+    # Thunnus albacares (Yellowfin tuna)
+    "yellowfin": "Thunnus albacares",
+    "yellowfin tuna": "Thunnus albacares",
+    "barilis": "Thunnus albacares",
+    "bariles": "Thunnus albacares",
+    "karaw": "Thunnus albacares",
+    "tambakol": "Thunnus albacares",
+    "thunnus": "Thunnus albacares",
+    "thunnus albacares": "Thunnus albacares",
 }
 
 

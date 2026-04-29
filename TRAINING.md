@@ -304,10 +304,14 @@ Image Upload
 
 ### 1. Register species in the database
 
-Edit `scripts/seed_ph_fish_species.py` to add new species, then run:
+Edit the `DEFAULT_SPECIES` list in `app/seeders/fish_models.py` (or
+`SPECIES_FIVE` in `scripts/seed_5_species_only.py`) to add new species,
+keeping `classIndex` aligned with the alphabetical order of the
+`dataset/<species>/` folders the classifier was trained on. Then run the
+seeder:
 
 ```bash
-PYTHONPATH=. python scripts/seed_ph_fish_species.py
+PYTHONPATH=. python scripts/seed_5_species_only.py
 ```
 
 Or use the API:
