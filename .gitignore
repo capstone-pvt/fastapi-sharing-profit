@@ -76,4 +76,4 @@ build/
 *.egg-info/
 
 # Evaluation results
-eval_results.json
+eval_results.jsonfish_species.bak.*.json

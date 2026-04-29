@@ -52,12 +52,11 @@ DEFAULT_MODELS: list[dict] = [
         "description": "Scikit-learn weight estimation – pre-trained",
         "relativePath": "models/weight/weight_model.joblib",
     },
-    {
-        "modelType": "price",
-        "version": "1.0.0",
-        "description": "Scikit-learn price prediction – pre-trained",
-        "relativePath": "models/price/price_model.joblib",
-    },
+    # NOTE: the price model was removed because the legacy file was trained on
+    # the old 65-species classIndex semantics. With the 5-species classifier its
+    # outputs were nonsense. The inference path falls back to a flat
+    # PHP 8.50/kg rate (see app/infrastructure/fish/estimator.py:80) until a
+    # new price model is trained on the fish_sales collection.
 ]
 
 

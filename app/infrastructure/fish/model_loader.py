@@ -97,11 +97,19 @@ def _load_price_model():
         return _price_model
     settings = get_settings()
     if not settings.price_model_path:
-        logger.warning("Price model: PRICE_MODEL_PATH not configured in environment")
+        logger.info(
+            "Price model: PRICE_MODEL_PATH not configured — using flat "
+            "PHP 8.50/kg fallback (estimator.py:estimate_price)"
+        )
         return None
     try:
         if not os.path.exists(settings.price_model_path):
-            logger.error("Price model: file not found at: %s", settings.price_model_path)
+            logger.info(
+                "Price model: file not found at %s — using flat PHP 8.50/kg "
+                "fallback. This is expected until a model is trained on the "
+                "fish_sales collection.",
+                settings.price_model_path,
+            )
             return None
 
         _price_model = joblib.load(settings.price_model_path)
