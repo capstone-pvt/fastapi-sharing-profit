@@ -1,0 +1,294 @@
+{
+  "model_path": "app/models/classifier/best.pt",
+  "val_dir": "datasets\\fish_species\\val",
+  "total_images": 2324,
+  "top1_accuracy": 0.9583,
+  "top5_accuracy": 0.994,
+  "top1_correct": 2227,
+  "top5_correct": 2310,
+  "classes_evaluated": 40,
+  "use_tta": true,
+  "per_class": {
+    "Bangus": {
+      "total": 52,
+      "top1_correct": 49,
+      "top1_accuracy": 0.9423,
+      "top5_correct": 52,
+      "top5_accuracy": 1.0
+    },
+    "Big Head Carp": {
+      "total": 60,
+      "top1_correct": 59,
+      "top1_accuracy": 0.9833,
+      "top5_correct": 59,
+      "top5_accuracy": 0.9833
+    },
+    "Black Sea Sprat": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Black Spotted Barb": {
+      "total": 60,
+      "top1_correct": 55,
+      "top1_accuracy": 0.9167,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Catfish": {
+      "total": 60,
+      "top1_correct": 56,
+      "top1_accuracy": 0.9333,
+      "top5_correct": 59,
+      "top5_accuracy": 0.9833
+    },
+    "Climbing Perch": {
+      "total": 46,
+      "top1_correct": 45,
+      "top1_accuracy": 0.9783,
+      "top5_correct": 46,
+      "top5_accuracy": 1.0
+    },
+    "Fourfinger Threadfin": {
+      "total": 58,
+      "top1_correct": 56,
+      "top1_accuracy": 0.9655,
+      "top5_correct": 58,
+      "top5_accuracy": 1.0
+    },
+    "Freshwater Eel": {
+      "total": 60,
+      "top1_correct": 53,
+      "top1_accuracy": 0.8833,
+      "top5_correct": 59,
+      "top5_accuracy": 0.9833
+    },
+    "Gilt-Head Bream": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Glass Perchlet": {
+      "total": 60,
+      "top1_correct": 56,
+      "top1_accuracy": 0.9333,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Goby": {
+      "total": 60,
+      "top1_correct": 55,
+      "top1_accuracy": 0.9167,
+      "top5_correct": 57,
+      "top5_accuracy": 0.95
+    },
+    "Gold Fish": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Gourami": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Grass Carp": {
+      "total": 60,
+      "top1_correct": 58,
+      "top1_accuracy": 0.9667,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Green Spotted Puffer": {
+      "total": 34,
+      "top1_correct": 34,
+      "top1_accuracy": 1.0,
+      "top5_correct": 34,
+      "top5_accuracy": 1.0
+    },
+    "Hourse Mackerel": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Indian Carp": {
+      "total": 60,
+      "top1_correct": 58,
+      "top1_accuracy": 0.9667,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Indo-Pacific Tarpon": {
+      "total": 57,
+      "top1_correct": 54,
+      "top1_accuracy": 0.9474,
+      "top5_correct": 57,
+      "top5_accuracy": 1.0
+    },
+    "Jaguar Gapote": {
+      "total": 60,
+      "top1_correct": 59,
+      "top1_accuracy": 0.9833,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Janitor Fish": {
+      "total": 60,
+      "top1_correct": 56,
+      "top1_accuracy": 0.9333,
+      "top5_correct": 59,
+      "top5_accuracy": 0.9833
+    },
+    "Knifefish": {
+      "total": 60,
+      "top1_correct": 54,
+      "top1_accuracy": 0.9,
+      "top5_correct": 59,
+      "top5_accuracy": 0.9833
+    },
+    "Long-Snouted Pipefish": {
+      "total": 60,
+      "top1_correct": 57,
+      "top1_accuracy": 0.95,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Mosquito Fish": {
+      "total": 60,
+      "top1_correct": 57,
+      "top1_accuracy": 0.95,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Mudfish": {
+      "total": 57,
+      "top1_correct": 50,
+      "top1_accuracy": 0.8772,
+      "top5_correct": 55,
+      "top5_accuracy": 0.9649
+    },
+    "Mullet": {
+      "total": 54,
+      "top1_correct": 53,
+      "top1_accuracy": 0.9815,
+      "top5_correct": 54,
+      "top5_accuracy": 1.0
+    },
+    "Pangasius": {
+      "total": 59,
+      "top1_correct": 57,
+      "top1_accuracy": 0.9661,
+      "top5_correct": 59,
+      "top5_accuracy": 1.0
+    },
+    "Perch": {
+      "total": 60,
+      "top1_correct": 56,
+      "top1_accuracy": 0.9333,
+      "top5_correct": 59,
+      "top5_accuracy": 0.9833
+    },
+    "Red Mullet": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Red Sea Bream": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Scat Fish": {
+      "total": 47,
+      "top1_correct": 46,
+      "top1_accuracy": 0.9787,
+      "top5_correct": 47,
+      "top5_accuracy": 1.0
+    },
+    "Sea Bass": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Shrimp": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Silver Barb": {
+      "total": 60,
+      "top1_correct": 58,
+      "top1_accuracy": 0.9667,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Silver Carp": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Silver Perch": {
+      "total": 60,
+      "top1_correct": 54,
+      "top1_accuracy": 0.9,
+      "top5_correct": 57,
+      "top5_accuracy": 0.95
+    },
+    "Snakehead": {
+      "total": 60,
+      "top1_correct": 51,
+      "top1_accuracy": 0.85,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Striped Red Mullet": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Tenpounder": {
+      "total": 60,
+      "top1_correct": 54,
+      "top1_accuracy": 0.9,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Tilapia": {
+      "total": 60,
+      "top1_correct": 57,
+      "top1_accuracy": 0.95,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    },
+    "Trout": {
+      "total": 60,
+      "top1_correct": 60,
+      "top1_accuracy": 1.0,
+      "top5_correct": 60,
+      "top5_accuracy": 1.0
+    }
+  },
+  "evaluated_at": "2026-03-19T08:41:12.893402"
+}

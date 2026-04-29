@@ -1,0 +1,2262 @@
+[
+  {
+    "_id": "69da851329ac74d9bc52b990",
+    "name": "Bangus",
+    "classIndex": 0,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Milkfish",
+    "family": "Chanidae",
+    "genus": "Chanos",
+    "habitat": "brackish",
+    "isActive": true,
+    "localName": "Bangus",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pricePerKg": [
+      140,
+      220
+    ],
+    "scientificName": "Chanos chanos",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      3.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b991",
+    "name": "Big Head Carp",
+    "classIndex": 1,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Big Head Carp",
+    "family": "Cyprinidae",
+    "genus": "Hypophthalmichthys",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Big Head Carp",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      150
+    ],
+    "scientificName": "Hypophthalmichthys nobilis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      1.0,
+      15.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b992",
+    "name": "Black Sea Sprat",
+    "classIndex": 2,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Black Sea Sprat",
+    "family": "Clupeidae",
+    "genus": "Clupeonella",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Black Sea Sprat",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      60,
+      120
+    ],
+    "scientificName": "Clupeonella cultriventris",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.01,
+      0.05
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b993",
+    "name": "Black Spotted Barb",
+    "classIndex": 3,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Black Spotted Barb",
+    "family": "Cyprinidae",
+    "genus": "Dawkinsia",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Black Spotted Barb",
+    "peakMonths": [
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pricePerKg": [
+      80,
+      140
+    ],
+    "scientificName": "Dawkinsia filamentosa",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.3
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b994",
+    "name": "Catfish",
+    "classIndex": 4,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Catfish",
+    "family": "Clariidae",
+    "genus": "Clarias",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Hito",
+    "peakMonths": [
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "pricePerKg": [
+      120,
+      200
+    ],
+    "scientificName": "Clarias batrachus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.2,
+      2.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b995",
+    "name": "Climbing Perch",
+    "classIndex": 5,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Climbing Perch",
+    "family": "Anabantidae",
+    "genus": "Anabas",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Martiniko",
+    "peakMonths": [
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pricePerKg": [
+      100,
+      180
+    ],
+    "scientificName": "Anabas testudineus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.3
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b996",
+    "name": "Fourfinger Threadfin",
+    "classIndex": 6,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Fourfinger Threadfin",
+    "family": "Polynemidae",
+    "genus": "Eleutheronema",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Mamali",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      9,
+      10,
+      11
+    ],
+    "pricePerKg": [
+      180,
+      300
+    ],
+    "scientificName": "Eleutheronema tetradactylum",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.5,
+      5.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b997",
+    "name": "Freshwater Eel",
+    "classIndex": 7,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Freshwater Eel",
+    "family": "Anguillidae",
+    "genus": "Anguilla",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Igat",
+    "peakMonths": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "pricePerKg": [
+      200,
+      400
+    ],
+    "scientificName": "Anguilla marmorata",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      3.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b998",
+    "name": "Gilt-Head Bream",
+    "classIndex": 8,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Gilt-Head Bream",
+    "family": "Sparidae",
+    "genus": "Sparus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Gilt-Head Bream",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      250,
+      450
+    ],
+    "scientificName": "Sparus aurata",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      2.5
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b999",
+    "name": "Glass Perchlet",
+    "classIndex": 9,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Glass Perchlet",
+    "family": "Ambassidae",
+    "genus": "Ambassis",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Glass Perchlet",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      60,
+      100
+    ],
+    "scientificName": "Ambassis urotaenia",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.005,
+      0.03
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b99a",
+    "name": "Goby",
+    "classIndex": 10,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Goby",
+    "family": "Gobiidae",
+    "genus": "Glossogobius",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Biya",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      100,
+      200
+    ],
+    "scientificName": "Glossogobius giuris",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.01,
+      0.1
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b99b",
+    "name": "Gold Fish",
+    "classIndex": 11,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Gold Fish",
+    "family": "Cyprinidae",
+    "genus": "Carassius",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Gold Fish",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      50,
+      100
+    ],
+    "scientificName": "Carassius auratus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.01,
+      0.3
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b99c",
+    "name": "Gourami",
+    "classIndex": 12,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Gourami",
+    "family": "Osphronemidae",
+    "genus": "Osphronemus",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Gurami",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pricePerKg": [
+      150,
+      280
+    ],
+    "scientificName": "Osphronemus goramy",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      4.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b99d",
+    "name": "Grass Carp",
+    "classIndex": 13,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Grass Carp",
+    "family": "Cyprinidae",
+    "genus": "Ctenopharyngodon",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Grass Carp",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      160
+    ],
+    "scientificName": "Ctenopharyngodon idella",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      1.0,
+      15.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b99e",
+    "name": "Green Spotted Puffer",
+    "classIndex": 14,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Green Spotted Puffer",
+    "family": "Tetraodontidae",
+    "genus": "Tetraodon",
+    "habitat": "brackish",
+    "isActive": true,
+    "localName": "Butete",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      40,
+      80
+    ],
+    "scientificName": "Tetraodon nigroviridis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.01,
+      0.1
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b99f",
+    "name": "Galunggong",
+    "classIndex": 15,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Roundscad",
+    "family": "Carangidae",
+    "genus": "Decapterus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Galunggong",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3,
+      4
+    ],
+    "pricePerKg": [
+      80,
+      160
+    ],
+    "scientificName": "Decapterus macrosoma",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.3
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a0",
+    "name": "Indian Carp",
+    "classIndex": 16,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Indian Carp",
+    "family": "Cyprinidae",
+    "genus": "Catla",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Indian Carp",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      150
+    ],
+    "scientificName": "Catla catla",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      1.0,
+      10.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a1",
+    "name": "Indo-Pacific Tarpon",
+    "classIndex": 17,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Indo-Pacific Tarpon",
+    "family": "Megalopidae",
+    "genus": "Megalops",
+    "habitat": "brackish",
+    "isActive": true,
+    "localName": "Buan-buan",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "pricePerKg": [
+      100,
+      180
+    ],
+    "scientificName": "Megalops cyprinoides",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.5,
+      5.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a2",
+    "name": "Jaguar Gapote",
+    "classIndex": 18,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Jaguar Gapote",
+    "family": "Cichlidae",
+    "genus": "Parachromis",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Jaguar Gapote",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      100,
+      180
+    ],
+    "scientificName": "Parachromis managuensis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      2.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a3",
+    "name": "Janitor Fish",
+    "classIndex": 19,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Janitor Fish",
+    "family": "Loricariidae",
+    "genus": "Pterygoplichthys",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Janitor Fish",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      20,
+      50
+    ],
+    "scientificName": "Pterygoplichthys disjunctivus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.1,
+      1.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a4",
+    "name": "Knifefish",
+    "classIndex": 20,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Knifefish",
+    "family": "Notopteridae",
+    "genus": "Chitala",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Knifefish",
+    "peakMonths": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "pricePerKg": [
+      120,
+      220
+    ],
+    "scientificName": "Chitala ornata",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.5,
+      5.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a5",
+    "name": "Long-Snouted Pipefish",
+    "classIndex": 21,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Long-Snouted Pipefish",
+    "family": "Syngnathidae",
+    "genus": "Syngnathus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Long-Snouted Pipefish",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      30,
+      60
+    ],
+    "scientificName": "Syngnathus temminckii",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.001,
+      0.01
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a6",
+    "name": "Mosquito Fish",
+    "classIndex": 22,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Mosquito Fish",
+    "family": "Poeciliidae",
+    "genus": "Gambusia",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Mosquito Fish",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      20,
+      40
+    ],
+    "scientificName": "Gambusia affinis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.001,
+      0.005
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a7",
+    "name": "Mudfish",
+    "classIndex": 23,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Mudfish",
+    "family": "Channidae",
+    "genus": "Channa",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Dalag",
+    "peakMonths": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "pricePerKg": [
+      180,
+      320
+    ],
+    "scientificName": "Channa striata",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      3.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a8",
+    "name": "Mullet",
+    "classIndex": 24,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Mullet",
+    "family": "Mugilidae",
+    "genus": "Mugil",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Banak",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      140,
+      250
+    ],
+    "scientificName": "Mugil cephalus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.2,
+      2.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9a9",
+    "name": "Pangasius",
+    "classIndex": 25,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Pangasius",
+    "family": "Pangasiidae",
+    "genus": "Pangasianodon",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Pangasius",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      150
+    ],
+    "scientificName": "Pangasianodon hypophthalmus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.5,
+      10.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9aa",
+    "name": "Perch",
+    "classIndex": 26,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Perch",
+    "family": "Percidae",
+    "genus": "Perca",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Perch",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      9,
+      10,
+      11
+    ],
+    "pricePerKg": [
+      150,
+      280
+    ],
+    "scientificName": "Perca fluviatilis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.1,
+      1.5
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9ab",
+    "name": "Red Mullet",
+    "classIndex": 27,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Red Mullet",
+    "family": "Mullidae",
+    "genus": "Mullus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Red Mullet",
+    "peakMonths": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "pricePerKg": [
+      200,
+      350
+    ],
+    "scientificName": "Mullus barbatus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.3
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9ac",
+    "name": "Red Sea Bream",
+    "classIndex": 28,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Red Sea Bream",
+    "family": "Sparidae",
+    "genus": "Pagrus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Red Sea Bream",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      280,
+      500
+    ],
+    "scientificName": "Pagrus major",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      4.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9ad",
+    "name": "Scat Fish",
+    "classIndex": 29,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Scat Fish",
+    "family": "Scatophagidae",
+    "genus": "Scatophagus",
+    "habitat": "brackish",
+    "isActive": true,
+    "localName": "Kitang",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pricePerKg": [
+      100,
+      180
+    ],
+    "scientificName": "Scatophagus argus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.1,
+      0.5
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9ae",
+    "name": "Sea Bass",
+    "classIndex": 30,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Sea Bass",
+    "family": "Latidae",
+    "genus": "Lates",
+    "habitat": "brackish",
+    "isActive": true,
+    "localName": "Apahap",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pricePerKg": [
+      280,
+      500
+    ],
+    "scientificName": "Lates calcarifer",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.5,
+      10.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9af",
+    "name": "Shrimp",
+    "classIndex": 31,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Shrimp",
+    "family": "Penaeidae",
+    "genus": "Penaeus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Hipon / Sugpo",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3,
+      4
+    ],
+    "pricePerKg": [
+      300,
+      600
+    ],
+    "scientificName": "Penaeus monodon",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.01,
+      0.15
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b0",
+    "name": "Silver Barb",
+    "classIndex": 32,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Silver Barb",
+    "family": "Cyprinidae",
+    "genus": "Barbonymus",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Silver Barb",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      140
+    ],
+    "scientificName": "Barbonymus gonionotus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.1,
+      1.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b1",
+    "name": "Silver Carp",
+    "classIndex": 33,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Silver Carp",
+    "family": "Cyprinidae",
+    "genus": "Hypophthalmichthys",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Silver Carp",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      70,
+      130
+    ],
+    "scientificName": "Hypophthalmichthys molitrix",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      1.0,
+      15.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b2",
+    "name": "Silver Perch",
+    "classIndex": 34,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Silver Perch",
+    "family": "Terapontidae",
+    "genus": "Leiopotherapon",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Ayungin",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      250,
+      500
+    ],
+    "scientificName": "Leiopotherapon plumbeus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.02,
+      0.15
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b3",
+    "name": "Snakehead",
+    "classIndex": 35,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Snakehead",
+    "family": "Channidae",
+    "genus": "Channa",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Dalag",
+    "peakMonths": [
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "pricePerKg": [
+      180,
+      320
+    ],
+    "scientificName": "Channa striata",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      3.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b4",
+    "name": "Striped Red Mullet",
+    "classIndex": 36,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Striped Red Mullet",
+    "family": "Mullidae",
+    "genus": "Mullus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Striped Red Mullet",
+    "peakMonths": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "pricePerKg": [
+      200,
+      380
+    ],
+    "scientificName": "Mullus surmuletus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.4
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b5",
+    "name": "Tenpounder",
+    "classIndex": 37,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Tenpounder",
+    "family": "Elopidae",
+    "genus": "Elops",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Bidbid",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "pricePerKg": [
+      100,
+      180
+    ],
+    "scientificName": "Elops machnata",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      3.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b6",
+    "name": "Tilapia",
+    "classIndex": 38,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Tilapia",
+    "family": "Cichlidae",
+    "genus": "Oreochromis",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Tilapia",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      100,
+      180
+    ],
+    "scientificName": "Oreochromis niloticus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.2,
+      1.5
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b7",
+    "name": "Trout",
+    "classIndex": 39,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Trout",
+    "family": "Salmonidae",
+    "genus": "Oncorhynchus",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Trout",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      350,
+      600
+    ],
+    "scientificName": "Oncorhynchus mykiss",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      5.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b8",
+    "name": "Yellowfin Tuna",
+    "classIndex": 40,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Yellowfin Tuna",
+    "family": "Scombridae",
+    "genus": "Thunnus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Tambakol/Bariles/Bangkulis",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      250,
+      500
+    ],
+    "scientificName": "Thunnus albacares",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      1.0,
+      80.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9b9",
+    "name": "Bullet Tuna",
+    "classIndex": 67,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Bullet Tuna",
+    "family": "Scombridae",
+    "genus": "Auxis",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Tulingan/Tangi/Pirit",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      150
+    ],
+    "scientificName": "Auxis rochei",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.2,
+      2.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9ba",
+    "name": "Skipjack Tuna",
+    "classIndex": 41,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Skipjack Tuna",
+    "family": "Scombridae",
+    "genus": "Katsuwonus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Gulyasan",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      180
+    ],
+    "scientificName": "Katsuwonus pelamis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      1.5,
+      15.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9bb",
+    "name": "Bigeye Tuna",
+    "classIndex": 42,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Bigeye Tuna",
+    "family": "Scombridae",
+    "genus": "Thunnus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Tambakol",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      200,
+      450
+    ],
+    "scientificName": "Thunnus obesus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      2.0,
+      100.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9bc",
+    "name": "Eastern Little Tuna",
+    "classIndex": 43,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Eastern Little Tuna",
+    "family": "Scombridae",
+    "genus": "Euthynnus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Tulingan",
+    "peakMonths": [
+      2,
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      100,
+      200
+    ],
+    "scientificName": "Euthynnus affinis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.5,
+      5.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9bd",
+    "name": "Frigate Tuna",
+    "classIndex": 44,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Frigate Tuna",
+    "family": "Scombridae",
+    "genus": "Auxis",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Tulingan Puti",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      160
+    ],
+    "scientificName": "Auxis thazard",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      3.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9be",
+    "name": "Sardine",
+    "classIndex": 45,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Bali Sardinella",
+    "family": "Clupeidae",
+    "genus": "Sardinella",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Tamban",
+    "peakMonths": [
+      9,
+      10,
+      11,
+      12,
+      1,
+      2
+    ],
+    "pricePerKg": [
+      30,
+      80
+    ],
+    "scientificName": "Sardinella lemuru",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.02,
+      0.1
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9bf",
+    "name": "Fimbriated Sardine",
+    "classIndex": 46,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Fimbriated Sardine",
+    "family": "Clupeidae",
+    "genus": "Sardinella",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Tunsoy",
+    "peakMonths": [
+      9,
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      30,
+      70
+    ],
+    "scientificName": "Sardinella fimbriata",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.01,
+      0.08
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c0",
+    "name": "Tawilis",
+    "classIndex": 47,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Freshwater Sardine",
+    "family": "Clupeidae",
+    "genus": "Sardinella",
+    "habitat": "freshwater",
+    "isActive": true,
+    "localName": "Tawilis",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      100,
+      250
+    ],
+    "scientificName": "Sardinella tawilis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.01,
+      0.06
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c1",
+    "name": "Round Herring",
+    "classIndex": 48,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Round Herring",
+    "family": "Dussumieriidae",
+    "genus": "Etrumeus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Turay",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      40,
+      90
+    ],
+    "scientificName": "Etrumeus teres",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.02,
+      0.1
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c2",
+    "name": "Indian Mackerel",
+    "classIndex": 49,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Indian Mackerel",
+    "family": "Scombridae",
+    "genus": "Rastrelliger",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Alumahan",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3,
+      4
+    ],
+    "pricePerKg": [
+      100,
+      180
+    ],
+    "scientificName": "Rastrelliger kanagurta",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.1,
+      0.4
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c3",
+    "name": "Indo-Pacific Mackerel",
+    "classIndex": 50,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Indo-Pacific Mackerel",
+    "family": "Scombridae",
+    "genus": "Rastrelliger",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Hasa-hasa",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      80,
+      160
+    ],
+    "scientificName": "Rastrelliger brachysoma",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.3
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c4",
+    "name": "Spanish Mackerel",
+    "classIndex": 51,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Spanish Mackerel",
+    "family": "Scombridae",
+    "genus": "Scomberomorus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Tangigue",
+    "peakMonths": [
+      11,
+      12,
+      1,
+      2,
+      3,
+      4
+    ],
+    "pricePerKg": [
+      300,
+      550
+    ],
+    "scientificName": "Scomberomorus commerson",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      1.0,
+      20.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c5",
+    "name": "Big-eyed Scad",
+    "classIndex": 52,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Big-eyed Scad",
+    "family": "Carangidae",
+    "genus": "Selar",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Matang-baka",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "pricePerKg": [
+      90,
+      170
+    ],
+    "scientificName": "Selar crumenophthalmus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.3
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c6",
+    "name": "Anchovy",
+    "classIndex": 53,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Anchovy",
+    "family": "Engraulidae",
+    "genus": "Stolephorus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Dilis",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3,
+      4
+    ],
+    "pricePerKg": [
+      60,
+      150
+    ],
+    "scientificName": "Stolephorus commersonnii",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.002,
+      0.02
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c7",
+    "name": "Squid",
+    "classIndex": 54,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Squid",
+    "family": "Loliginidae",
+    "genus": "Loligo",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Pusit",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      150,
+      350
+    ],
+    "scientificName": "Loligo chinensis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      1.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c8",
+    "name": "Threadfin Bream",
+    "classIndex": 55,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Threadfin Bream",
+    "family": "Nemipteridae",
+    "genus": "Nemipterus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Bisugo",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "pricePerKg": [
+      150,
+      280
+    ],
+    "scientificName": "Nemipterus japonicus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.4
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9c9",
+    "name": "Crevalle Jack",
+    "classIndex": 56,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Crevalle Jack",
+    "family": "Carangidae",
+    "genus": "Caranx",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Talakitok",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      200
+    ],
+    "scientificName": "Caranx ignobilis",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.3,
+      15.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9ca",
+    "name": "Slipmouth",
+    "classIndex": 57,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Slipmouth",
+    "family": "Leiognathidae",
+    "genus": "Leiognathus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Sapsap",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      60,
+      140
+    ],
+    "scientificName": "Leiognathus equulus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.01,
+      0.1
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9cb",
+    "name": "Blue Marlin",
+    "classIndex": 58,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Blue Marlin",
+    "family": "Istiophoridae",
+    "genus": "Makaira",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Malasugi",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      10,
+      11
+    ],
+    "pricePerKg": [
+      200,
+      400
+    ],
+    "scientificName": "Makaira nigricans",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      10.0,
+      200.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9cc",
+    "name": "Grouper",
+    "classIndex": 59,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Grouper",
+    "family": "Serranidae",
+    "genus": "Epinephelus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Lapu-lapu",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "pricePerKg": [
+      350,
+      700
+    ],
+    "scientificName": "Epinephelus coioides",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.5,
+      15.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9cd",
+    "name": "Rabbitfish",
+    "classIndex": 60,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Rabbitfish",
+    "family": "Siganidae",
+    "genus": "Siganus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Samaral / Danggit",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "pricePerKg": [
+      200,
+      450
+    ],
+    "scientificName": "Siganus guttatus",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.4
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9ce",
+    "name": "Flying Fish",
+    "classIndex": 61,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Flying Fish",
+    "family": "Exocoetidae",
+    "genus": "Cheilopogon",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Bangsi / Iliw",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "pricePerKg": [
+      80,
+      160
+    ],
+    "scientificName": "Cheilopogon spp.",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.3
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9cf",
+    "name": "Barracuda",
+    "classIndex": 62,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Barracuda",
+    "family": "Sphyraenidae",
+    "genus": "Sphyraena",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Barakuda / Panghalwan",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      150,
+      300
+    ],
+    "scientificName": "Sphyraena barracuda",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.5,
+      20.0
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9d0",
+    "name": "Moonfish",
+    "classIndex": 63,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Moonfish",
+    "family": "Menidae",
+    "genus": "Mene",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Chabita / Salay-salay",
+    "peakMonths": [
+      10,
+      11,
+      12,
+      1,
+      2,
+      3
+    ],
+    "pricePerKg": [
+      80,
+      160
+    ],
+    "scientificName": "Mene maculata",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.05,
+      0.3
+    ]
+  },
+  {
+    "_id": "69da851329ac74d9bc52b9d1",
+    "name": "Milkfish Fry",
+    "classIndex": 64,
+    "createdAt": "2026-04-11T17:29:55.474000",
+    "englishName": "Milkfish Fry",
+    "family": "Chanidae",
+    "genus": "Chanos",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Bangus Fry / Sabiid",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "pricePerKg": [
+      500,
+      2000
+    ],
+    "scientificName": "Chanos chanos",
+    "updatedAt": "2026-04-29T08:31:36.158000",
+    "weightRange": [
+      0.001,
+      0.01
+    ]
+  },
+  {
+    "_id": "69f1c44c8c81ce82fa4c8157",
+    "name": "Auxis rochei",
+    "classIndex": 0,
+    "createdAt": "2026-04-29T08:41:48.243000",
+    "englishName": "Bullet tuna",
+    "family": "Scombridae",
+    "genus": "Auxis",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Mangko/Pirit",
+    "peakMonths": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      150
+    ],
+    "scientificName": "Auxis rochei",
+    "updatedAt": "2026-04-29T09:26:39.044000",
+    "weightRange": [
+      0.05,
+      2.0
+    ]
+  },
+  {
+    "_id": "69f1c44c8c81ce82fa4c8158",
+    "name": "Elagatis bipinnulata",
+    "classIndex": 1,
+    "createdAt": "2026-04-29T08:41:48.243000",
+    "englishName": "Rainbow runner",
+    "family": "Carangidae",
+    "genus": "Elagatis",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Salindatu/Salmon",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      6,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      150,
+      300
+    ],
+    "scientificName": "Elagatis bipinnulata",
+    "updatedAt": "2026-04-29T09:26:39.044000",
+    "weightRange": [
+      0.5,
+      15.0
+    ]
+  },
+  {
+    "_id": "69f1c44c8c81ce82fa4c8159",
+    "name": "Euthynnus affinis",
+    "classIndex": 2,
+    "createdAt": "2026-04-29T08:41:48.243000",
+    "englishName": "Eastern little tuna",
+    "family": "Scombridae",
+    "genus": "Euthynnus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Patikan/Tulingan",
+    "peakMonths": [
+      2,
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      100,
+      200
+    ],
+    "scientificName": "Euthynnus affinis",
+    "updatedAt": "2026-04-29T09:26:39.044000",
+    "weightRange": [
+      0.5,
+      5.0
+    ]
+  },
+  {
+    "_id": "69f1c44c8c81ce82fa4c815a",
+    "name": "Katsuwonus pelamis",
+    "classIndex": 3,
+    "createdAt": "2026-04-29T08:41:48.243000",
+    "englishName": "Skipjack tuna",
+    "family": "Scombridae",
+    "genus": "Katsuwonus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Sambagon/Tulingan/Bulis",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      80,
+      180
+    ],
+    "scientificName": "Katsuwonus pelamis",
+    "updatedAt": "2026-04-29T09:26:39.044000",
+    "weightRange": [
+      0.75,
+      15.0
+    ]
+  },
+  {
+    "_id": "69f1c44c8c81ce82fa4c815b",
+    "name": "Thunnus albacares",
+    "classIndex": 4,
+    "createdAt": "2026-04-29T08:41:48.243000",
+    "englishName": "Yellowfin tuna",
+    "family": "Scombridae",
+    "genus": "Thunnus",
+    "habitat": "marine",
+    "isActive": true,
+    "localName": "Barilis/Bariles/Karaw",
+    "peakMonths": [
+      3,
+      4,
+      5,
+      10,
+      11,
+      12
+    ],
+    "pricePerKg": [
+      250,
+      500
+    ],
+    "scientificName": "Thunnus albacares",
+    "updatedAt": "2026-04-29T09:26:39.044000",
+    "weightRange": [
+      1.0,
+      80.0
+    ]
+  }
+]
