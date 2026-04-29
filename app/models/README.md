@@ -64,30 +64,55 @@ joblib.dump(model, 'models/weight/weight_model.joblib')
 
 ---
 
-### 4. Price Prediction Model
-**Location:** `price/price_model.joblib`
-**Type:** Scikit-learn regression model
-**Purpose:** Predicts fish price based on species and weight
-**Format:** Joblib pickle file
+### 4. Price Prediction Model — currently disabled
 
-**Features Expected:**
-- species_index (int)
-- estimated_weight (float - kg)
+**Status:** **Not shipped.** The legacy `price/price_model.joblib` was removed
+with the 5-species classifier rollout because it was trained on incompatible
+`classIndex` semantics (old 65-species seed → indices 0..64; new classifier
+emits 0..4). Feeding the new indices to the old model produced nonsense
+prices, so the file was deleted.
 
-**Output:** Price per kg (float)
+**Current behavior:** `estimate_price()` falls back to a flat
+**PHP 8.50/kg** (`PRICE_FALLBACK_PER_KG` in
+[`app/infrastructure/fish/estimator.py`](../infrastructure/fish/estimator.py)).
+Predictable; obviously not market-accurate.
 
-**Training Example:**
+**To re-enable** with a real price model:
+
+1. Pull `species`, `weightKg`, `pricePerKg` rows from the `fish_sales`
+   collection (real broker entries — much better signal than the old
+   training data).
+2. Train a regression model with **exactly these features** in this order
+   (matched by [`estimate_price()`](../infrastructure/fish/estimator.py)):
+   - `species_index` (int — must match `fish_species.classIndex` of the
+     CURRENT seeder; today: 0..4)
+   - `weight_kg` (float)
+3. Save as `app/models/price/price_model.joblib`. The loader picks it up
+   automatically; no code change needed.
+
+**Training sketch:**
 ```python
-from sklearn.linear_model import LinearRegression
 import joblib
+import numpy as np
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 
-# Train on historical fish pricing data
-model = LinearRegression()
-model.fit(X_train, y_train_price_per_kg)
+# X_train: [[species_index, weight_kg], ...]
+# y_train: pricePerKg (PHP)
 
-# Save model
-joblib.dump(model, 'models/price/price_model.joblib')
+model = Pipeline([
+    ("scaler", StandardScaler()),
+    ("regressor", GradientBoostingRegressor(
+        n_estimators=200, max_depth=4, random_state=42,
+    )),
+])
+model.fit(X_train, y_train)
+joblib.dump(model, "app/models/price/price_model.joblib")
 ```
+
+When you put a file there, the loader logs `Price model: loaded from ...`
+and switches off the flat-rate fallback automatically.
 
 ---
 
@@ -98,7 +123,7 @@ If you have pre-trained models, place them in the respective directories:
 - `detector/best.pt`
 - `classifier/best.pt`
 - `weight/weight_model.joblib`
-- `price/price_model.joblib`
+- `price/price_model.joblib` (optional; fallback is flat PHP 8.50/kg)
 
 ### Option 2: Train Your Own Models
 1. Collect and label training data for fish species in your region

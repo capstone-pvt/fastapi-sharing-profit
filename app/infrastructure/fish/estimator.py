@@ -61,10 +61,18 @@ def estimate_weight(
     return float(width * height) * 0.000001
 
 
+PRICE_FALLBACK_PER_KG = 8.5
+
+
 def estimate_price(species_index: int, estimated_weight: float) -> float:
     """Estimate total price for a fish given species and estimated weight.
 
-    Falls back to a flat rate of 8.5 per kg when the model is unavailable.
+    Returns weight × PRICE_FALLBACK_PER_KG (PHP 8.50/kg) when no price model
+    is loaded. The legacy price model was retired with the 5-species classifier
+    rollout because it was trained on incompatible classIndex semantics — see
+    `app/seeders/fish_models.py` and `PROD_RESEED_RUNBOOK.md`. Train a new
+    model on the `fish_sales` collection (real broker entries) and drop the
+    file at `app/models/price/price_model.joblib` to re-enable.
     """
     price_model = _load_price_model()
     if price_model is not None:
@@ -77,4 +85,4 @@ def estimate_price(species_index: int, estimated_weight: float) -> float:
             return max(0.0, price_per_kg * estimated_weight)
         except Exception as exc:
             logger.exception("estimate_price: model.predict() failed: %s", exc)
-    return estimated_weight * 8.5
+    return estimated_weight * PRICE_FALLBACK_PER_KG
