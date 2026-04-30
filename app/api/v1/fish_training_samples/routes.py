@@ -20,6 +20,7 @@ from app.domain.fish_training_samples.services import (
     build_sample_doc,
     build_samples_query,
 )
+from app.infrastructure.fish.fish_check import is_fish_image
 from app.infrastructure.fish_training_samples import exporter as training_exporter
 from app.infrastructure.fish_training_samples.repository import (
     create_sample as repo_create_sample,
@@ -85,6 +86,16 @@ async def create_sample(
             status_code=400,
             detail="species and weightKg are required",
         )
+
+    # Server-side non-fish guard — keeps the training set clean even when the
+    # client skipped its own pre-flight check (Flutter broker correction
+    # panel + training_admin upload page didn't run /fish/analyze first).
+    image_bytes = await image.read()
+    looks_like_fish, reason = is_fish_image(image_bytes)
+    if not looks_like_fish:
+        raise HTTPException(status_code=422, detail=reason)
+    # Reset the file pointer so save_training_upload can re-read the bytes.
+    await image.seek(0)
 
     settings = get_settings()
     image_path = save_training_upload(
