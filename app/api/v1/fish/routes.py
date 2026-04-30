@@ -406,6 +406,96 @@ async def analyze_fish(
         raise HTTPException(status_code=500, detail="Image analysis failed")
 
 
+@router.post("/reestimate")
+async def reestimate(
+    payload: dict[str, Any],
+    user: dict[str, Any] = Depends(require_permissions("fish:analyze")),
+):
+    """Re-run weight + price estimation for a corrected species.
+
+    Used after the user fixes an AI-misclassified species so the displayed
+    weight and price reflect the right species index. Cheap — no image
+    inference; just looks up classIndex and runs the regression models.
+
+    Body
+        species : str       — required. Scientific name, common name, or
+                              one of the aliases in _SPECIES_ALIASES.
+        lengthCm, widthCm, heightCm, scaleReferenceCm : float? — optional.
+        bbox : { x, y, width, height }? — optional pixel-space bbox from
+                                           the original detector pass.
+
+    Returns { speciesIndex, estimatedWeightKg, predictedPricePhp,
+              sizeCategory, speciesInfo }.
+    """
+    species_input = (payload.get("species") or "").strip()
+    if not species_input:
+        raise HTTPException(status_code=400, detail="species is required")
+
+    # Normalize using the same aliases the analyze endpoint uses
+    species_map = await list_active_species_name_map()
+    normalize = _build_species_normalizer(species_map)
+    canonical = normalize(species_input)
+
+    species_index = await get_species_index(canonical)
+    if species_index is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Unknown species: '{species_input}'. Not in fish_species.",
+        )
+
+    species_info = await get_species_info(canonical) or {}
+
+    # Optional dimensions — default to None so estimator falls back gracefully
+    def _f(key):
+        v = payload.get(key)
+        if v is None:
+            return None
+        try:
+            return float(v)
+        except (TypeError, ValueError):
+            return None
+
+    length_cm = _f("lengthCm")
+    width_cm = _f("widthCm")
+    height_cm = _f("heightCm")
+    scale_ref = _f("scaleReferenceCm")
+
+    bbox = payload.get("bbox") or {}
+    bbox_w = _f_from_bbox(bbox, "width")
+    bbox_h = _f_from_bbox(bbox, "height")
+
+    weight_kg = estimate_weight(
+        species_index,
+        bbox_w or 0.0,
+        bbox_h or 0.0,
+        scale_ref,
+        length_cm,
+        width_cm,
+        height_cm,
+    )
+    price_php = estimate_price(species_index, weight_kg)
+    size = classify_size_by_weight(weight_kg)
+
+    return {
+        "species": canonical,
+        "speciesIndex": species_index,
+        "estimatedWeightKg": round(float(weight_kg), 3),
+        "predictedPricePhp": round(float(price_php), 2),
+        "sizeCategory": size,
+        "speciesInfo": species_info,
+    }
+
+
+def _f_from_bbox(bbox: dict, key: str):
+    v = (bbox or {}).get(key)
+    if v is None:
+        return None
+    try:
+        return float(v)
+    except (TypeError, ValueError):
+        return None
+
+
 @router.get("/diagnostic")
 async def diagnostic(user: dict[str, Any] = Depends(require_permissions("fish:diagnostic"))):
     """Diagnostic endpoint to verify model loading and species DB."""
