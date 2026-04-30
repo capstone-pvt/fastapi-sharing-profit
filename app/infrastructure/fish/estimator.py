@@ -20,8 +20,15 @@ def estimate_weight(
     scale_reference_cm: float | None,
     length_cm: float | None,
     width_cm: float | None,
+    height_cm: float | None = None,
 ) -> float:
     """Estimate fish weight in kg from bounding-box dimensions and species index.
+
+    `width` / `height` are pixel-space bbox dimensions (from the detector).
+    `length_cm` / `width_cm` / `height_cm` are real-world measurements when
+    available — height_cm is meaningful for tub-based scans where you know
+    the container's physical depth. Pass `None` (or 0) for per-fish scans
+    where height isn't known.
 
     Falls back to a naive pixel-area heuristic when the model is unavailable
     or the feature vector shape does not match the trained model.
@@ -33,11 +40,18 @@ def estimate_weight(
         sr = float(scale_reference_cm or 0)
         lc = float(length_cm or 0)
         wc = float(width_cm or 0)
+        hc = float(height_cm or 0)
 
-        # Base features (must match the trained model — currently 6 features)
-        base = [species_index, w, h, sr, lc, wc]
+        # Base features (must match the trained model — currently 7 base)
+        base = [species_index, w, h, sr, lc, wc, hc]
+        # Engineered (must match scripts/train_regression_models.py)
+        bbox_area = w * h
+        bbox_aspect = (w / max(h, 1.0)) if h > 0 else 1.0
+        volume_cm = lc * wc * hc
 
-        features = np.array([base], dtype=float)
+        features = np.array(
+            [[*base, bbox_area, bbox_aspect, volume_cm]], dtype=float
+        )
 
         # Validate feature count before predict to produce an actionable error
         # instead of a cryptic sklearn shape mismatch buried in a silent except.

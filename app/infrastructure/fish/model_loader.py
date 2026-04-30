@@ -16,7 +16,13 @@ logger = logging.getLogger(__name__)
 
 # Number of features the weight model must accept.
 # Changing this constant requires retraining and redeploying the model file.
-WEIGHT_MODEL_EXPECTED_FEATURES = 6
+# Layout: 7 base + 3 engineered = 10
+#   base:       [species_index, bbox_w, bbox_h, scale_ref_cm, length_cm,
+#                width_cm, height_cm]
+#   engineered: [bbox_area, bbox_aspect, volume_cm = length × width × height]
+# height_cm is the third tub dimension. For per-fish records (Individual sheet)
+# it is unknown and passed as 0 — the model treats it as missing-by-convention.
+WEIGHT_MODEL_EXPECTED_FEATURES = 10
 
 # Confidence threshold below which detector species is verified by classifier.
 # Configurable via ENSEMBLE_CONFIDENCE_THRESHOLD env var.

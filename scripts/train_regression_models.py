@@ -43,30 +43,33 @@ def _safe_float(val: str, default: float = 0.0) -> float:
 
 
 def _add_engineered_features(X: np.ndarray) -> np.ndarray:
-    """Add engineered features for better weight/price prediction.
+    """Add engineered features for better weight prediction.
 
-    Input columns: [species_index, bbox_width, bbox_height, scale_ref, length_cm, width_cm]
-    Added columns: [area, aspect_ratio, area_cm]
+    Input columns (7 base):
+      [species_index, bbox_width, bbox_height, scale_ref,
+       length_cm, width_cm, height_cm]
+    Added columns (3 engineered): [bbox_area, bbox_aspect, volume_cm]
+
+    Total: 10 features. Must match estimator.estimate_weight()
+    AND model_loader.WEIGHT_MODEL_EXPECTED_FEATURES.
+
+    height_cm is real-world container/fish height (cm). For Individual
+    scans where height is unknown, pass 0 — volume_cm becomes 0, so the
+    feature naturally degenerates without breaking the column count.
     """
-    species_idx = X[:, 0:1]
     bbox_w = X[:, 1]
     bbox_h = X[:, 2]
-    scale_ref = X[:, 3]
     length_cm = X[:, 4]
     width_cm = X[:, 5]
+    height_cm = X[:, 6]
 
-    # Pixel area (proxy for fish size)
-    area = (bbox_w * bbox_h).reshape(-1, 1)
-
-    # Aspect ratio (distinguishes long thin fish from round ones)
-    aspect = np.where(
+    bbox_area = (bbox_w * bbox_h).reshape(-1, 1)
+    bbox_aspect = np.where(
         bbox_h > 0, bbox_w / np.maximum(bbox_h, 1.0), 1.0
     ).reshape(-1, 1)
+    volume_cm = (length_cm * width_cm * height_cm).reshape(-1, 1)
 
-    # Area in cm^2 (when scale reference is available)
-    area_cm = (length_cm * width_cm).reshape(-1, 1)
-
-    return np.hstack([X, area, aspect, area_cm])
+    return np.hstack([X, bbox_area, bbox_aspect, volume_cm])
 
 
 def train_weight_model(export_root: Path, output_path: Path) -> None:
@@ -91,6 +94,7 @@ def train_weight_model(export_root: Path, output_path: Path) -> None:
                 _safe_float(row.get("scaleReferenceCm", "")),
                 _safe_float(row.get("lengthCm", "")),
                 _safe_float(row.get("widthCm", "")),
+                _safe_float(row.get("heightCm", "")),
             ]
             X_rows.append(features)
             y_rows.append(weight)
@@ -104,7 +108,7 @@ def train_weight_model(export_root: Path, output_path: Path) -> None:
 
     # Add engineered features
     X = _add_engineered_features(X)
-    print(f"Weight model: {len(X)} samples, {X.shape[1]} features (6 base + 3 engineered)")
+    print(f"Weight model: {len(X)} samples, {X.shape[1]} features (7 base + 3 engineered)")
 
     # Select best model via cross-validation
     if len(X) >= 10:
