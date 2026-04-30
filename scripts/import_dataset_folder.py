@@ -175,7 +175,8 @@ def _build_classifier_doc(image_path: Path, species: dict, now) -> dict:
         "englishName": species.get("englishName"),
         "localName": species.get("localName"),
         "weightKg": None, "pricePerKg": None,
-        "lengthCm": None, "widthCm": None, "scaleReferenceCm": None,
+        "lengthCm": None, "widthCm": None, "heightCm": None,
+        "scaleReferenceCm": None,
         "notes": "Imported from dataset folder",
         "bbox": None, "capturedAt": None,
         "createdAt": now, "updatedAt": now,
@@ -186,7 +187,7 @@ def _build_classifier_doc(image_path: Path, species: dict, now) -> dict:
 
 
 def _build_weight_doc(
-    image_path: Path, species: dict, weightKg, lengthCm, widthCm,
+    image_path: Path, species: dict, weightKg, lengthCm, widthCm, heightCm,
     label: str, sheet: str, now,
 ) -> dict:
     return {
@@ -198,7 +199,8 @@ def _build_weight_doc(
         "englishName": species.get("englishName"),
         "localName": species.get("localName"),
         "weightKg": weightKg, "pricePerKg": None,
-        "lengthCm": lengthCm, "widthCm": widthCm, "scaleReferenceCm": None,
+        "lengthCm": lengthCm, "widthCm": widthCm, "heightCm": heightCm,
+        "scaleReferenceCm": None,
         "notes": f"Excel ground-truth ({sheet}): {label}",
         "bbox": None, "capturedAt": None,
         "createdAt": now, "updatedAt": now,
@@ -292,7 +294,7 @@ async def _seed_excel_weight_samples(
         docs.append(
             _build_weight_doc(
                 img, species, row["weightKg"],
-                row["lengthCm"], row["widthCm"],
+                row["lengthCm"], row["widthCm"], None,
                 row["label"], "Individual", now,
             )
         )
@@ -317,7 +319,7 @@ async def _seed_excel_weight_samples(
         docs.append(
             _build_weight_doc(
                 img, species, row["weightKg"],
-                row["lengthCm"], row["widthCm"],
+                row["lengthCm"], row["widthCm"], row.get("heightCm"),
                 row["label_no_coin"], "Tub", now,
             )
         )

@@ -66,6 +66,7 @@ def _read_excel():
                 "label": r[6],
                 "lengthCm": _safe_float(r[8]),
                 "widthCm": _safe_float(r[9]),
+                "heightCm": _safe_float(r[10]),
                 "weightKg": _safe_float(r[11]),
             }
         )
@@ -78,15 +79,16 @@ def _build_species_index(folders: list[Path]) -> dict[str, int]:
 
 
 def _add_engineered(X: np.ndarray) -> np.ndarray:
-    species_idx = X[:, 0:1]
+    """7 base + 3 engineered. Must match train_regression_models.py."""
     bbox_w = X[:, 1]
     bbox_h = X[:, 2]
     length_cm = X[:, 4]
     width_cm = X[:, 5]
-    area = (bbox_w * bbox_h).reshape(-1, 1)
-    aspect = np.where(bbox_h > 0, bbox_w / np.maximum(bbox_h, 1.0), 1.0).reshape(-1, 1)
-    area_cm = (length_cm * width_cm).reshape(-1, 1)
-    return np.hstack([X, area, aspect, area_cm])
+    height_cm = X[:, 6]
+    bbox_area = (bbox_w * bbox_h).reshape(-1, 1)
+    bbox_aspect = np.where(bbox_h > 0, bbox_w / np.maximum(bbox_h, 1.0), 1.0).reshape(-1, 1)
+    volume_cm = (length_cm * width_cm * height_cm).reshape(-1, 1)
+    return np.hstack([X, bbox_area, bbox_aspect, volume_cm])
 
 
 def _eval_weight(rows: list[dict], species_index: dict[str, int], model) -> dict:
@@ -101,7 +103,11 @@ def _eval_weight(rows: list[dict], species_index: dict[str, int], model) -> dict
     y_true = []
     for r in valid:
         idx = species_index.get(r["species"], -1)
-        X_rows.append([idx, 0.0, 0.0, 0.0, r["lengthCm"], r["widthCm"]])
+        X_rows.append([
+            idx, 0.0, 0.0, 0.0,
+            r["lengthCm"], r["widthCm"],
+            float(r.get("heightCm") or 0),
+        ])
         y_true.append(r["weightKg"])
 
     X = _add_engineered(np.array(X_rows, dtype=float))

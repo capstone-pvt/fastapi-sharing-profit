@@ -25,6 +25,7 @@ def build_sample_doc(
         "pricePerKg": payload.get("pricePerKg"),
         "lengthCm": payload.get("lengthCm"),
         "widthCm": payload.get("widthCm"),
+        "heightCm": payload.get("heightCm"),
         "scaleReferenceCm": payload.get("scaleReferenceCm"),
         "notes": payload.get("notes"),
         "bbox": None,

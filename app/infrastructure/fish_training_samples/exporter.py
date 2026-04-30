@@ -31,7 +31,7 @@ def export_dataset(
         class_index_by_name = {name: idx for idx, name in enumerate(unique_species)}
 
     weight_rows = [
-        "image,species,classIndex,weightKg,pricePerKg,lengthCm,widthCm,scaleReferenceCm,bboxX,bboxY,bboxWidth,bboxHeight"
+        "image,species,classIndex,weightKg,pricePerKg,lengthCm,widthCm,heightCm,scaleReferenceCm,bboxX,bboxY,bboxWidth,bboxHeight"
     ]
     price_rows = ["image,species,classIndex,weightKg,pricePerKg"]
     images_count = 0
@@ -92,6 +92,7 @@ def export_dataset(
                     str(sample.get("pricePerKg") or ""),
                     str(sample.get("lengthCm") or ""),
                     str(sample.get("widthCm") or ""),
+                    str(sample.get("heightCm") or ""),
                     str(sample.get("scaleReferenceCm") or ""),
                     bbox_x,
                     bbox_y,

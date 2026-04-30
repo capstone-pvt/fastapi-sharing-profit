@@ -88,18 +88,22 @@ def _read_rows() -> list[dict]:
 
 
 def _build_features(rows: list[dict], species_index: dict[str, int]) -> tuple[np.ndarray, np.ndarray]:
-    """Same feature contract as scripts/train_regression_models.py."""
+    """Same feature contract as scripts/train_regression_models.py.
+
+    7 base + 3 engineered = 10. height_cm is 0 for Individual scans.
+    """
     X_rows = []
     y = []
     for r in rows:
         idx = species_index[r["species"]]
         X_rows.append([
             float(idx),
-            0.0,                # bboxWidth (no detector data for Excel rows)
-            0.0,                # bboxHeight
-            0.0,                # scaleReferenceCm
+            0.0,                                          # bboxWidth
+            0.0,                                          # bboxHeight
+            0.0,                                          # scaleReferenceCm
             float(r["lengthCm"]),
             float(r["widthCm"]),
+            float(r.get("heightCm") or 0),                # heightCm (Tub only)
         ])
         y.append(float(r["weightKg"]))
     X = np.array(X_rows, dtype=float)
@@ -107,10 +111,11 @@ def _build_features(rows: list[dict], species_index: dict[str, int]) -> tuple[np
     bbox_h = X[:, 2]
     length_cm = X[:, 4]
     width_cm = X[:, 5]
-    area = (bbox_w * bbox_h).reshape(-1, 1)
-    aspect = np.where(bbox_h > 0, bbox_w / np.maximum(bbox_h, 1.0), 1.0).reshape(-1, 1)
-    area_cm = (length_cm * width_cm).reshape(-1, 1)
-    X_full = np.hstack([X, area, aspect, area_cm])
+    height_cm = X[:, 6]
+    bbox_area = (bbox_w * bbox_h).reshape(-1, 1)
+    bbox_aspect = np.where(bbox_h > 0, bbox_w / np.maximum(bbox_h, 1.0), 1.0).reshape(-1, 1)
+    volume_cm = (length_cm * width_cm * height_cm).reshape(-1, 1)
+    X_full = np.hstack([X, bbox_area, bbox_aspect, volume_cm])
     return X_full, np.array(y, dtype=float)
 
 
